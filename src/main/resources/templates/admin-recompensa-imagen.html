@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="es"
+      xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <meta name="_csrf"
+          th:content="${_csrf.token}">
+
+    <title>
+        Fotografía de recompensa | PERÚ RECICLA
+    </title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f4f8f5;
+            color: #20392b;
+        }
+
+        header {
+            background: white;
+            padding: 22px 5%;
+        }
+
+        .logo {
+            color: #105a38;
+            font-size: 23px;
+            font-weight: bold;
+            text-decoration: none;
+        }
+
+        main {
+            max-width: 700px;
+            margin: 40px auto 70px;
+            padding: 0 20px;
+        }
+
+        .tarjeta {
+            background: white;
+            border: 1px solid #deebe1;
+            border-radius: 17px;
+            padding: 30px;
+        }
+
+        h1 {
+            color: #105a38;
+            margin-top: 0;
+        }
+
+        .descripcion {
+            color: #60736a;
+            line-height: 1.6;
+        }
+
+        .producto {
+            background: #f1f8f3;
+            border-radius: 11px;
+            padding: 17px;
+            margin: 20px 0;
+        }
+
+        .producto strong {
+            display: block;
+            margin-bottom: 6px;
+        }
+
+        .producto span {
+            color: #60736a;
+            font-size: 13px;
+        }
+
+        .visualizacion {
+            width: 100%;
+            height: 280px;
+            background: #f1f8f3;
+            border: 2px dashed #b8d7c2;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            margin: 22px 0;
+        }
+
+        .visualizacion img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            padding: 12px;
+        }
+
+        .sin-imagen {
+            text-align: center;
+            font-size: 58px;
+            color: #60736a;
+        }
+
+        .sin-imagen small {
+            display: block;
+            font-size: 13px;
+            margin-top: 10px;
+        }
+
+        label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        input[type="file"] {
+            display: block;
+            width: 100%;
+            padding: 15px;
+            background: #f8faf8;
+            border: 1px solid #d1e2d5;
+            border-radius: 9px;
+            font: inherit;
+        }
+
+        .nota {
+            color: #60736a;
+            font-size: 12px;
+            line-height: 1.6;
+            margin-top: 12px;
+        }
+
+        .mensaje {
+            padding: 14px;
+            background: #fff0ed;
+            color: #93362d;
+            border-radius: 9px;
+            margin-bottom: 20px;
+        }
+
+        .acciones {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-top: 25px;
+        }
+
+        .boton {
+            background: #16804d;
+            color: white;
+            border: none;
+            padding: 13px 20px;
+            border-radius: 9px;
+            font-weight: bold;
+            font-size: 13px;
+            cursor: pointer;
+            text-decoration: none;
+        }
+
+        .boton:hover {
+            background: #105a38;
+        }
+
+        .secundario {
+            background: #e5f3e9;
+            color: #105a38;
+        }
+
+        @media (max-width: 600px) {
+            .tarjeta {
+                padding: 20px;
+            }
+
+            .visualizacion {
+                height: 220px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<header>
+    <a class="logo" th:href="@{/admin}">
+        ♻ PERÚ RECICLA
+    </a>
+</header>
+
+<main>
+
+    <div class="tarjeta">
+
+        <h1>📷 Fotografía de recompensa</h1>
+
+        <p class="descripcion">
+            Selecciona una fotografía de tu computadora
+            para mostrarla en el catálogo de productos.
+        </p>
+
+        <div class="producto">
+
+            <strong th:text="${recompensa.nombre}">
+                Nombre de la recompensa
+            </strong>
+
+            <span>
+                Producto ID:
+                <span th:text="${recompensa.id_recompensa}">
+                    1
+                </span>
+            </span>
+
+        </div>
+
+        <div class="mensaje"
+             th:if="${error != null}"
+             th:text="${error}"
+             role="alert">
+        </div>
+
+        <!-- FOTOGRAFIA ACTUAL O VISTA PREVIA -->
+
+        <div class="visualizacion">
+
+            <img
+                id="imagenActual"
+                th:if="${recompensa.url_imagen != null and !#strings.isEmpty(recompensa.url_imagen)}"
+                th:src="${#strings.startsWith(recompensa.url_imagen, 'https://') ? recompensa.url_imagen : (#strings.startsWith(recompensa.url_imagen, '/') ? recompensa.url_imagen : '/images/' + recompensa.url_imagen)}"
+                alt="Fotografía actual de la recompensa"
+                onerror="this.style.display='none';document.getElementById('sinImagen').style.display='block'">
+
+            <img
+                id="imagenNueva"
+                alt="Vista previa de la nueva fotografía"
+                style="display:none">
+
+            <div
+                id="sinImagen"
+                class="sin-imagen"
+                th:style="${recompensa.url_imagen != null and !#strings.isEmpty(recompensa.url_imagen)} ? 'display:none' : 'display:block'">
+
+                🎁
+
+                <small>Sin fotografía disponible</small>
+
+            </div>
+
+        </div>
+
+        <!-- FORMULARIO DE SUBIDA -->
+
+        <form
+            th:action="@{/admin/recompensas/imagen/{id}(id=${recompensa.id_recompensa})}"
+            method="post"
+            enctype="multipart/form-data">
+
+            <label for="imagen">
+                Seleccionar fotografía *
+            </label>
+
+            <input
+                type="file"
+                id="imagen"
+                name="imagen"
+                accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp"
+                required>
+
+            <p class="nota">
+                Formatos permitidos: JPG, PNG y WebP.
+                Tamaño máximo: 5 MB.
+                La fotografía se guardará al pulsar
+                «Guardar fotografía».
+            </p>
+
+            <div class="acciones">
+
+                <button class="boton" type="submit">
+                    Guardar fotografía
+                </button>
+
+                <a class="boton secundario"
+                   th:href="@{/admin/recompensas}">
+                    Cancelar y volver
+                </a>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</main>
+
+<script>
+    const entrada = document.getElementById("imagen");
+    const nueva = document.getElementById("imagenNueva");
+    const actual = document.getElementById("imagenActual");
+    const sinImagen = document.getElementById("sinImagen");
+
+    let direccionTemporal = null;
+
+    entrada.addEventListener("change", function () {
+
+        const archivo = entrada.files[0];
+
+        if (!archivo) {
+            return;
+        }
+
+        const tiposPermitidos = [
+            "image/jpeg",
+            "image/png",
+            "image/webp"
+        ];
+
+        if (!tiposPermitidos.includes(archivo.type)) {
+
+            alert("Selecciona una imagen JPG, PNG o WebP.");
+
+            entrada.value = "";
+
+            return;
+        }
+
+        if (archivo.size > 5 * 1024 * 1024) {
+
+            alert("La fotografía supera los 5 MB.");
+
+            entrada.value = "";
+
+            return;
+        }
+
+        if (direccionTemporal !== null) {
+            URL.revokeObjectURL(direccionTemporal);
+        }
+
+        direccionTemporal = URL.createObjectURL(archivo);
+
+        nueva.src = direccionTemporal;
+        nueva.style.display = "block";
+
+        if (actual) {
+            actual.style.display = "none";
+        }
+
+        sinImagen.style.display = "none";
+    });
+</script>
+
+</body>
+</html>

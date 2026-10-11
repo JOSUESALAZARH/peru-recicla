@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="es"
       xmlns:th="http://www.thymeleaf.org">
@@ -9,7 +8,12 @@
     <meta name="viewport"
           content="width=device-width, initial-scale=1.0">
 
-    <title>Confirmar canje | PERÚ RECICLA</title>
+    <meta name="_csrf"
+          th:content="${_csrf.token}">
+
+    <title>
+        Confirmar canje | PERÚ RECICLA
+    </title>
 
     <style>
         :root {
@@ -36,6 +40,8 @@
         a {
             text-decoration: none;
         }
+
+        /* ENCABEZADO */
 
         header {
             background: #fff;
@@ -80,6 +86,8 @@
             cursor: pointer;
         }
 
+        /* CONTENIDO */
+
         .contenedor {
             max-width: 1050px;
             margin: auto;
@@ -88,7 +96,9 @@
 
         .hero {
             background: linear-gradient(
-                130deg, #105a38, #16804d
+                130deg,
+                #105a38,
+                #16804d
             );
             color: #fff;
             padding: 38px;
@@ -113,9 +123,12 @@
             border-radius: 20px;
         }
 
+        /* TARJETAS */
+
         .grid {
             display: grid;
-            grid-template-columns: 1fr 1fr;
+            grid-template-columns:
+                repeat(2, minmax(0, 1fr));
             gap: 24px;
             margin-top: 27px;
         }
@@ -126,6 +139,7 @@
             border-radius: 17px;
             padding: 28px;
             box-shadow: 0 5px 20px rgba(0,0,0,.04);
+            min-width: 0;
         }
 
         .tarjeta h2 {
@@ -134,8 +148,12 @@
             font-size: 22px;
         }
 
+        /* IMAGEN UNIFORME */
+
         .imagen {
-            height: 185px;
+            width: 100%;
+            aspect-ratio: 4 / 3;
+            height: auto;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -152,9 +170,11 @@
             inset: 0;
             width: 100%;
             height: 100%;
-            object-fit: contain;
-            background: #fff;
+            object-fit: cover;
+            padding: 0;
         }
+
+        /* DATOS */
 
         .valor {
             font-weight: bold;
@@ -175,6 +195,12 @@
             border-bottom: 1px solid var(--borde);
         }
 
+        .fila strong {
+            text-align: right;
+        }
+
+        /* MENSAJES */
+
         .aviso {
             padding: 16px;
             border-radius: 11px;
@@ -193,6 +219,17 @@
             color: #88420f;
             border: 1px solid #e6c4a9;
         }
+
+        .ticket {
+            display: inline-block;
+            font-family: Consolas, monospace;
+            font-weight: bold;
+            font-size: 17px;
+            overflow-wrap: anywhere;
+            margin-top: 7px;
+        }
+
+        /* BOTONES */
 
         .boton {
             display: inline-block;
@@ -221,6 +258,27 @@
             background: var(--suave);
         }
 
+        .boton-confirmar {
+            width: 100%;
+        }
+
+        .boton-confirmar:disabled {
+            background: #8da89a;
+            cursor: wait;
+            opacity: 0.85;
+        }
+
+        .texto-proceso {
+            display: none;
+            margin-top: 12px;
+            color: var(--gris);
+            font-size: 13px;
+        }
+
+        .texto-proceso.visible {
+            display: block;
+        }
+
         .acciones {
             display: flex;
             gap: 12px;
@@ -239,6 +297,8 @@
             color: #c8dfd1;
             font-size: 13px;
         }
+
+        /* ADAPTACION A CELULARES */
 
         @media (max-width: 750px) {
             .barra {
@@ -265,256 +325,421 @@
                 flex-direction: column;
                 gap: 0;
             }
+
+            .fila strong {
+                text-align: left;
+            }
         }
     </style>
 </head>
 
 <body>
 
-<header>
-    <nav class="barra"
-         aria-label="Navegacion principal">
+    <!-- ENCABEZADO -->
 
-        <a class="logo" th:href="@{/}">
-            ♻ PERÚ RECICLA
-        </a>
+    <header>
 
-        <div class="menu">
-            <a th:href="@{/}">Inicio</a>
+        <nav class="barra"
+             aria-label="Navegacion principal">
 
-            <a th:href="@{/vecino}">Mi panel</a>
-
-            <a th:href="@{/vecino/recompensas}">
-                Recompensas
+            <a class="logo"
+               th:href="@{/}">
+                ♻ PERÚ RECICLA
             </a>
 
-            <a th:href="@{/vecino/canjes}">
-                Mis canjes
-            </a>
+            <div class="menu">
 
-            <form th:action="@{/logout}"
-                  method="post">
-
-                <button class="cerrar"
-                        type="submit">
-                    Cerrar sesión
-                </button>
-            </form>
-        </div>
-    </nav>
-</header>
-
-<main class="contenedor">
-
-    <!-- PRESENTACION -->
-
-    <section class="hero">
-
-        <span class="etiqueta">
-            PANEL DEL VECINO
-        </span>
-
-        <h1>🎁 Confirmar canje</h1>
-
-        <p>
-            Hola,
-            <strong th:text="${nombre}">
-                Vecino
-            </strong>.
-
-            Revisa la recompensa antes de confirmar.
-        </p>
-    </section>
-
-    <!-- MENSAJE DE EXITO -->
-
-    <div th:if="${mensajeExito != null}"
-         class="aviso exito"
-         role="status">
-
-        <strong th:text="${mensajeExito}">
-            Canje registrado correctamente.
-        </strong>
-
-        <p th:if="${codigoTicket != null}">
-            Tu código de ticket:
-
-            <strong th:text="${codigoTicket}">
-                TK-123
-            </strong>
-        </p>
-
-        <a th:href="@{/vecino/canjes}">
-            Ver mi historial de canjes →
-        </a>
-    </div>
-
-    <!-- MENSAJE DE ERROR -->
-
-    <div th:if="${mensajeError != null}"
-         class="aviso error"
-         role="alert"
-         th:text="${mensajeError}">
-
-        No se pudo completar el canje.
-    </div>
-
-    <!-- DETALLE Y CONFIRMACION -->
-
-    <div class="grid">
-
-        <article class="tarjeta">
-
-            <div class="imagen">
-
-                🎁
-
-                <img
-                    th:if="${recompensa.url_imagen != null and !#strings.isEmpty(recompensa.url_imagen)}"
-
-                    th:src="${#strings.startsWith(recompensa.url_imagen, 'http') ? recompensa.url_imagen : (#strings.startsWith(recompensa.url_imagen, '/') ? recompensa.url_imagen : '/images/' + recompensa.url_imagen)}"
-
-                    th:alt="${recompensa.nombre}"
-
-                    onerror="this.style.display='none'">
-            </div>
-
-            <h2 th:text="${recompensa.nombre}">
-                Recompensa
-            </h2>
-
-            <div class="fila">
-                <span>Costo</span>
-
-                <strong th:text="|${recompensa.costo_puntos} puntos|">
-                    0 puntos
-                </strong>
-            </div>
-
-            <div class="fila">
-                <span>Stock disponible</span>
-
-                <strong
-                    th:text="${recompensa.stock != null ? recompensa.stock : 0}">
-                    0
-                </strong>
-            </div>
-        </article>
-
-        <section class="tarjeta">
-
-            <h2>Resumen de tu canje</h2>
-
-            <p class="detalle">
-                Puntos actuales en tu cuenta:
-            </p>
-
-            <div class="valor"
-                 th:text="|${puntos} pts|">
-                0.00 pts
-            </div>
-
-            <p class="detalle">
-                Puntos que se descontarán,
-                si confirmas:
-
-                <strong
-                    th:text="${recompensa.costo_puntos}">
-                    0
-                </strong>
-            </p>
-
-            <!-- SIN STOCK -->
-
-            <div th:if="${!conStock}"
-                 class="aviso error">
-
-                Esta recompensa no tiene
-                stock disponible.
-            </div>
-
-            <!-- PUNTOS INSUFICIENTES -->
-
-            <div
-                th:if="${conStock and !puntosSuficientes}"
-                class="aviso error">
-
-                Todavía no tienes puntos
-                suficientes para este canje.
-            </div>
-
-            <!-- PUEDE CANJEAR -->
-
-            <div
-                th:if="${puedeCanjear and mensajeExito == null}"
-                class="aviso exito">
-
-                Tienes puntos suficientes y
-                hay stock disponible.
-
-                Confirma solo si deseas
-                realizar el canje.
-            </div>
-
-            <!-- FORMULARIO POST PROTEGIDO
-                 POR SPRING SECURITY -->
-
-            <form
-                th:if="${puedeCanjear and mensajeExito == null}"
-
-                th:action="@{/vecino/recompensas/{id}/confirmar(id=${recompensa.id_recompensa})}"
-
-                method="post">
-
-                <button
-                    class="boton"
-                    type="submit">
-
-                    Confirmar y descontar puntos
-
-                </button>
-            </form>
-
-            <p th:if="${mensajeExito != null}"
-               class="detalle">
-
-                El canje ya fue procesado.
-                Actualiza tu historial para
-                ver el registro.
-            </p>
-
-            <!-- NAVEGACION -->
-
-            <div class="acciones">
-
-                <a class="boton secundario"
-                   th:href="@{/vecino/recompensas}">
-
-                    ← Volver al catálogo
+                <a th:href="@{/}">
+                    Inicio
                 </a>
 
-                <a class="boton secundario"
-                   th:href="@{/vecino/canjes}">
+                <a th:href="@{/vecino}">
+                    Mi panel
+                </a>
 
+                <a th:href="@{/vecino/recompensas}">
+                    Recompensas
+                </a>
+
+                <a th:href="@{/vecino/canjes}">
                     Mis canjes
                 </a>
+
+                <form th:action="@{/logout}"
+                      method="post">
+
+                    <button class="cerrar"
+                            type="submit">
+                        Cerrar sesión
+                    </button>
+
+                </form>
+
             </div>
 
+        </nav>
+
+    </header>
+
+    <main class="contenedor">
+
+        <!-- PRESENTACION -->
+
+        <section class="hero">
+
+            <span class="etiqueta">
+                PANEL DEL VECINO
+            </span>
+
+            <h1>🎁 Confirmar canje</h1>
+
+            <p>
+                Hola,
+
+                <strong th:text="${nombre}">
+                    Vecino
+                </strong>.
+
+                Revisa la recompensa antes
+                de confirmar tu canje.
+            </p>
+
         </section>
-    </div>
 
-</main>
+        <!-- MENSAJE DE EXITO -->
 
-<footer>
-    <strong>♻ PERÚ RECICLA</strong>
+        <div class="aviso exito"
+             th:if="${mensajeExito != null}"
+             role="status">
 
-    <p>
-        Ecosistema Digital de Incentivos
-        para el Reciclaje
-    </p>
+            <strong th:text="${mensajeExito}">
+                Canje registrado correctamente.
+            </strong>
 
-    <p>Proyecto académico - Cibertec</p>
-</footer>
+            <p th:if="${codigoTicket != null}">
+
+                Tu código de ticket:
+
+                <span class="ticket"
+                      th:text="${codigoTicket}">
+                    TK-EJEMPLO
+                </span>
+
+            </p>
+
+            <p>
+                Tus puntos y el stock de la
+                recompensa se han actualizado.
+            </p>
+
+            <a th:href="@{/vecino/canjes}">
+                Ver mi historial de canjes →
+            </a>
+
+        </div>
+
+        <!-- MENSAJE DE ERROR -->
+
+        <div class="aviso error"
+             th:if="${mensajeError != null}"
+             role="alert"
+             th:text="${mensajeError}">
+
+            No se pudo completar el canje.
+
+        </div>
+
+        <!-- DETALLE Y CONFIRMACION -->
+
+        <div class="grid">
+
+            <!-- PRODUCTO -->
+
+            <article class="tarjeta">
+
+                <div class="imagen">
+
+                    🎁
+
+                    <img
+                        th:if="${recompensa.url_imagen != null and !#strings.isEmpty(recompensa.url_imagen)}"
+
+                        th:src="${#strings.startsWith(recompensa.url_imagen, 'https://') ? recompensa.url_imagen : (#strings.startsWith(recompensa.url_imagen, '/') ? recompensa.url_imagen : '/images/' + recompensa.url_imagen)}"
+
+                        th:alt="${recompensa.nombre}"
+
+                        onerror="this.style.display='none'">
+
+                </div>
+
+                <h2 th:text="${recompensa.nombre}">
+                    Recompensa
+                </h2>
+
+                <div class="fila">
+
+                    <span>Costo</span>
+
+                    <strong
+                        th:text="|${recompensa.costo_puntos} puntos|">
+                        0 puntos
+                    </strong>
+
+                </div>
+
+                <div class="fila">
+
+                    <span>Stock disponible</span>
+
+                    <strong
+                        th:text="${recompensa.stock != null ? recompensa.stock : 0}">
+                        0
+                    </strong>
+
+                </div>
+
+            </article>
+
+            <!-- CONFIRMACION -->
+
+            <section class="tarjeta">
+
+                <h2>Resumen de tu canje</h2>
+
+                <p class="detalle">
+                    Puntos actuales en tu cuenta:
+                </p>
+
+                <div class="valor"
+                     th:text="|${puntos} pts|">
+                    0.00 pts
+                </div>
+
+                <p class="detalle">
+                    Puntos que se descontarán
+                    si confirmas:
+
+                    <strong
+                        th:text="${recompensa.costo_puntos}">
+                        0
+                    </strong>
+                </p>
+
+                <!-- SIN STOCK -->
+
+                <div class="aviso error"
+                     th:if="${!conStock}">
+
+                    Esta recompensa no tiene
+                    stock disponible.
+
+                </div>
+
+                <!-- PUNTOS INSUFICIENTES -->
+
+                <div class="aviso error"
+                     th:if="${conStock and !puntosSuficientes}">
+
+                    Todavía no tienes puntos
+                    suficientes para este canje.
+
+                </div>
+
+                <!-- PUEDE CANJEAR -->
+
+                <div class="aviso exito"
+                     th:if="${puedeCanjear and mensajeExito == null}">
+
+                    Tienes puntos suficientes
+                    y hay stock disponible.
+
+                    Confirma solo si deseas
+                    realizar este canje.
+
+                </div>
+
+                <!--
+                    FORMULARIO DE CONFIRMACION
+
+                    PROTECCIONES:
+                    1. CSRF DE SPRING SECURITY
+                    2. TOKEN DE SOLICITUD UNICA
+                    3. BOTON BLOQUEADO AL ENVIAR
+                -->
+
+                <form
+                    id="formularioCanje"
+
+                    th:if="${puedeCanjear and mensajeExito == null}"
+
+                    th:action="@{/vecino/recompensas/{id}/confirmar(id=${recompensa.id_recompensa})}"
+
+                    method="post">
+
+                    <!-- TOKEN DEL PASO 77 -->
+
+                    <input
+                        type="hidden"
+                        name="solicitudToken"
+                        th:value="${solicitudToken}">
+
+                    <!-- BOTON -->
+
+                    <button
+                        id="botonConfirmar"
+                        class="boton boton-confirmar"
+                        type="submit">
+
+                        Confirmar y descontar puntos
+
+                    </button>
+
+                    <p id="textoProcesando"
+                       class="texto-proceso"
+                       role="status">
+
+                        Procesando tu canje.
+                        Espera la confirmación
+                        y no cierres esta página.
+
+                    </p>
+
+                </form>
+
+                <!-- DESPUES DEL CANJE -->
+
+                <p th:if="${mensajeExito != null}"
+                   class="detalle">
+
+                    Este canje ya fue procesado.
+
+                    Puedes consultar el ticket
+                    en tu historial.
+
+                </p>
+
+                <!-- NAVEGACION -->
+
+                <div class="acciones">
+
+                    <a class="boton secundario"
+                       th:href="@{/vecino/recompensas}">
+
+                        ← Volver al catálogo
+
+                    </a>
+
+                    <a class="boton secundario"
+                       th:href="@{/vecino/canjes}">
+
+                        Mis canjes
+
+                    </a>
+
+                </div>
+
+            </section>
+
+        </div>
+
+    </main>
+
+    <!-- PIE DE PAGINA -->
+
+    <footer>
+
+        <strong>
+            ♻ PERÚ RECICLA
+        </strong>
+
+        <p>
+            Ecosistema Digital de Incentivos
+            para el Reciclaje
+        </p>
+
+        <p>
+            Proyecto académico - Cibertec
+        </p>
+
+    </footer>
+
+    <!--
+        PASO 77:
+        EVITAR DOBLE CLIC EN EL BOTON
+    -->
+
+    <script>
+        const formularioCanje =
+            document.getElementById(
+                "formularioCanje"
+            );
+
+        if (formularioCanje) {
+
+            const botonConfirmar =
+                document.getElementById(
+                    "botonConfirmar"
+                );
+
+            const textoProcesando =
+                document.getElementById(
+                    "textoProcesando"
+                );
+
+            let envioRealizado = false;
+
+            formularioCanje.addEventListener(
+                "submit",
+                function (evento) {
+
+                    // Si el formulario ya se envio,
+                    // bloquear cualquier otro intento.
+
+                    if (envioRealizado) {
+
+                        evento.preventDefault();
+                        return;
+                    }
+
+                    envioRealizado = true;
+
+                    botonConfirmar.disabled = true;
+
+                    botonConfirmar.textContent =
+                        "Procesando canje...";
+
+                    textoProcesando.classList.add(
+                        "visible"
+                    );
+                }
+            );
+
+            // Si el navegador restaura la pagina
+            // al presionar Atras, habilitar la UI.
+            // El token del servidor sigue siendo
+            // de un solo uso.
+
+            window.addEventListener(
+                "pageshow",
+                function (evento) {
+
+                    if (evento.persisted) {
+
+                        envioRealizado = false;
+
+                        botonConfirmar.disabled = false;
+
+                        botonConfirmar.textContent =
+                            "Confirmar y descontar puntos";
+
+                        textoProcesando.classList.remove(
+                            "visible"
+                        );
+                    }
+                }
+            );
+        }
+    </script>
 
 </body>
 </html>

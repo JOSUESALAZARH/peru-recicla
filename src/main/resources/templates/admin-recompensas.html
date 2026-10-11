@@ -1,0 +1,641 @@
+<!DOCTYPE html>
+<html lang="es"
+      xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <meta name="_csrf"
+          th:content="${_csrf.token}">
+
+    <title>
+        Gestión de recompensas | PERÚ RECICLA
+    </title>
+
+    <style>
+        :root {
+            --verde: #16804d;
+            --oscuro: #105a38;
+            --fondo: #f4f8f5;
+            --texto: #21392c;
+            --gris: #60736a;
+            --borde: #deebe1;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: var(--fondo);
+            color: var(--texto);
+            line-height: 1.5;
+        }
+
+        a {
+            text-decoration: none;
+        }
+
+        header {
+            background: white;
+            padding: 20px 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 20px;
+            flex-wrap: wrap;
+            box-shadow: 0 2px 12px #0000000d;
+        }
+
+        .logo {
+            font-size: 23px;
+            font-weight: bold;
+            color: var(--oscuro);
+        }
+
+        nav {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 18px;
+        }
+
+        nav a {
+            color: var(--oscuro);
+            font-size: 13px;
+            font-weight: bold;
+        }
+
+        nav button {
+            padding: 10px 15px;
+            background: white;
+            border: 1px solid var(--verde);
+            border-radius: 8px;
+            color: var(--oscuro);
+            cursor: pointer;
+        }
+
+        main {
+            width: 92%;
+            max-width: 1200px;
+            margin: 35px auto 70px;
+        }
+
+        .hero {
+            background: linear-gradient(
+                120deg,
+                #105a38,
+                #16804d
+            );
+
+            color: white;
+            padding: 35px;
+            border-radius: 17px;
+        }
+
+        .hero h1 {
+            margin: 0 0 12px;
+        }
+
+        .hero p {
+            line-height: 1.6;
+        }
+
+        .botones {
+            margin-top: 20px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .boton {
+            display: inline-block;
+            padding: 12px 18px;
+            border-radius: 9px;
+            background: var(--verde);
+            color: white;
+            font-size: 13px;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        .boton:hover {
+            background: var(--oscuro);
+        }
+
+        .boton-blanco {
+            background: white;
+            color: var(--oscuro);
+        }
+
+        .boton-blanco:hover {
+            background: #e5f4e9;
+        }
+
+        h2 {
+            margin: 34px 0 18px;
+            color: var(--oscuro);
+        }
+
+        /* INDICADORES */
+
+        .indicadores {
+            display: grid;
+            grid-template-columns:
+                repeat(4, minmax(0, 1fr));
+            gap: 15px;
+        }
+
+        .indicador {
+            background: white;
+            padding: 22px;
+            border: 1px solid var(--borde);
+            border-radius: 12px;
+        }
+
+        .indicador small {
+            color: var(--gris);
+            font-weight: bold;
+        }
+
+        .indicador strong {
+            display: block;
+            margin-top: 10px;
+            font-size: 30px;
+            color: var(--verde);
+        }
+
+        /* LISTADO DE PRODUCTOS */
+
+        .lista-recompensas {
+            display: grid;
+            grid-template-columns:
+                repeat(3, minmax(0, 1fr));
+            gap: 20px;
+            align-items: stretch;
+        }
+
+        .recompensa-card {
+            min-width: 0;
+            background: white;
+            border: 1px solid var(--borde);
+            border-radius: 15px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 4px 15px #00000008;
+        }
+
+        /* FOTOGRAFIAS UNIFORMES */
+
+        .imagen {
+            width: 100%;
+            aspect-ratio: 4 / 3;
+            height: auto;
+            position: relative;
+            background: #f1f7f3;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            border-bottom: 1px solid var(--borde);
+        }
+
+        .regalo {
+            font-size: 60px;
+        }
+
+        .imagen img {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            padding: 0;
+            background: transparent;
+        }
+
+        .contenido {
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            flex: 1;
+        }
+
+        .id {
+            color: var(--gris);
+            font-size: 12px;
+        }
+
+        .nombre {
+            margin: 0;
+            font-size: 19px;
+            color: var(--oscuro);
+            overflow-wrap: anywhere;
+        }
+
+        .descripcion {
+            color: var(--gris);
+            font-size: 13px;
+            line-height: 1.5;
+            margin: 0;
+            overflow-wrap: anywhere;
+        }
+
+        .datos {
+            display: grid;
+            grid-template-columns:
+                repeat(2, minmax(0, 1fr));
+            gap: 10px;
+        }
+
+        .dato {
+            background: #f4f8f5;
+            padding: 12px;
+            border-radius: 9px;
+        }
+
+        .dato small {
+            display: block;
+            color: var(--gris);
+            margin-bottom: 6px;
+        }
+
+        .dato strong {
+            color: var(--oscuro);
+            overflow-wrap: anywhere;
+        }
+
+        .estado {
+            font-size: 12px;
+            font-weight: bold;
+            padding: 7px 12px;
+            border-radius: 8px;
+            align-self: flex-start;
+            background: #e5f3e9;
+            color: #17643b;
+        }
+
+        .estado.inactivo {
+            background: #f9e7e4;
+            color: #93362d;
+        }
+
+        .editar {
+            width: 100%;
+            margin-top: auto;
+        }
+
+        .mensaje {
+            padding: 15px;
+            border-radius: 9px;
+            margin: 15px 0;
+            background: #e5f3e9;
+        }
+
+        .mensaje.error {
+            background: #fff0ed;
+            color: #93362d;
+        }
+
+        .vacio {
+            padding: 35px;
+            text-align: center;
+            background: white;
+            border-radius: 12px;
+        }
+
+        footer {
+            background: #123827;
+            padding: 25px;
+            text-align: center;
+            color: white;
+        }
+
+        @media (max-width: 950px) {
+            .lista-recompensas {
+                grid-template-columns:
+                    repeat(2, minmax(0, 1fr));
+            }
+
+            .indicadores {
+                grid-template-columns:
+                    repeat(2, minmax(0, 1fr));
+            }
+        }
+
+        @media (max-width: 600px) {
+            .lista-recompensas,
+            .indicadores {
+                grid-template-columns: 1fr;
+            }
+
+            .hero {
+                padding: 25px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- ENCABEZADO -->
+
+    <header>
+
+        <a class="logo"
+           th:href="@{/admin}">
+            ♻ PERÚ RECICLA
+        </a>
+
+        <nav>
+
+            <a th:href="@{/admin}">
+                Dashboard
+            </a>
+
+            <a th:href="@{/admin/usuarios}">
+                Usuarios
+            </a>
+
+            <a th:href="@{/admin/recolectas}">
+                Recolectas
+            </a>
+
+            <a th:href="@{/admin/canjes}">
+                Canjes
+            </a>
+
+            <form th:action="@{/logout}"
+                  method="post">
+
+                <button type="submit">
+                    Cerrar sesión
+                </button>
+
+            </form>
+
+        </nav>
+
+    </header>
+
+    <main>
+
+        <!-- PRESENTACION -->
+
+        <section class="hero">
+
+            <h1>🎁 Gestión de recompensas</h1>
+
+            <p>
+                Administrador:
+
+                <strong th:text="${administrador}">
+                    Administrador
+                </strong>
+            </p>
+
+            <p>
+                Registra y administra los productos
+                disponibles para canje.
+            </p>
+
+            <div class="botones">
+
+                <a class="boton boton-blanco"
+                   th:href="@{/admin/recompensas/nuevo}">
+
+                    + Registrar recompensa
+
+                </a>
+
+                <a class="boton boton-blanco"
+                   th:href="@{/admin}">
+
+                    Volver al dashboard
+
+                </a>
+
+            </div>
+
+        </section>
+
+        <!-- MENSAJES -->
+
+        <div class="mensaje"
+             th:if="${exito != null}"
+             th:text="${exito}"
+             role="status">
+        </div>
+
+        <div class="mensaje error"
+             th:if="${error != null}"
+             th:text="${error}"
+             role="alert">
+        </div>
+
+        <!-- RESUMEN DEL CATALOGO -->
+
+        <h2>Resumen del catálogo</h2>
+
+        <div class="indicadores">
+
+            <div class="indicador">
+
+                <small>Total de recompensas</small>
+
+                <strong th:text="${totalRecompensas}">
+                    0
+                </strong>
+
+            </div>
+
+            <div class="indicador">
+
+                <small>Recompensas activas</small>
+
+                <strong th:text="${activas}">
+                    0
+                </strong>
+
+            </div>
+
+            <div class="indicador">
+
+                <small>Recompensas inactivas</small>
+
+                <strong th:text="${inactivas}">
+                    0
+                </strong>
+
+            </div>
+
+            <div class="indicador">
+
+                <small>Productos sin stock</small>
+
+                <strong th:text="${sinStock}">
+                    0
+                </strong>
+
+            </div>
+
+        </div>
+
+        <!-- PRODUCTOS REGISTRADOS -->
+
+        <h2>Productos registrados</h2>
+
+        <div class="vacio"
+             th:if="${#lists.isEmpty(recompensas)}">
+
+            No hay productos registrados.
+
+        </div>
+
+        <!--
+            CADA RECOMPENSA ES UNA TARJETA
+            INDEPENDIENTE DENTRO DEL GRID.
+        -->
+
+        <div class="lista-recompensas">
+
+            <div class="recompensa-card"
+                 th:each="r : ${recompensas}">
+
+                <!-- IMAGEN -->
+
+                <div class="imagen">
+
+                    <span class="regalo"
+                          aria-hidden="true">
+                        🎁
+                    </span>
+
+                    <img
+                        th:if="${r.url_imagen != null and !#strings.isEmpty(r.url_imagen)}"
+                        th:src="${#strings.startsWith(r.url_imagen, 'https://') ? r.url_imagen : (#strings.startsWith(r.url_imagen, '/') ? r.url_imagen : '/images/' + r.url_imagen)}"
+                        th:alt="${r.nombre}"
+                        onerror="this.style.display='none'"
+                        loading="lazy">
+
+                </div>
+
+                <!-- INFORMACION DEL PRODUCTO -->
+
+                <div class="contenido">
+
+                    <small class="id">
+
+                        ID:
+                        <span th:text="${r.id_recompensa}">
+                            1
+                        </span>
+
+                    </small>
+
+                    <h3 class="nombre"
+                        th:text="${r.nombre}">
+
+                        Nombre del producto
+
+                    </h3>
+
+                    <p class="descripcion"
+                       th:text="${r.descripcion != null ? r.descripcion : 'Sin descripción'}">
+
+                        Descripción del producto
+
+                    </p>
+
+                    <!-- DATOS -->
+
+                    <div class="datos">
+
+                        <div class="dato">
+
+                            <small>Categoría</small>
+
+                            <strong th:text="${r.categoria}">
+                                alimentos
+                            </strong>
+
+                        </div>
+
+                        <div class="dato">
+
+                            <small>Costo en puntos</small>
+
+                            <strong th:text="${r.costo_puntos}">
+                                150
+                            </strong>
+
+                        </div>
+
+                        <div class="dato">
+
+                            <small>Stock disponible</small>
+
+                            <strong th:text="${r.stock}">
+                                20
+                            </strong>
+
+                        </div>
+
+                        <div class="dato">
+
+                            <small>Estado</small>
+
+                            <strong th:text="${r.estado}">
+                                activo
+                            </strong>
+
+                        </div>
+
+                    </div>
+
+                    <!-- ESTADO -->
+
+                    <span
+                        class="estado"
+                        th:classappend="${r.estado != null and r.estado.name() == 'inactivo'} ? 'inactivo' : ''"
+                        th:text="${r.estado}">
+
+                        activo
+
+                    </span>
+
+                    <!--
+                        UNICO BOTON DE GESTION:
+
+                        INCLUYE EDITAR DATOS
+                        Y CAMBIAR FOTOGRAFIA.
+                    -->
+
+                    <a class="boton editar"
+                       th:href="@{/admin/recompensas/editar/{id}(id=${r.id_recompensa})}">
+
+                        ✏️ Editar recompensa
+
+                    </a>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </main>
+
+    <footer>
+        ♻ PERÚ RECICLA · Gestión administrativa de recompensas
+    </footer>
+
+</body>
+</html>

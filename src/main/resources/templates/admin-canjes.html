@@ -1,12 +1,20 @@
-
 <!DOCTYPE html>
 <html lang="es"
       xmlns:th="http://www.thymeleaf.org">
+
 <head>
     <meta charset="UTF-8">
+
     <meta name="viewport"
           content="width=device-width, initial-scale=1.0">
-    <title>Validar canjes | PERÚ RECICLA</title>
+
+    <meta name="_csrf"
+          th:content="${_csrf.token}">
+
+    <title>
+        Validar canjes | PERÚ RECICLA
+    </title>
+
     <style>
         :root {
             --verde: #16804d;
@@ -15,10 +23,13 @@
             --fondo: #f6f9f6;
             --borde: #dde9e0;
             --texto: #20392b;
+            --gris: #60736a;
         }
+
         * {
             box-sizing: border-box;
         }
+
         body {
             margin: 0;
             background: var(--fondo);
@@ -26,9 +37,19 @@
             font-family: Arial, Helvetica, sans-serif;
             line-height: 1.55;
         }
+
+        a {
+            text-decoration: none;
+        }
+
+        /* ENCABEZADO */
+
         .barra {
             background: white;
-            padding: 20px max(24px, calc((100% - 1050px)/2));
+            padding: 20px max(
+                24px,
+                calc((100% - 1150px) / 2)
+            );
             display: flex;
             align-items: center;
             justify-content: space-between;
@@ -36,23 +57,26 @@
             flex-wrap: wrap;
             box-shadow: 0 2px 12px #0000000b;
         }
+
         .logo {
             color: var(--oscuro);
             font-size: 23px;
             font-weight: bold;
-            text-decoration: none;
         }
+
         .navegacion {
             display: flex;
             align-items: center;
             gap: 18px;
+            flex-wrap: wrap;
         }
+
         .navegacion a {
             color: var(--oscuro);
-            text-decoration: none;
             font-size: 13px;
             font-weight: bold;
         }
+
         .salir {
             padding: 10px 16px;
             background: white;
@@ -61,18 +85,26 @@
             color: var(--oscuro);
             cursor: pointer;
         }
+
+        /* CONTENEDOR */
+
         main {
-            max-width: 1050px;
+            max-width: 1150px;
             margin: 42px auto 75px;
             padding: 0 20px;
         }
+
         .hero {
-            background: linear-gradient(120deg,
-                        #105a38, #16804d);
+            background: linear-gradient(
+                120deg,
+                #105a38,
+                #16804d
+            );
             color: white;
             padding: 40px;
             border-radius: 20px;
         }
+
         .etiqueta {
             display: inline-block;
             border-radius: 30px;
@@ -81,13 +113,18 @@
             font-weight: bold;
             font-size: 12px;
         }
+
         .hero h1 {
             font-size: 32px;
             margin: 17px 0 10px;
         }
+
         .hero p {
             margin: 0;
         }
+
+        /* TARJETAS */
+
         .card {
             margin-top: 25px;
             padding: 30px;
@@ -96,26 +133,33 @@
             border-radius: 17px;
             box-shadow: 0 5px 22px #00000008;
         }
+
         h2 {
             color: var(--oscuro);
             font-size: 22px;
             margin: 0 0 14px;
         }
+
         .ayuda {
-            color: #60736a;
+            color: var(--gris);
             font-size: 14px;
         }
+
         label {
             display: block;
             font-size: 13px;
             font-weight: bold;
             margin-bottom: 9px;
         }
+
+        /* BUSCADOR */
+
         .busqueda {
             display: flex;
             gap: 12px;
             flex-wrap: wrap;
         }
+
         input[type="text"] {
             padding: 13px 15px;
             border: 1px solid #ccdcd1;
@@ -124,59 +168,102 @@
             flex: 1;
             min-width: 220px;
         }
+
         input:focus {
             outline: 2px solid #85cda5;
         }
+
         .boton {
-            padding: 13px 20px;
+            display: inline-block;
+            padding: 12px 18px;
             background: var(--verde);
             border: none;
             border-radius: 10px;
             color: white;
             font-weight: bold;
             cursor: pointer;
-            font-size: 14px;
+            font-size: 13px;
+            text-align: center;
         }
+
         .boton:hover {
             background: var(--oscuro);
         }
+
+        .boton-secundario {
+            background: #e5f3e9;
+            color: var(--oscuro);
+        }
+
+        .boton-secundario:hover {
+            background: #d2ebdc;
+        }
+
+        /* MENSAJES */
+
         .mensaje {
             padding: 16px;
             margin-top: 20px;
             border-radius: 10px;
             font-size: 14px;
         }
+
         .exito {
             background: #e0f5e6;
             border: 1px solid #a0ddb0;
             color: #125d38;
         }
+
         .error {
             background: #fff0e6;
             border: 1px solid #efc5ac;
             color: #8d4010;
         }
+
+        /* DETALLE DEL TICKET */
+
         .detalle {
             display: grid;
             grid-template-columns: 175px 1fr;
             gap: 16px;
             margin-top: 24px;
         }
+
         .etiqueta-dato {
-            color: #60736a;
+            color: var(--gris);
             font-size: 14px;
         }
+
         .valor {
             font-weight: bold;
             overflow-wrap: anywhere;
         }
+
         .estado {
             display: inline-block;
             padding: 7px 13px;
             background: var(--claro);
             color: var(--oscuro);
             border-radius: 9px;
+            font-weight: bold;
+            font-size: 12px;
         }
+
+        .estado.pendiente {
+            background: #fff1d9;
+            color: #825400;
+        }
+
+        .estado.entregado {
+            background: #e0f5e6;
+            color: #12633a;
+        }
+
+        .estado.cancelado {
+            background: #fce8e8;
+            color: #a52828;
+        }
+
         .confirmacion {
             margin-top: 28px;
             padding: 24px;
@@ -184,9 +271,11 @@
             border: 1px solid #c7e6d1;
             border-radius: 12px;
         }
+
         .confirmacion p {
             margin-top: 0;
         }
+
         .advertencia {
             background: #fff5e9;
             border: 1px solid #ead3b5;
@@ -194,6 +283,176 @@
             padding: 18px;
             margin-top: 25px;
         }
+
+        /* NUEVA SECCION: LISTADO */
+
+        .cabecera-listado {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 20px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+
+        .cabecera-listado h2 {
+            margin-bottom: 5px;
+        }
+
+        .contador {
+            display: inline-block;
+            background: #e5f3e9;
+            color: var(--oscuro);
+            border-radius: 12px;
+            padding: 12px 18px;
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        .contador strong {
+            font-size: 22px;
+            margin-right: 7px;
+        }
+
+        .tabla-contenedor {
+            width: 100%;
+            overflow-x: auto;
+            border: 1px solid var(--borde);
+            border-radius: 12px;
+        }
+
+        table {
+            width: 100%;
+            min-width: 940px;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+
+        thead {
+            background: var(--oscuro);
+            color: white;
+        }
+
+        th,
+        td {
+            text-align: left;
+            padding: 15px 13px;
+        }
+
+        td {
+            border-bottom: 1px solid var(--borde);
+        }
+
+        tbody tr:hover {
+            background: #f3faf5;
+        }
+
+        tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        .codigo-ticket {
+            font-family: Consolas, monospace;
+            color: var(--oscuro);
+            font-weight: bold;
+            font-size: 12px;
+            overflow-wrap: anywhere;
+        }
+
+        .puntos {
+            color: var(--verde);
+            font-weight: bold;
+        }
+
+        .acciones-tabla {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .boton-tabla {
+            display: inline-block;
+            border: none;
+            border-radius: 8px;
+            padding: 9px 12px;
+            font-size: 12px;
+            font-weight: bold;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+
+        .boton-ver {
+            background: #e5f3e9;
+            color: var(--oscuro);
+        }
+
+        .boton-entregar {
+            background: var(--verde);
+            color: white;
+        }
+
+        .boton-entregar:hover {
+            background: var(--oscuro);
+        }
+
+        .sin-pendientes {
+            padding: 35px;
+            border-radius: 12px;
+            background: #edf8f0;
+            text-align: center;
+            color: var(--oscuro);
+        }
+
+        .sin-pendientes strong {
+            display: block;
+            font-size: 19px;
+            margin-bottom: 8px;
+        }
+
+        /* PAGINACION */
+
+        .paginacion {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-top: 22px;
+        }
+
+        .paginacion-info {
+            color: var(--gris);
+            font-size: 13px;
+        }
+
+        .paginacion-botones {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .enlace-pagina {
+            background: #e5f3e9;
+            color: var(--oscuro);
+            padding: 10px 15px;
+            border-radius: 9px;
+            font-size: 13px;
+            font-weight: bold;
+        }
+
+        .enlace-pagina:hover {
+            background: #cde6d6;
+        }
+
+        .enlace-deshabilitado {
+            color: #8b9a90;
+            background: #eef1ef;
+            padding: 10px 15px;
+            border-radius: 9px;
+            font-size: 13px;
+        }
+
         footer {
             background: #123827;
             color: white;
@@ -201,73 +460,117 @@
             text-align: center;
             font-size: 13px;
         }
+
+        /* RESPONSIVE */
+
         @media (max-width: 650px) {
+
             .hero {
                 padding: 28px;
             }
+
             .hero h1 {
                 font-size: 26px;
             }
+
             .card {
                 padding: 22px;
             }
+
             .detalle {
                 grid-template-columns: 1fr;
                 gap: 5px;
             }
+
+            .contador {
+                width: 100%;
+            }
         }
     </style>
 </head>
+
 <body>
+
     <!-- ENCABEZADO ADMINISTRATIVO -->
+
     <header class="barra">
-        <a class="logo" th:href="@{/admin}">
+
+        <a class="logo"
+           th:href="@{/admin}">
             ♻ PERÚ RECICLA
         </a>
-        <nav class="navegacion" aria-label="Navegación administrativa">
-            <!-- Regresar al inicio del administrador -->
+
+        <nav class="navegacion"
+             aria-label="Navegación administrativa">
+
             <a th:href="@{/admin}">
                 Mi dashboard
             </a>
+
             <a th:href="@{/admin/canjes}">
                 Validar canjes
             </a>
-            <form th:action="@{/logout}" method="post">
-                <button class="salir" type="submit">
+
+            <form th:action="@{/logout}"
+                  method="post">
+
+                <button class="salir"
+                        type="submit">
                     Cerrar sesión
                 </button>
+
             </form>
+
         </nav>
+
     </header>
+
     <main>
+
         <!-- PRESENTACION -->
+
         <section class="hero">
+
             <span class="etiqueta">
                 PANEL ADMINISTRATIVO
             </span>
+
             <h1>Validación de recompensas</h1>
+
             <p>
                 Bienvenido,
+
                 <strong th:text="${administrador}">
                     Administrador
                 </strong>.
-                Consulta tickets y registra
-                entregas de recompensas.
+
+                Consulta los tickets pendientes,
+                verifica los datos y registra
+                las entregas físicas.
             </p>
+
         </section>
-        <!-- BUSCADOR -->
+
+        <!-- BUSCADOR ORIGINAL -->
+
         <section class="card">
+
             <h2>Buscar comprobante</h2>
+
             <p class="ayuda">
-                Ingresa el código del ticket
-                presentado por el vecino.
+                Ingresa el código de un ticket
+                para consultar sus datos y estado.
             </p>
+
             <form th:action="@{/admin/canjes}"
                   method="get">
+
                 <label for="codigo">
                     Código de ticket
                 </label>
+
                 <div class="busqueda">
+
                     <input
                         id="codigo"
                         type="text"
@@ -276,117 +579,451 @@
                         required
                         placeholder="Ejemplo: TK-9EB2F72EC2274932"
                         th:value="${codigo}">
+
                     <button class="boton"
                             type="submit">
                         Buscar ticket
                     </button>
+
+                    <a class="boton boton-secundario"
+                       th:href="@{/admin/canjes}">
+                        Limpiar
+                    </a>
+
                 </div>
+
             </form>
+
             <!-- MENSAJES -->
+
             <div class="mensaje exito"
                  role="status"
                  th:if="${exito != null}"
                  th:text="${exito}">
             </div>
+
             <div class="mensaje error"
                  role="alert"
                  th:if="${error != null}"
                  th:text="${error}">
             </div>
+
         </section>
-        <!-- INFORMACION DEL CANJE -->
+
+        <!-- DETALLE DEL TICKET BUSCADO -->
+
         <section class="card"
                  th:if="${canje != null}">
+
             <h2>Detalle del ticket</h2>
+
             <div class="detalle">
+
                 <span class="etiqueta-dato">
                     Código de ticket
                 </span>
+
                 <span class="valor"
                       th:text="${canje.codigo_ticket}">
                 </span>
+
                 <span class="etiqueta-dato">
                     Vecino
                 </span>
+
                 <span class="valor"
                       th:text="${canje.usuario.nombre + ' ' + canje.usuario.apellido}">
                 </span>
+
                 <span class="etiqueta-dato">
                     Recompensa
                 </span>
+
                 <span class="valor"
                       th:text="${canje.recompensa.nombre}">
                 </span>
+
                 <span class="etiqueta-dato">
                     Puntos descontados
                 </span>
+
                 <span class="valor"
                       th:text="${canje.puntos_descontados + ' pts'}">
                 </span>
+
                 <span class="etiqueta-dato">
                     Fecha del canje
                 </span>
+
                 <span class="valor"
                       th:text="${canje.fecha_canje != null ? #temporals.format(canje.fecha_canje, 'dd/MM/yyyy HH:mm') : 'Sin fecha'}">
                 </span>
+
                 <span class="etiqueta-dato">
                     Estado
                 </span>
+
                 <span class="valor">
+
                     <span class="estado"
+                          th:classappend="${canje.estado != null ? canje.estado.name() : ''}"
                           th:text="${canje.estado}">
                     </span>
+
                 </span>
+
             </div>
-            <!-- CONFIRMACION SOLO SI ESTA PENDIENTE -->
+
+            <!-- CONFIRMACION ORIGINAL -->
+
             <div class="confirmacion"
                  th:if="${canje.estado != null and canje.estado.name() == 'pendiente'}">
+
                 <h2>Confirmar entrega</h2>
+
                 <p>
-                    Verifica que la recompensa
-                    haya sido entregada físicamente
+                    Verifica que la recompensa haya
+                    sido entregada físicamente
                     antes de confirmar.
                 </p>
+
                 <form th:action="@{/admin/canjes/entregar}"
-                      method="post">
+                      method="post"
+                      onsubmit="return confirm('¿Confirmas que esta recompensa ya fue entregada físicamente?');">
+
                     <input type="hidden"
                            name="codigo"
                            th:value="${canje.codigo_ticket}">
+
+                    <input type="hidden"
+                           name="pagina"
+                           th:value="${paginaActual}">
+
                     <input type="hidden"
                            th:name="${_csrf.parameterName}"
                            th:value="${_csrf.token}">
+
                     <button class="boton"
                             type="submit">
                         ✓ Confirmar entrega física
                     </button>
+
                 </form>
+
             </div>
+
             <!-- ESTADO FINAL -->
+
             <div class="mensaje exito"
                  th:if="${canje.estado != null and canje.estado.name() == 'entregado'}">
+
                 Esta recompensa ya fue registrada
                 como entregada.
+
             </div>
+
             <div class="advertencia"
                  th:if="${canje.estado != null and canje.estado.name() == 'cancelado'}">
-                Este canje está cancelado y
-                no puede entregarse.
+
+                Este canje está cancelado
+                y no puede entregarse.
+
             </div>
+
         </section>
+
+        <!-- NUEVO: LISTADO DE CANJES PENDIENTES -->
+
+        <section class="card"
+                 id="pendientes">
+
+            <div class="cabecera-listado">
+
+                <div>
+
+                    <h2>
+                        Canjes pendientes de entrega
+                    </h2>
+
+                    <p class="ayuda">
+                        Consulta los tickets sin necesidad
+                        de buscarlos individualmente.
+
+                        Se muestran primero los
+                        canjes más recientes.
+                    </p>
+
+                </div>
+
+                <div class="contador">
+
+                    <strong th:text="${totalPendientes}">
+                        0
+                    </strong>
+
+                    pendientes
+
+                </div>
+
+            </div>
+
+            <!-- SIN CANJES PENDIENTES -->
+
+            <div class="sin-pendientes"
+                 th:if="${#lists.isEmpty(canjesPendientes)}">
+
+                <strong>
+                    ✓ No hay entregas pendientes
+                </strong>
+
+                Todos los tickets disponibles
+                para esta consulta ya fueron
+                procesados o todavía no hay canjes.
+
+            </div>
+
+            <!-- TABLA PAGINADA -->
+
+            <div class="tabla-contenedor"
+                 th:if="${!#lists.isEmpty(canjesPendientes)}">
+
+                <table>
+
+                    <thead>
+
+                        <tr>
+                            <th>Ticket</th>
+                            <th>Fecha</th>
+                            <th>Vecino</th>
+                            <th>Recompensa</th>
+                            <th>Puntos</th>
+                            <th>Estado</th>
+                            <th>Acciones</th>
+                        </tr>
+
+                    </thead>
+
+                    <tbody>
+
+                        <tr th:each="fila : ${canjesPendientes}">
+
+                            <!-- TICKET -->
+
+                            <td>
+
+                                <span class="codigo-ticket"
+                                      th:text="${fila.codigo}">
+                                    TK-EJEMPLO
+                                </span>
+
+                            </td>
+
+                            <!-- FECHA -->
+
+                            <td th:text="${fila.fecha}">
+                                11/10/2026
+                            </td>
+
+                            <!-- VECINO -->
+
+                            <td th:text="${fila.vecino}">
+                                Nombre del vecino
+                            </td>
+
+                            <!-- RECOMPENSA -->
+
+                            <td th:text="${fila.recompensa}">
+                                Aceite de oliva
+                            </td>
+
+                            <!-- PUNTOS -->
+
+                            <td>
+
+                                <span class="puntos"
+                                      th:text="|${fila.puntos} pts|">
+                                    200 pts
+                                </span>
+
+                            </td>
+
+                            <!-- ESTADO -->
+
+                            <td>
+
+                                <span class="estado pendiente"
+                                      th:text="${fila.estado}">
+                                    pendiente
+                                </span>
+
+                            </td>
+
+                            <!-- ACCIONES -->
+
+                            <td>
+
+                                <div class="acciones-tabla">
+
+                                    <!-- VER DETALLE -->
+
+                                    <a
+                                        class="boton-tabla boton-ver"
+
+                                        th:href="@{/admin/canjes(codigo=${fila.codigo},pagina=${paginaActual})}">
+
+                                        Ver detalle
+
+                                    </a>
+
+                                    <!-- CONFIRMAR ENTREGA -->
+
+                                    <form
+                                        th:action="@{/admin/canjes/entregar}"
+
+                                        method="post"
+
+                                        onsubmit="return confirm('¿Confirmas que esta recompensa ya fue entregada físicamente?');">
+
+                                        <input
+                                            type="hidden"
+                                            name="codigo"
+                                            th:value="${fila.codigo}">
+
+                                        <input
+                                            type="hidden"
+                                            name="pagina"
+                                            th:value="${paginaActual}">
+
+                                        <input
+                                            type="hidden"
+                                            th:name="${_csrf.parameterName}"
+                                            th:value="${_csrf.token}">
+
+                                        <button
+                                            class="boton-tabla boton-entregar"
+                                            type="submit">
+
+                                            ✓ Entregar
+
+                                        </button>
+
+                                    </form>
+
+                                </div>
+
+                            </td>
+
+                        </tr>
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+            <!-- PAGINACION -->
+
+            <div class="paginacion"
+                 th:if="${totalPaginas > 0}">
+
+                <span class="paginacion-info">
+
+                    Página
+
+                    <strong th:text="${numeroPaginaVisible}">
+                        1
+                    </strong>
+
+                    de
+
+                    <strong th:text="${totalPaginas}">
+                        1
+                    </strong>
+
+                </span>
+
+                <div class="paginacion-botones">
+
+                    <!-- ANTERIOR -->
+
+                    <a
+                        class="enlace-pagina"
+                        th:if="${tieneAnterior}"
+                        th:href="@{/admin/canjes(pagina=${paginaActual - 1},codigo=${codigo})}">
+
+                        ← Anterior
+
+                    </a>
+
+                    <span
+                        class="enlace-deshabilitado"
+                        th:unless="${tieneAnterior}">
+
+                        ← Anterior
+
+                    </span>
+
+                    <!-- SIGUIENTE -->
+
+                    <a
+                        class="enlace-pagina"
+                        th:if="${tieneSiguiente}"
+                        th:href="@{/admin/canjes(pagina=${paginaActual + 1},codigo=${codigo})}">
+
+                        Siguiente →
+
+                    </a>
+
+                    <span
+                        class="enlace-deshabilitado"
+                        th:unless="${tieneSiguiente}">
+
+                        Siguiente →
+
+                    </span>
+
+                </div>
+
+            </div>
+
+        </section>
+
+        <!-- INFORMACION DE SEGURIDAD -->
+
         <div class="advertencia">
+
             <strong>Importante:</strong>
+
             este módulo registra la entrega
-            de un canje previamente realizado.
-            No debe utilizarse para descontar
-            puntos ni reducir el stock nuevamente.
+            física de una recompensa que ya
+            fue canjeada por un vecino.
+
+            Antes de pulsar Entregar,
+            comprueba que el producto
+            haya sido entregado realmente.
+
+            Esta operación no vuelve a
+            descontar puntos ni reduce
+            nuevamente el stock.
+
         </div>
+
     </main>
+
+    <!-- PIE DE PAGINA -->
+
     <footer>
-        ♻ PERÚ RECICLA
+
+        <strong>
+            ♻ PERÚ RECICLA
+        </strong>
+
         <div>
             Ecosistema Digital de Incentivos
             para el Reciclaje
         </div>
+
     </footer>
+
 </body>
 </html>

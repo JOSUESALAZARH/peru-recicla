@@ -1,23 +1,13 @@
-
 <!DOCTYPE html>
-<html lang="es"
-      xmlns:th="http://www.thymeleaf.org">
-
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-
     <meta name="viewport"
           content="width=device-width, initial-scale=1.0">
-
+    <meta name="_csrf" th:content="${_csrf.token}">
     <title>Panel administrativo | PERÚ RECICLA</title>
 
     <style>
-        /* =====================================
-           PERU RECICLA
-           DASHBOARD ADMINISTRATIVO
-           PASO 62
-        ===================================== */
-
         :root {
             --verde: #16804d;
             --verde-oscuro: #105a38;
@@ -45,9 +35,7 @@
             text-decoration: none;
         }
 
-        /* =====================================
-           ENCABEZADO
-        ===================================== */
+        /* ENCABEZADO */
 
         .encabezado {
             background: white;
@@ -102,9 +90,7 @@
             background: var(--verde-claro);
         }
 
-        /* =====================================
-           CONTENEDOR
-        ===================================== */
+        /* CONTENEDOR */
 
         .contenedor {
             max-width: 1180px;
@@ -112,15 +98,11 @@
             padding: 45px 24px 80px;
         }
 
-        /* =====================================
-           PRESENTACION
-        ===================================== */
+        /* PRESENTACION */
 
         .presentacion {
             background: linear-gradient(
-                130deg,
-                #105a38,
-                #16804d
+                130deg, #105a38, #16804d
             );
             padding: 42px;
             border-radius: 22px;
@@ -178,9 +160,7 @@
             color: white;
         }
 
-        /* =====================================
-           TITULOS DE SECCION
-        ===================================== */
+        /* SECCIONES */
 
         .seccion {
             margin-top: 45px;
@@ -198,9 +178,7 @@
             margin: 0 0 24px;
         }
 
-        /* =====================================
-           TARJETAS DE INDICADORES
-        ===================================== */
+        /* INDICADORES */
 
         .indicadores {
             display: grid;
@@ -240,10 +218,6 @@
             margin: 12px 0 0;
         }
 
-        /* =====================================
-           RESUMEN COMPLEMENTARIO
-        ===================================== */
-
         .indicadores-secundarios {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
@@ -266,9 +240,7 @@
             margin-bottom: 5px;
         }
 
-        /* =====================================
-           ACCESO A MODULOS
-        ===================================== */
+        /* MODULOS ADMINISTRATIVOS */
 
         .modulos {
             display: grid;
@@ -315,9 +287,7 @@
             background: var(--verde-oscuro);
         }
 
-        /* =====================================
-           TABLA DE ULTIMOS CANJES
-        ===================================== */
+        /* TABLA ULTIMOS CANJES */
 
         .tabla-contenedor {
             background: white;
@@ -403,9 +373,7 @@
             border-radius: 17px;
         }
 
-        /* =====================================
-           PIE DE PAGINA
-        ===================================== */
+        /* PIE DE PAGINA */
 
         footer {
             background: #123827;
@@ -420,9 +388,7 @@
             margin: 7px;
         }
 
-        /* =====================================
-           RESPONSIVE
-        ===================================== */
+        /* RESPONSIVE */
 
         @media (max-width: 1000px) {
             .indicadores {
@@ -462,15 +428,14 @@
 
 <body>
 
-    <!-- =====================================
-         ENCABEZADO
-    ===================================== -->
+    <!-- ENCABEZADO -->
 
     <header class="encabezado">
 
         <nav class="barra">
 
-            <a class="logo" th:href="@{/admin}">
+            <a class="logo"
+               th:href="@{/admin}">
                 ♻ PERÚ RECICLA
             </a>
 
@@ -480,14 +445,16 @@
                     Mi dashboard
                 </a>
 
-                <!-- PASO 57: MODULO DE USUARIOS -->
                 <a th:href="@{/admin/usuarios}">
                     Usuarios
                 </a>
 
-                <!-- PASO 62: VALIDACION DE RECOLECTAS -->
                 <a th:href="@{/admin/recolectas}">
                     Validar recolectas
+                </a>
+
+                <a th:href="@{/admin/recompensas}">
+                    Recompensas
                 </a>
 
                 <a th:href="@{/admin/canjes}">
@@ -516,9 +483,7 @@
 
     <main class="contenedor">
 
-        <!-- =====================================
-             PRESENTACION DEL ADMINISTRADOR
-        ===================================== -->
+        <!-- PRESENTACION -->
 
         <section class="presentacion">
 
@@ -535,6 +500,7 @@
                 <strong th:text="${administrador}">
                     Administrador
                 </strong>.
+
                 Consulta el estado de las operaciones
                 registradas en PERÚ RECICLA.
             </p>
@@ -546,6 +512,11 @@
                     ✓ Validar recompensas
                 </a>
 
+                <a class="boton"
+                   th:href="@{/admin/recompensas}">
+                    🎁 Gestionar recompensas
+                </a>
+
                 <a class="boton boton-transparente"
                    th:href="@{/}">
                     Ver inicio público
@@ -555,9 +526,7 @@
 
         </section>
 
-        <!-- =====================================
-             INDICADORES PRINCIPALES
-        ===================================== -->
+        <!-- INDICADORES PRINCIPALES -->
 
         <section class="seccion">
 
@@ -570,7 +539,8 @@
 
             <div class="indicadores">
 
-                <!-- TOTAL DE CANJES -->
+                <!-- TOTAL CANJES -->
+
                 <article class="tarjeta">
 
                     <div class="tarjeta-icono">
@@ -592,6 +562,7 @@
                 </article>
 
                 <!-- CANJES PENDIENTES -->
+
                 <article class="tarjeta">
 
                     <div class="tarjeta-icono">
@@ -613,6 +584,7 @@
                 </article>
 
                 <!-- CANJES ENTREGADOS -->
+
                 <article class="tarjeta">
 
                     <div class="tarjeta-icono">
@@ -634,6 +606,7 @@
                 </article>
 
                 <!-- CANJES CANCELADOS -->
+
                 <article class="tarjeta">
 
                     <div class="tarjeta-icono">
@@ -656,20 +629,22 @@
 
             </div>
 
-            <!-- =================================
-                 INDICADORES COMPLEMENTARIOS
-            ================================= -->
+            <!-- INDICADORES COMPLEMENTARIOS -->
 
             <div class="indicadores-secundarios">
 
                 <article class="tarjeta indicador-horizontal">
 
                     <div>
-                        <h3>👤 Vecinos registrados</h3>
+
+                        <h3>
+                            👤 Vecinos registrados
+                        </h3>
 
                         <p>
                             Usuarios con rol de vecino.
                         </p>
+
                     </div>
 
                     <div class="numero"
@@ -682,11 +657,15 @@
                 <article class="tarjeta indicador-horizontal">
 
                     <div>
-                        <h3>🎁 Recompensas del catálogo</h3>
+
+                        <h3>
+                            🎁 Recompensas del catálogo
+                        </h3>
 
                         <p>
                             Total de recompensas registradas.
                         </p>
+
                     </div>
 
                     <div class="numero"
@@ -700,9 +679,7 @@
 
         </section>
 
-        <!-- =====================================
-             GESTION ADMINISTRATIVA
-        ===================================== -->
+        <!-- GESTION ADMINISTRATIVA -->
 
         <section class="seccion">
 
@@ -715,10 +692,7 @@
 
             <div class="modulos">
 
-                <!-- =================================
-                     MODULO DE USUARIOS
-                     PASO 57
-                ================================= -->
+                <!-- MODULO USUARIOS -->
 
                 <article class="modulo">
 
@@ -742,11 +716,7 @@
 
                 </article>
 
-                <!-- =================================
-                     NUEVO MODULO
-                     VALIDACION DE RECOLECTAS
-                     PASO 62
-                ================================= -->
+                <!-- MODULO RECOLECTAS -->
 
                 <article class="modulo">
 
@@ -770,9 +740,33 @@
 
                 </article>
 
-                <!-- =================================
-                     MODULO DE CANJES
-                ================================= -->
+                <!-- NUEVO MODULO RECOMPENSAS -->
+
+                <article class="modulo">
+
+                    <div class="modulo-icono">
+                        🎁
+                    </div>
+
+                    <h3>Gestión de recompensas</h3>
+
+                    <p>
+                        Registra nuevos productos,
+                        actualiza su nombre, categoría,
+                        costo en puntos, stock y estado.
+
+                        Administra fotografías y consulta
+                        todas las recompensas del catálogo.
+                    </p>
+
+                    <a class="enlace-modulo"
+                       th:href="@{/admin/recompensas}">
+                        Gestionar recompensas →
+                    </a>
+
+                </article>
+
+                <!-- MODULO CANJES -->
 
                 <article class="modulo">
 
@@ -796,9 +790,7 @@
 
                 </article>
 
-                <!-- =================================
-                     MODULO SEGUIMIENTO
-                ================================= -->
+                <!-- MODULO SEGUIMIENTO -->
 
                 <article class="modulo">
 
@@ -826,14 +818,14 @@
 
         </section>
 
-        <!-- =====================================
-             ULTIMOS CANJES
-        ===================================== -->
+        <!-- ULTIMOS CANJES -->
 
         <section class="seccion"
                  id="ultimos-canjes">
 
-            <h2>Últimos canjes registrados</h2>
+            <h2>
+                Últimos canjes registrados
+            </h2>
 
             <p class="descripcion">
                 Se muestran las cinco operaciones
@@ -841,10 +833,13 @@
             </p>
 
             <!-- SIN REGISTROS -->
+
             <div class="sin-registros"
                  th:if="${#lists.isEmpty(ultimosCanjes)}">
 
-                <h3>Todavía no existen canjes</h3>
+                <h3>
+                    Todavía no existen canjes
+                </h3>
 
                 <p>
                     Las operaciones aparecerán aquí
@@ -854,7 +849,8 @@
 
             </div>
 
-            <!-- TABLA CON REGISTROS -->
+            <!-- TABLA DE ULTIMOS CANJES -->
+
             <div class="tabla-contenedor"
                  th:if="${!#lists.isEmpty(ultimosCanjes)}">
 
@@ -919,9 +915,7 @@
 
     </main>
 
-    <!-- =====================================
-         PIE DE PAGINA
-    ===================================== -->
+    <!-- PIE DE PAGINA -->
 
     <footer>
 

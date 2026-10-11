@@ -1,4 +1,3 @@
-
 package com.perurecicla.service.impl;
 
 import com.perurecicla.model.Canje;
@@ -11,6 +10,9 @@ import com.perurecicla.repository.UsuarioRepository;
 
 import com.perurecicla.service.CanjeService;
 
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.LockModeType;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,26 +22,29 @@ import java.util.List;
 import java.util.UUID;
 
 /**
- * PERU RECICLA
+ * PERU RECICLA - PASO 76
  *
- * Implementacion del servicio de canjes.
+ * Servicio de canjes.
  *
- * Funcionalidades:
+ * CONSERVA:
+ * - Validacion del vecino
+ * - Validacion de la recompensa
+ * - Comprobacion de puntos
+ * - Verificacion de stock
+ * - Descuento de puntos
+ * - Actualizacion de stock
+ * - Generacion del ticket
+ * - Registro en MySQL
+ * - Historial de canjes
  *
- * 1. Validar usuario.
- * 2. Verificar recompensa.
- * 3. Comprobar puntos disponibles.
- * 4. Verificar stock.
- * 5. Descontar puntos.
- * 6. Actualizar stock.
- * 7. Generar codigo de ticket.
- * 8. Registrar canje en MySQL.
- * 9. Consultar historial de canjes.
+ * MEJORA:
+ * - Bloqueo de saldo del vecino
+ * - Bloqueo de stock de recompensa
+ * - Lectura actualizada antes del descuento
+ * - Proteccion de operaciones simultaneas
  *
- * Arquitectura:
- * Controller -> Service -> Repository -> MySQL
+ * No modifica la estructura de las tablas.
  */
-
 @Service
 public class CanjeServiceImpl
         implements CanjeService {
@@ -55,24 +60,36 @@ public class CanjeServiceImpl
     private final RecompensaRepository recompensaRepository;
 
     // =====================================
+    // ENTITY MANAGER
+    // =====================================
+
+    private final EntityManager entityManager;
+
+    // =====================================
     // CONSTRUCTOR
     // =====================================
 
     public CanjeServiceImpl(
             CanjeRepository canjeRepository,
             UsuarioRepository usuarioRepository,
-            RecompensaRepository recompensaRepository) {
+            RecompensaRepository recompensaRepository,
+            EntityManager entityManager) {
 
-        this.canjeRepository = canjeRepository;
+        this.canjeRepository =
+                canjeRepository;
 
-        this.usuarioRepository = usuarioRepository;
+        this.usuarioRepository =
+                usuarioRepository;
 
         this.recompensaRepository =
-            recompensaRepository;
+                recompensaRepository;
+
+        this.entityManager =
+                entityManager;
     }
 
     // =====================================
-    // REALIZAR CANJE DE RECOMPENSA
+    // REALIZAR CANJE
     // =====================================
 
     @Override
@@ -82,18 +99,19 @@ public class CanjeServiceImpl
             Integer idRecompensa) {
 
         // =================================
-        // VALIDAR IDENTIFICADORES
+        // 1. VALIDAR IDENTIFICADORES
         // =================================
 
-        if (idUsuario == null || idUsuario <= 0) {
+        if (idUsuario == null
+                || idUsuario <= 0) {
 
             throw new IllegalArgumentException(
                 "El ID del usuario no es valido"
             );
         }
 
-        if (idRecompensa == null ||
-            idRecompensa <= 0) {
+        if (idRecompensa == null
+                || idRecompensa <= 0) {
 
             throw new IllegalArgumentException(
                 "El ID de la recompensa no es valido"
@@ -101,35 +119,48 @@ public class CanjeServiceImpl
         }
 
         // =================================
-        // BUSCAR USUARIO
+        // 2. BUSCAR USUARIO
         // =================================
 
-        Usuario usuario = usuarioRepository
-            .findById(idUsuario)
-            .orElseThrow(() ->
-                new IllegalArgumentException(
-                    "El usuario no existe"
-                )
-            );
+        Usuario usuario =
+            usuarioRepository
+                .findById(idUsuario)
+                .orElseThrow(() ->
+                    new IllegalArgumentException(
+                        "El usuario no existe"
+                    )
+                );
 
         // =================================
-        // VALIDAR ROL DEL USUARIO
+        // 3. BLOQUEAR EL SALDO DEL USUARIO
+        //
+        // Evita que dos canjes simultaneos
+        // calculen usando el mismo saldo.
+        //
+        // refresh actualiza los datos y
+        // solicita bloqueo de escritura.
         // =================================
 
-        if (usuario.getRol() !=
-                Usuario.Rol.ROLE_vecino) {
+        entityManager.refresh(
+            usuario,
+            LockModeType.PESSIMISTIC_WRITE
+        );
+
+        // =================================
+        // 4. VALIDAR ROL Y ESTADO
+        // =================================
+
+        if (usuario.getRol()
+                != Usuario.Rol.ROLE_vecino) {
 
             throw new IllegalArgumentException(
-                "Solo los vecinos pueden realizar canjes"
+                "Solo los vecinos pueden "
+                + "realizar canjes"
             );
         }
 
-        // =================================
-        // VALIDAR ESTADO DEL USUARIO
-        // =================================
-
-        if (usuario.getEstado() !=
-                Usuario.Estado.activo) {
+        if (usuario.getEstado()
+                != Usuario.Estado.activo) {
 
             throw new IllegalStateException(
                 "El usuario no se encuentra activo"
@@ -137,7 +168,7 @@ public class CanjeServiceImpl
         }
 
         // =================================
-        // BUSCAR RECOMPENSA
+        // 5. BUSCAR RECOMPENSA
         // =================================
 
         Recompensa recompensa =
@@ -150,11 +181,24 @@ public class CanjeServiceImpl
                 );
 
         // =================================
-        // VERIFICAR ESTADO DE RECOMPENSA
+        // 6. BLOQUEAR STOCK
+        //
+        // Dos vecinos no deben descontar
+        // unidades tomando el mismo stock
+        // inicial de una recompensa.
         // =================================
 
-        if (recompensa.getEstado() !=
-                Recompensa.EstadoRecompensa.activo) {
+        entityManager.refresh(
+            recompensa,
+            LockModeType.PESSIMISTIC_WRITE
+        );
+
+        // =================================
+        // 7. VALIDAR ESTADO DE RECOMPENSA
+        // =================================
+
+        if (recompensa.getEstado()
+                != Recompensa.EstadoRecompensa.activo) {
 
             throw new IllegalStateException(
                 "La recompensa no esta disponible"
@@ -162,14 +206,14 @@ public class CanjeServiceImpl
         }
 
         // =================================
-        // VERIFICAR STOCK
+        // 8. VALIDAR STOCK
         // =================================
 
         Integer stockActual =
-            recompensa.getStock();
+                recompensa.getStock();
 
-        if (stockActual == null ||
-            stockActual <= 0) {
+        if (stockActual == null
+                || stockActual <= 0) {
 
             throw new IllegalStateException(
                 "No existe stock disponible"
@@ -177,49 +221,52 @@ public class CanjeServiceImpl
         }
 
         // =================================
-        // VERIFICAR COSTO EN PUNTOS
+        // 9. VALIDAR COSTO
         // =================================
 
         Integer costoPuntos =
-            recompensa.getCosto_puntos();
+                recompensa.getCosto_puntos();
 
-        if (costoPuntos == null ||
-            costoPuntos < 0) {
+        if (costoPuntos == null
+                || costoPuntos < 0) {
 
             throw new IllegalStateException(
-                "La recompensa tiene un costo invalido"
+                "La recompensa tiene "
+                + "un costo invalido"
             );
         }
 
         // =================================
-        // CONSULTAR PUNTOS DEL USUARIO
+        // 10. CONSULTAR SALDO ACTUAL
         // =================================
 
         BigDecimal puntosDisponibles =
-            usuario.getPuntos_acumulados();
+                usuario.getPuntos_acumulados();
 
         if (puntosDisponibles == null) {
 
-            puntosDisponibles = BigDecimal.ZERO;
+            puntosDisponibles =
+                    BigDecimal.ZERO;
         }
 
         BigDecimal puntosNecesarios =
-            BigDecimal.valueOf(costoPuntos);
+                BigDecimal.valueOf(costoPuntos);
 
         // =================================
-        // VALIDAR SALDO
+        // 11. VERIFICAR PUNTOS SUFICIENTES
         // =================================
 
         if (puntosDisponibles.compareTo(
                 puntosNecesarios) < 0) {
 
             throw new IllegalStateException(
-                "El usuario no tiene puntos suficientes"
+                "El usuario no tiene "
+                + "puntos suficientes"
             );
         }
 
         // =================================
-        // CALCULAR NUEVO SALDO
+        // 12. CALCULAR NUEVO SALDO
         // =================================
 
         BigDecimal nuevoSaldo =
@@ -228,23 +275,26 @@ public class CanjeServiceImpl
             );
 
         // =================================
-        // CALCULAR NUEVO STOCK
+        // 13. CALCULAR NUEVO STOCK
         // =================================
 
-        Integer nuevoStock = stockActual - 1;
+        int nuevoStock =
+                stockActual - 1;
 
         // =================================
-        // ACTUALIZAR PUNTOS DEL VECINO
+        // 14. DESCONTAR PUNTOS
         // =================================
 
         usuario.setPuntos_acumulados(
             nuevoSaldo
         );
 
-        usuarioRepository.save(usuario);
+        usuarioRepository.save(
+            usuario
+        );
 
         // =================================
-        // ACTUALIZAR STOCK DE RECOMPENSA
+        // 15. DESCONTAR STOCK
         // =================================
 
         recompensa.setStock(
@@ -256,21 +306,25 @@ public class CanjeServiceImpl
         );
 
         // =================================
-        // GENERAR CODIGO UNICO DE TICKET
+        // 16. GENERAR TICKET
         // =================================
 
         String codigoTicket =
-            generarCodigoTicket();
+                generarCodigoTicket();
 
         // =================================
-        // CREAR REGISTRO DE CANJE
+        // 17. CREAR REGISTRO DE CANJE
         // =================================
 
         Canje canje = new Canje();
 
-        canje.setUsuario(usuario);
+        canje.setUsuario(
+            usuario
+        );
 
-        canje.setRecompensa(recompensa);
+        canje.setRecompensa(
+            recompensa
+        );
 
         canje.setPuntos_descontados(
             costoPuntos
@@ -289,10 +343,21 @@ public class CanjeServiceImpl
         );
 
         // =================================
-        // REGISTRAR CANJE EN MYSQL
+        // 18. REGISTRAR EN MYSQL
+        //
+        // La transaccion confirma juntos:
+        //
+        // - Nuevo saldo del vecino
+        // - Nuevo stock de recompensa
+        // - Nuevo registro de canje
+        //
+        // Si ocurre un error que provoque
+        // rollback, se revierten los tres.
         // =================================
 
-        return canjeRepository.save(canje);
+        return canjeRepository.save(
+            canje
+        );
     }
 
     // =====================================
@@ -316,20 +381,22 @@ public class CanjeServiceImpl
     public List<Canje> listarCanjesPorUsuario(
             Integer idUsuario) {
 
-        if (idUsuario == null || idUsuario <= 0) {
+        if (idUsuario == null
+                || idUsuario <= 0) {
 
             throw new IllegalArgumentException(
                 "El ID del usuario no es valido"
             );
         }
 
-        Usuario usuario = usuarioRepository
-            .findById(idUsuario)
-            .orElseThrow(() ->
-                new IllegalArgumentException(
-                    "El usuario no existe"
-                )
-            );
+        Usuario usuario =
+            usuarioRepository
+                .findById(idUsuario)
+                .orElseThrow(() ->
+                    new IllegalArgumentException(
+                        "El usuario no existe"
+                    )
+                );
 
         return canjeRepository.findByUsuario(
             usuario
@@ -337,20 +404,17 @@ public class CanjeServiceImpl
     }
 
     // =====================================
-    // GENERAR CODIGO DE TICKET
+    // GENERAR CODIGO UNICO DE TICKET
     // =====================================
 
     private String generarCodigoTicket() {
 
-        // Crear identificador aleatorio UUID
-
-        String identificador = UUID.randomUUID()
-            .toString()
-            .replace("-", "")
-            .substring(0, 16)
-            .toUpperCase();
-
-        // Longitud total: 19 caracteres
+        String identificador =
+            UUID.randomUUID()
+                .toString()
+                .replace("-", "")
+                .substring(0, 16)
+                .toUpperCase();
 
         return "TK-" + identificador;
     }
