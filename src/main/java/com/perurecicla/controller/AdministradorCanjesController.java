@@ -7,6 +7,7 @@ import com.perurecicla.repository.CanjeRepository;
 
 import com.perurecicla.service.UsuarioService;
 import com.perurecicla.service.EntregaCanjeService;
+import com.perurecicla.service.CancelacionCanjeService;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -30,7 +31,7 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * PERU RECICLA - PASO 78
+ * PERU RECICLA - PASOS 78 Y 83
  *
  * Gestion administrativa de canjes.
  *
@@ -49,7 +50,12 @@ import java.util.Optional;
  * - Paginar de 10 en 10.
  * - Confirmar una entrega desde la lista.
  *
- * No descuenta puntos ni stock.
+ * PASO 83:
+ * - Cancelar un ticket pendiente con motivo obligatorio.
+ * - Reembolsar puntos y restituir stock de manera atomica.
+ * - Registrar fecha e identidad del administrador.
+ *
+ * La entrega no descuenta puntos ni stock.
  */
 @Controller
 public class AdministradorCanjesController {
@@ -67,6 +73,8 @@ public class AdministradorCanjesController {
 
     private final EntregaCanjeService entregaCanjeService;
 
+    private final CancelacionCanjeService cancelacionCanjeService;
+
     // =====================================
     // CONSTRUCTOR
     // =====================================
@@ -74,7 +82,8 @@ public class AdministradorCanjesController {
     public AdministradorCanjesController(
             UsuarioService usuarioService,
             CanjeRepository canjeRepository,
-            EntregaCanjeService entregaCanjeService) {
+            EntregaCanjeService entregaCanjeService,
+            CancelacionCanjeService cancelacionCanjeService) {
 
         this.usuarioService =
             usuarioService;
@@ -84,6 +93,9 @@ public class AdministradorCanjesController {
 
         this.entregaCanjeService =
             entregaCanjeService;
+
+        this.cancelacionCanjeService =
+            cancelacionCanjeService;
     }
 
     // =====================================
@@ -365,6 +377,57 @@ public class AdministradorCanjesController {
     }
 
     // =====================================
+    // PASO 83 - CANCELAR CANJE PENDIENTE
+    // =====================================
+
+    @PostMapping("/admin/canjes/cancelar")
+    public String cancelarCanje(
+
+            @RequestParam("codigo") String codigo,
+
+            @RequestParam("motivo") String motivo,
+
+            @RequestParam(name = "pagina", defaultValue = "0")
+            int pagina,
+
+            Principal principal,
+
+            RedirectAttributes redirect) {
+
+        validarAdministrador(principal);
+
+        String codigoLimpio = codigo == null ? "" : codigo.strip();
+
+        try {
+
+            cancelacionCanjeService.cancelarCanje(
+                codigoLimpio,
+                motivo,
+                principal.getName()
+            );
+
+            redirect.addFlashAttribute(
+                "exito",
+                "Canje cancelado correctamente. "
+                + "Los puntos fueron devueltos al vecino "
+                + "y se restituyo una unidad al stock."
+            );
+
+        } catch (IllegalArgumentException | IllegalStateException ex) {
+
+            redirect.addFlashAttribute("error", ex.getMessage());
+        }
+
+        if (!codigoLimpio.isEmpty() && codigoLimpio.length() <= 20) {
+            redirect.addAttribute("codigo", codigoLimpio);
+        }
+
+        redirect.addAttribute("pagina", Math.max(0, pagina));
+
+        return "redirect:/admin/canjes";
+    }
+
+    // =====================================
     // VALIDAR ADMINISTRADOR ACTIVO
     // =====================================
 
@@ -474,9 +537,9 @@ public class AdministradorCanjesController {
                     : canje.getEstado().name();
         }
 
-        // =================================
+        // =====================================
         // GETTERS PARA THYMELEAF
-        // =================================
+        // =====================================
 
         public String getCodigo() {
             return codigo;

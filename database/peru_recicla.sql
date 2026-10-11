@@ -1,4 +1,3 @@
-
 -- ============================================================
 --                 PERU RECICLA
 --          BASE DE DATOS - MYSQL 8
@@ -29,11 +28,17 @@
 -- 08. Datos de demostracion - Recompensas
 -- 09. Consultas de verificacion
 --
+-- ACTUALIZACIONES:
+-- PASO 82: Estado activo/inactivo de materiales
+-- PASO 83: Auditoria de cancelacion de canjes
+--
 -- IMPORTANTE:
--- Este script se basa en la estructura conocida
--- de PERU RECICLA. Debe verificarse contra
--- la base de datos actual antes de utilizarlo
--- como instalador definitivo.
+-- Este script esta destinado a una instalacion
+-- nueva o a una base que todavia no tenga las
+-- modificaciones de los pasos 82 y 83.
+--
+-- No volver a ejecutar los ALTER TABLE si
+-- esas columnas ya existen.
 --
 -- No incluye usuarios ni contrasenas reales.
 -- No contiene instrucciones DROP.
@@ -139,6 +144,30 @@ CREATE TABLE IF NOT EXISTS Materiales (
 
 ) ENGINE=InnoDB
 DEFAULT CHARSET=utf8mb4;
+
+
+-- ============================================================
+-- ACTUALIZACION PASO 82
+-- ESTADO ACTIVO / INACTIVO DE MATERIALES
+-- ============================================================
+--
+-- Permite desactivar un material sin eliminarlo.
+--
+-- Los materiales existentes empiezan activos.
+--
+-- No modifica:
+-- - Nombre
+-- - Puntos por gramo
+-- - Imagen
+-- - Descripcion
+-- - Recolectas historicas
+--
+-- Ejecutar una sola vez.
+-- ============================================================
+
+ALTER TABLE Materiales
+ADD COLUMN estado ENUM('activo','inactivo')
+NOT NULL DEFAULT 'activo';
 
 
 -- ============================================================
@@ -331,6 +360,38 @@ CREATE TABLE IF NOT EXISTS Canjes (
 
 ) ENGINE=InnoDB
 DEFAULT CHARSET=utf8mb4;
+
+
+-- ============================================================
+-- ACTUALIZACION PASO 83
+-- AUDITORIA DE CANCELACION DE CANJES
+-- ============================================================
+--
+-- Permite registrar:
+-- - Motivo de cancelacion
+-- - Fecha de cancelacion
+-- - Administrador que realizo la cancelacion
+--
+-- Las nuevas columnas permiten valores NULL
+-- porque los canjes pendientes o entregados
+-- no tienen datos de cancelacion.
+--
+-- No modifica:
+-- - Puntos historicos
+-- - Codigo de ticket
+-- - Fecha del canje
+-- - Estado previo de los canjes
+--
+-- Ejecutar una sola vez.
+-- ============================================================
+
+ALTER TABLE Canjes
+    ADD COLUMN motivo_cancelacion VARCHAR(300) NULL,
+    ADD COLUMN fecha_cancelacion DATETIME NULL,
+    ADD COLUMN id_administrador_cancelacion INT NULL,
+    ADD CONSTRAINT fk_canje_admin_cancelacion
+        FOREIGN KEY (id_administrador_cancelacion)
+        REFERENCES Usuarios(id_usuario);
 
 
 -- ============================================================

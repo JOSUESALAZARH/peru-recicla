@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="es"
       xmlns:th="http://www.thymeleaf.org">
@@ -16,6 +15,7 @@
 
         /* =====================================
            COLORES INSTITUCIONALES
+           PASO 84
         ===================================== */
 
         :root {
@@ -244,6 +244,10 @@
             font-weight: bold;
         }
 
+        /* =====================================
+           ETIQUETA BASE DE ESTADO
+        ===================================== */
+
         .estado {
             display: inline-block;
             background: var(--verde-claro);
@@ -253,6 +257,46 @@
             font-size: 12px;
             font-weight: bold;
             overflow-wrap: anywhere;
+        }
+
+        /* =====================================
+           PASO 84 - COLORES POR ESTADO
+
+           Pendiente: amarillo
+           Validado: verde
+           Rechazado: rojo
+        ===================================== */
+
+        .estado.pendiente {
+            background: #fff1d9;
+            color: #825400;
+            border: 1px solid #f0d391;
+        }
+
+        .estado.validado {
+            background: #e0f5e6;
+            color: #12633a;
+            border: 1px solid #b7e2c5;
+        }
+
+        .estado.rechazado {
+            background: #fce8e8;
+            color: #a52828;
+            border: 1px solid #edb8b8;
+        }
+
+        /* =====================================
+           LEYENDA DE ESTADOS
+        ===================================== */
+
+        .leyenda-estados {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 10px 16px;
+            margin: 0 0 22px;
+            font-size: 13px;
+            color: var(--gris);
         }
 
         /* =====================================
@@ -462,12 +506,12 @@
 
             </article>
 
-            <!-- PUNTOS ACUMULADOS -->
+            <!-- PUNTOS DISPONIBLES -->
 
             <article class="tarjeta">
 
                 <h2>
-                    ⭐ Mis puntos acumulados
+                    ⭐ Mis puntos disponibles
                 </h2>
 
                 <div class="numero">
@@ -511,6 +555,31 @@
                 a tu nombre.
 
             </p>
+
+            <!-- PASO 84: LEYENDA DE ESTADOS -->
+
+            <div class="leyenda-estados"
+                 th:if="${!#lists.isEmpty(recolectas)}">
+
+                <span class="estado pendiente">
+                    Pendiente
+                </span>
+
+                <span>Por validar</span>
+
+                <span class="estado validado">
+                    Validado
+                </span>
+
+                <span>Puntos acreditados</span>
+
+                <span class="estado rechazado">
+                    Rechazado
+                </span>
+
+                <span>Sin acreditación</span>
+
+            </div>
 
             <!-- =================================
                  MENSAJE SIN RECOLECTAS
@@ -591,7 +660,7 @@
 
                             </td>
 
-                            <!-- PESO -->
+                            <!-- PESO: LA BASE GUARDA GRAMOS -->
 
                             <td>
 
@@ -599,7 +668,7 @@
                                     0.00
                                 </span>
 
-                                kg
+                                g
 
                             </td>
 
@@ -620,6 +689,7 @@
                             <td>
 
                                 <span class="estado"
+                                      th:classappend="${r.estado_validacion != null ? r.estado_validacion.name() : ''}"
                                       th:text="${r.estado_validacion != null ? r.estado_validacion : 'Sin estado'}">
 
                                     pendiente

@@ -1,24 +1,18 @@
-
 <!DOCTYPE html>
 <html lang="es"
       xmlns:th="http://www.thymeleaf.org">
 
 <head>
-
     <meta charset="UTF-8">
 
     <meta name="viewport"
           content="width=device-width, initial-scale=1.0">
 
-    <title>Gestión de usuarios | PERÚ RECICLA</title>
+    <title>
+        Gestión de usuarios | PERÚ RECICLA
+    </title>
 
     <style>
-
-        /* =====================================
-           PERU RECICLA - PASO 56
-           GESTION DE USUARIOS
-        ===================================== */
-
         :root {
             --verde: #16804d;
             --oscuro: #105a38;
@@ -45,9 +39,7 @@
             text-decoration: none;
         }
 
-        /* =====================================
-           NAVEGACION
-        ===================================== */
+        /* NAVEGACION */
 
         .barra {
             background: white;
@@ -100,19 +92,13 @@
             background: var(--claro);
         }
 
-        /* =====================================
-           ESTRUCTURA PRINCIPAL
-        ===================================== */
+        /* ESTRUCTURA */
 
         main {
             max-width: 1150px;
             margin: 42px auto 75px;
             padding: 0 20px;
         }
-
-        /* =====================================
-           PRESENTACION
-        ===================================== */
 
         .hero {
             background: linear-gradient(
@@ -144,14 +130,13 @@
             margin: 0;
         }
 
-        /* =====================================
-           INDICADORES
-        ===================================== */
+        /* INDICADORES */
 
         .indicadores {
             margin-top: 27px;
             display: grid;
-            grid-template-columns: repeat(4, 1fr);
+            grid-template-columns:
+                repeat(4, 1fr);
             gap: 18px;
         }
 
@@ -186,9 +171,7 @@
             color: var(--verde);
         }
 
-        /* =====================================
-           TARJETAS
-        ===================================== */
+        /* TARJETAS */
 
         .card {
             background: white;
@@ -211,9 +194,29 @@
             margin: 0 0 24px;
         }
 
-        /* =====================================
-           FILTROS
-        ===================================== */
+        /* MENSAJES */
+
+        .mensaje {
+            margin-top: 20px;
+            padding: 15px 18px;
+            border-radius: 11px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .mensaje.exito {
+            background: #e0f5e6;
+            color: #125d38;
+            border: 1px solid #a0ddb0;
+        }
+
+        .mensaje.error {
+            background: #fce8e8;
+            color: #9c2929;
+            border: 1px solid #edb7b7;
+        }
+
+        /* FILTROS */
 
         .filtros {
             display: grid;
@@ -278,9 +281,7 @@
             background: #cdebd7;
         }
 
-        /* =====================================
-           TABLA DE USUARIOS
-        ===================================== */
+        /* LISTADO */
 
         .encabezado-listado {
             display: flex;
@@ -312,7 +313,7 @@
 
         table {
             width: 100%;
-            min-width: 880px;
+            min-width: 1050px;
             border-collapse: collapse;
             font-size: 13px;
         }
@@ -326,6 +327,7 @@
         td {
             text-align: left;
             padding: 15px 13px;
+            vertical-align: middle;
         }
 
         td {
@@ -355,6 +357,8 @@
             color: var(--verde);
         }
 
+        /* ESTADOS */
+
         .estado {
             display: inline-block;
             padding: 6px 11px;
@@ -376,6 +380,81 @@
             color: #9c2929;
         }
 
+        /* NUEVO - EDICION DE ESTADO */
+
+        .editor-estado {
+            min-width: 155px;
+        }
+
+        .editor-estado summary {
+            list-style: none;
+            display: inline-block;
+            background: #e5f3e9;
+            color: var(--oscuro);
+            padding: 9px 13px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: bold;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+
+        .editor-estado summary::-webkit-details-marker {
+            display: none;
+        }
+
+        .editor-estado summary:hover {
+            background: #cdebd7;
+        }
+
+        .editor-estado[open] summary {
+            margin-bottom: 12px;
+        }
+
+        .formulario-estado {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            min-width: 180px;
+            background: #f4faf6;
+            border: 1px solid #d6e9dc;
+            border-radius: 10px;
+            padding: 12px;
+        }
+
+        .formulario-estado label {
+            margin: 0;
+            font-size: 12px;
+        }
+
+        .formulario-estado select {
+            min-width: 145px;
+            padding: 10px;
+        }
+
+        .guardar-estado {
+            padding: 10px 13px;
+            background: var(--verde);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .guardar-estado:hover {
+            background: var(--oscuro);
+        }
+
+        .cuenta-protegida {
+            color: var(--gris);
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        /* SIN REGISTROS */
+
         .sin-registros {
             text-align: center;
             padding: 45px 20px;
@@ -387,9 +466,7 @@
             margin: 0 0 9px;
         }
 
-        /* =====================================
-           PIE DE PAGINA
-        ===================================== */
+        /* PIE DE PAGINA */
 
         footer {
             background: #123827;
@@ -404,14 +481,13 @@
             color: #c8dfd1;
         }
 
-        /* =====================================
-           RESPONSIVE
-        ===================================== */
+        /* RESPONSIVE */
 
         @media (max-width: 950px) {
 
             .indicadores {
-                grid-template-columns: repeat(2, 1fr);
+                grid-template-columns:
+                    repeat(2, 1fr);
             }
 
             .filtros {
@@ -457,19 +533,17 @@
                 padding: 19px;
             }
         }
-
     </style>
 </head>
 
 <body>
 
-    <!-- =====================================
-         NAVEGACION ADMINISTRATIVA
-    ===================================== -->
+    <!-- NAVEGACION ADMINISTRATIVA -->
 
     <header class="barra">
 
-        <a class="logo" th:href="@{/admin}">
+        <a class="logo"
+           th:href="@{/admin}">
             ♻ PERÚ RECICLA
         </a>
 
@@ -504,9 +578,7 @@
 
     <main>
 
-        <!-- =====================================
-             PRESENTACION
-        ===================================== -->
+        <!-- PRESENTACION -->
 
         <section class="hero">
 
@@ -520,24 +592,41 @@
 
             <p>
                 Bienvenido,
+
                 <strong th:text="${administrador}">
                     Administrador
                 </strong>.
+
                 Consulta los usuarios registrados
-                en PERÚ RECICLA.
+                y administra el estado
+                de sus cuentas.
             </p>
 
         </section>
 
-        <!-- =====================================
-             INDICADORES
-        ===================================== -->
+        <!-- MENSAJES DE OPERACION -->
+
+        <div class="mensaje exito"
+             role="status"
+             th:if="${mensajeExito != null}"
+             th:text="${mensajeExito}">
+        </div>
+
+        <div class="mensaje error"
+             role="alert"
+             th:if="${mensajeError != null}"
+             th:text="${mensajeError}">
+        </div>
+
+        <!-- INDICADORES ORIGINALES -->
 
         <section class="indicadores">
 
             <article class="indicador">
 
-                <h3>👥 Total de usuarios</h3>
+                <h3>
+                    👥 Total de usuarios
+                </h3>
 
                 <div class="numero"
                      th:text="${totalUsuarios}">
@@ -548,7 +637,9 @@
 
             <article class="indicador">
 
-                <h3>♻ Vecinos</h3>
+                <h3>
+                    ♻ Vecinos
+                </h3>
 
                 <div class="numero"
                      th:text="${totalVecinos}">
@@ -559,7 +650,9 @@
 
             <article class="indicador">
 
-                <h3>🚚 Recolectores</h3>
+                <h3>
+                    🚚 Recolectores
+                </h3>
 
                 <div class="numero"
                      th:text="${totalRecolectores}">
@@ -570,7 +663,9 @@
 
             <article class="indicador">
 
-                <h3>⚙ Administradores</h3>
+                <h3>
+                    ⚙ Administradores
+                </h3>
 
                 <div class="numero"
                      th:text="${totalAdministradores}">
@@ -582,15 +677,16 @@
         </section>
 
         <p class="resumen-activos">
+
             Usuarios activos en el sistema:
+
             <strong th:text="${totalActivos}">
                 0
             </strong>
+
         </p>
 
-        <!-- =====================================
-             BUSCADOR Y FILTROS
-        ===================================== -->
+        <!-- BUSCADOR Y FILTROS -->
 
         <section class="card">
 
@@ -599,8 +695,10 @@
             </h2>
 
             <p class="ayuda">
-                Puedes buscar por nombre, apellido
-                o correo electrónico y combinar
+                Busca por nombre, apellido
+                o correo electrónico.
+
+                También puedes combinar
                 los filtros de rol y estado.
             </p>
 
@@ -638,23 +736,27 @@
                         <select id="rol"
                                 name="rol">
 
-                            <option value="todos"
-                                    th:selected="${rolSeleccionado == 'todos'}">
+                            <option
+                                value="todos"
+                                th:selected="${rolSeleccionado == 'todos'}">
                                 Todos los roles
                             </option>
 
-                            <option value="ROLE_vecino"
-                                    th:selected="${rolSeleccionado == 'ROLE_vecino'}">
+                            <option
+                                value="ROLE_vecino"
+                                th:selected="${rolSeleccionado == 'ROLE_vecino'}">
                                 Vecinos
                             </option>
 
-                            <option value="ROLE_recolector"
-                                    th:selected="${rolSeleccionado == 'ROLE_recolector'}">
+                            <option
+                                value="ROLE_recolector"
+                                th:selected="${rolSeleccionado == 'ROLE_recolector'}">
                                 Recolectores
                             </option>
 
-                            <option value="ROLE_administrador"
-                                    th:selected="${rolSeleccionado == 'ROLE_administrador'}">
+                            <option
+                                value="ROLE_administrador"
+                                th:selected="${rolSeleccionado == 'ROLE_administrador'}">
                                 Administradores
                             </option>
 
@@ -673,18 +775,21 @@
                         <select id="estado"
                                 name="estado">
 
-                            <option value="todos"
-                                    th:selected="${estadoSeleccionado == 'todos'}">
+                            <option
+                                value="todos"
+                                th:selected="${estadoSeleccionado == 'todos'}">
                                 Todos los estados
                             </option>
 
-                            <option value="activo"
-                                    th:selected="${estadoSeleccionado == 'activo'}">
+                            <option
+                                value="activo"
+                                th:selected="${estadoSeleccionado == 'activo'}">
                                 Activos
                             </option>
 
-                            <option value="inactivo"
-                                    th:selected="${estadoSeleccionado == 'inactivo'}">
+                            <option
+                                value="inactivo"
+                                th:selected="${estadoSeleccionado == 'inactivo'}">
                                 Inactivos
                             </option>
 
@@ -698,12 +803,16 @@
 
                     <button class="boton"
                             type="submit">
+
                         Buscar usuarios
+
                     </button>
 
                     <a class="boton boton-secundario"
                        th:href="@{/admin/usuarios}">
+
                         Limpiar filtros
+
                     </a>
 
                 </div>
@@ -712,9 +821,7 @@
 
         </section>
 
-        <!-- =====================================
-             LISTADO DE USUARIOS
-        ===================================== -->
+        <!-- LISTADO DE USUARIOS -->
 
         <section class="card">
 
@@ -747,7 +854,7 @@
 
             </div>
 
-            <!-- TABLA -->
+            <!-- TABLA COMPLETA -->
 
             <div class="tabla-contenedor"
                  th:if="${!#lists.isEmpty(usuarios)}">
@@ -755,6 +862,7 @@
                 <table>
 
                     <thead>
+
                         <tr>
                             <th>ID</th>
                             <th>Nombre completo</th>
@@ -763,48 +871,184 @@
                             <th>Estado</th>
                             <th>Puntos</th>
                             <th>Fecha de registro</th>
+                            <th>Acciones</th>
                         </tr>
+
                     </thead>
 
                     <tbody>
 
                         <tr th:each="usuario : ${usuarios}">
 
+                            <!-- ID -->
+
                             <td th:text="${usuario.id}">
                                 1
                             </td>
+
+                            <!-- NOMBRE -->
 
                             <td class="nombre"
                                 th:text="${usuario.nombreCompleto}">
                                 Nombre Apellido
                             </td>
 
+                            <!-- CORREO -->
+
                             <td class="correo"
                                 th:text="${usuario.correo}">
                                 ejemplo@correo.com
                             </td>
 
+                            <!-- ROL -->
+
                             <td th:text="${usuario.rol}">
                                 Vecino
                             </td>
 
+                            <!-- ESTADO CON COLOR -->
+
                             <td>
 
-                                <span class="estado"
-                                      th:classappend="${usuario.estado}"
-                                      th:text="${usuario.estado}">
+                                <span
+                                    class="estado"
+                                    th:classappend="${usuario.estado}"
+                                    th:text="${usuario.estado}">
                                     activo
                                 </span>
 
                             </td>
+
+                            <!-- PUNTOS -->
 
                             <td class="puntos"
                                 th:text="|${usuario.puntos} pts|">
                                 0 pts
                             </td>
 
+                            <!-- FECHA -->
+
                             <td th:text="${usuario.fechaRegistro}">
                                 10/10/2026
+                            </td>
+
+                            <!-- NUEVA ACCION -->
+
+                            <td>
+
+                                <!-- VECINOS Y RECOLECTORES -->
+
+                                <details
+                                    class="editor-estado"
+                                    th:if="${usuario.editable}">
+
+                                    <summary>
+                                        ✎ Editar estado
+                                    </summary>
+
+                                    <form
+                                        class="formulario-estado"
+
+                                        th:action="@{/admin/usuarios/cambiar-estado}"
+
+                                        method="post"
+
+                                        onsubmit="return confirm('¿Confirmas que deseas actualizar el estado de esta cuenta?');">
+
+                                        <!-- IDENTIFICADOR -->
+
+                                        <input
+                                            type="hidden"
+                                            name="idUsuario"
+                                            th:value="${usuario.id}">
+
+                                        <!-- MANTENER BUSQUEDA -->
+
+                                        <input
+                                            type="hidden"
+                                            name="buscar"
+                                            th:value="${buscar}">
+
+                                        <!-- MANTENER ROL -->
+
+                                        <input
+                                            type="hidden"
+                                            name="rol"
+                                            th:value="${rolSeleccionado}">
+
+                                        <!-- MANTENER ESTADO -->
+
+                                        <input
+                                            type="hidden"
+                                            name="estado"
+                                            th:value="${estadoSeleccionado}">
+
+                                        <!-- TOKEN DE SEGURIDAD -->
+
+                                        <input
+                                            type="hidden"
+                                            th:name="${_csrf.parameterName}"
+                                            th:value="${_csrf.token}">
+
+                                        <!-- SELECCION -->
+
+                                        <label
+                                            th:for="|estado-${usuario.id}|">
+
+                                            Nuevo estado
+
+                                        </label>
+
+                                        <select
+                                            th:id="|estado-${usuario.id}|"
+                                            name="nuevoEstado"
+                                            required>
+
+                                            <option
+                                                value="activo"
+                                                th:selected="${usuario.estado == 'activo'}">
+
+                                                Activo
+
+                                            </option>
+
+                                            <option
+                                                value="inactivo"
+                                                th:selected="${usuario.estado == 'inactivo'}">
+
+                                                Inactivo
+
+                                            </option>
+
+                                        </select>
+
+                                        <!-- GUARDAR -->
+
+                                        <button
+                                            class="guardar-estado"
+                                            type="submit">
+
+                                            Guardar estado
+
+                                        </button>
+
+                                    </form>
+
+                                </details>
+
+                                <!-- ADMINISTRADORES -->
+
+                                <span
+                                    class="cuenta-protegida"
+                                    th:unless="${usuario.editable}">
+
+                                    <span title="Las cuentas administrativas están protegidas">
+                                        <span aria-hidden="true">🔒</span>
+                                        Cuenta protegida
+                                    </span>
+
+                                </span>
+
                             </td>
 
                         </tr>
@@ -817,11 +1061,52 @@
 
         </section>
 
+        <!-- INFORMACION DE SEGURIDAD -->
+
+        <section class="card">
+
+            <h2>
+                Información sobre los estados
+            </h2>
+
+            <p class="ayuda">
+
+                <span class="estado activo">
+                    Activo
+                </span>
+
+                La cuenta puede acceder
+                a sus funciones autorizadas.
+
+            </p>
+
+            <p class="ayuda">
+
+                <span class="estado inactivo">
+                    Inactivo
+                </span>
+
+                La cuenta no podrá iniciar sesión
+                ni continuar utilizando
+                sus funciones mientras
+                permanezca desactivada.
+
+            </p>
+
+            <p class="ayuda">
+
+                Cambiar el estado no elimina
+                al usuario, no modifica sus puntos
+                y no borra sus recolectas
+                ni sus canjes anteriores.
+
+            </p>
+
+        </section>
+
     </main>
 
-    <!-- =====================================
-         PIE DE PAGINA
-    ===================================== -->
+    <!-- PIE DE PAGINA -->
 
     <footer>
 

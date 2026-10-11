@@ -1,18 +1,23 @@
-
 <!DOCTYPE html>
 <html lang="es"
-      xmlns:th="http://www.thymeleaf.org">
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
 <head>
     <meta charset="UTF-8">
+
     <meta name="viewport"
           content="width=device-width, initial-scale=1.0">
+
     <title th:text="${titulo} + ' | Inicio'">
         PERÚ RECICLA | Inicio
     </title>
+
     <style>
         /* =====================================
            COLORES INSTITUCIONALES
         ===================================== */
+
         :root {
             --verde: #16804d;
             --verde-oscuro: #105a38;
@@ -46,6 +51,7 @@
         /* =====================================
            ENCABEZADO
         ===================================== */
+
         .encabezado {
             background: var(--blanco);
             box-shadow: 0 2px 12px rgba(0,0,0,0.06);
@@ -86,8 +92,9 @@
         }
 
         /* =====================================
-           NUEVO BOTON INICIAR SESION
+           BOTON INICIAR SESION
         ===================================== */
+
         .menu .boton-login {
             display: inline-block;
             padding: 10px 18px;
@@ -104,8 +111,9 @@
         }
 
         /* =====================================
-           BOTON DE REGISTRO EXISTENTE
+           BOTON DE REGISTRO / MI PANEL
         ===================================== */
+
         .menu .boton-registro {
             background: var(--verde);
             color: white;
@@ -119,8 +127,33 @@
         }
 
         /* =====================================
+           PASO 80 - CERRAR SESION EN HOME
+        ===================================== */
+
+        .menu .form-salir {
+            margin: 0;
+        }
+
+        .menu .boton-salir {
+            display: inline-block;
+            padding: 10px 18px;
+            border: 1px solid #cbdcd1;
+            border-radius: 9px;
+            color: #8c3434;
+            background: white;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .menu .boton-salir:hover {
+            background: #fff0f0;
+        }
+
+        /* =====================================
            SECCION PRINCIPAL
         ===================================== */
+
         .hero {
             background: linear-gradient(
                 130deg,
@@ -171,6 +204,7 @@
         /* =====================================
            BOTONES PRINCIPALES
         ===================================== */
+
         .acciones-hero {
             display: flex;
             flex-wrap: wrap;
@@ -206,6 +240,7 @@
         /* =====================================
            TARJETA DE PRESENTACION
         ===================================== */
+
         .hero-tarjeta {
             background: rgba(255,255,255,0.12);
             border: 1px solid rgba(255,255,255,0.25);
@@ -232,6 +267,7 @@
         /* =====================================
            SECCIONES GENERALES
         ===================================== */
+
         .seccion {
             max-width: 1150px;
             margin: auto;
@@ -288,6 +324,7 @@
         /* =====================================
            COMO FUNCIONA
         ===================================== */
+
         .proceso {
             background: var(--verde-claro);
         }
@@ -309,6 +346,7 @@
         /* =====================================
            MODULOS
         ===================================== */
+
         .modulo {
             border-top: 4px solid var(--verde);
         }
@@ -327,6 +365,7 @@
         /* =====================================
            INVITACION AL REGISTRO
         ===================================== */
+
         .invitacion {
             background: var(--verde-claro);
             padding: 65px 24px;
@@ -357,6 +396,7 @@
         /* =====================================
            PIE DE PAGINA
         ===================================== */
+
         footer {
             background: #123827;
             color: white;
@@ -373,7 +413,9 @@
         /* =====================================
            DISEÑO RESPONSIVE
         ===================================== */
+
         @media (max-width: 900px) {
+
             .barra {
                 flex-direction: column;
                 text-align: center;
@@ -389,6 +431,7 @@
         }
 
         @media (max-width: 800px) {
+
             .hero {
                 padding: 55px 20px;
             }
@@ -411,6 +454,7 @@
         }
 
         @media (max-width: 500px) {
+
             .menu {
                 gap: 14px;
             }
@@ -431,9 +475,11 @@
 </head>
 
 <body>
+
     <!-- =====================================
          ENCABEZADO
     ===================================== -->
+
     <header class="encabezado">
 
         <nav class="barra"
@@ -444,6 +490,7 @@
             </a>
 
             <div class="menu">
+
                 <a th:href="@{/}">
                     Inicio
                 </a>
@@ -460,29 +507,98 @@
                     Módulos
                 </a>
 
-                <!-- NUEVO BOTON INICIAR SESION -->
+                <!-- =================================
+                     VISITANTES SIN SESION
+                ================================= -->
+
                 <a class="boton-login"
-                   th:href="@{/login}">
+                   th:href="@{/login}"
+                   sec:authorize="isAnonymous()">
+
                     Iniciar sesión
+
                 </a>
 
-                <!-- BOTON DE REGISTRO EXISTENTE -->
                 <a class="boton-registro"
-                   th:href="@{/registro}">
+                   th:href="@{/registro}"
+                   sec:authorize="isAnonymous()">
+
                     Registrarse
+
                 </a>
+
+                <!-- =================================
+                     ADMINISTRADOR AUTENTICADO
+                ================================= -->
+
+                <a class="boton-registro"
+                   th:href="@{/admin}"
+                   sec:authorize="hasAuthority('ROLE_administrador')">
+
+                    Ir a mi panel
+
+                </a>
+
+                <!-- =================================
+                     RECOLECTOR AUTENTICADO
+                ================================= -->
+
+                <a class="boton-registro"
+                   th:href="@{/recolector/panel}"
+                   sec:authorize="hasAuthority('ROLE_recolector')">
+
+                    Ir a mi panel
+
+                </a>
+
+                <!-- =================================
+                     VECINO AUTENTICADO
+                ================================= -->
+
+                <a class="boton-registro"
+                   th:href="@{/vecino}"
+                   sec:authorize="hasAuthority('ROLE_vecino')">
+
+                    Ir a mi panel
+
+                </a>
+
+                <!-- =================================
+                     CERRAR SESION
+                ================================= -->
+
+                <form class="form-salir"
+                      th:action="@{/logout}"
+                      method="post"
+                      sec:authorize="isAuthenticated()">
+
+                    <button class="boton-salir"
+                            type="submit">
+
+                        Cerrar sesión
+
+                    </button>
+
+                </form>
+
             </div>
+
         </nav>
+
     </header>
 
     <!-- =====================================
          SECCION PRINCIPAL
     ===================================== -->
+
     <main>
+
         <section class="hero">
+
             <div class="hero-contenido">
 
                 <div>
+
                     <span class="etiqueta">
                         PROYECTO PERÚ RECICLA
                     </span>
@@ -493,31 +609,82 @@
 
                     <p class="subtitulo"
                        th:text="${subtitulo}">
+
                         Ecosistema Digital de
                         Incentivos para el Reciclaje
+
                     </p>
 
                     <p th:text="${mensaje}">
+
                         Recicla, acumula puntos
                         y canjea recompensas.
+
                     </p>
 
-                    <!-- BOTONES PRINCIPALES -->
+                    <!-- =================================
+                         BOTONES PRINCIPALES
+                    ================================= -->
+
                     <div class="acciones-hero">
 
+                        <!-- VISITANTES -->
+
                         <a class="boton"
-                           th:href="@{/registro}">
+                           th:href="@{/registro}"
+                           sec:authorize="isAnonymous()">
+
                             Crear mi cuenta →
+
                         </a>
+
+                        <!-- ADMINISTRADOR -->
+
+                        <a class="boton"
+                           th:href="@{/admin}"
+                           sec:authorize="hasAuthority('ROLE_administrador')">
+
+                            Ir a mi panel de administración →
+
+                        </a>
+
+                        <!-- RECOLECTOR -->
+
+                        <a class="boton"
+                           th:href="@{/recolector/panel}"
+                           sec:authorize="hasAuthority('ROLE_recolector')">
+
+                            Ir a mi panel de recolector →
+
+                        </a>
+
+                        <!-- VECINO -->
+
+                        <a class="boton"
+                           th:href="@{/vecino}"
+                           sec:authorize="hasAuthority('ROLE_vecino')">
+
+                            Ir a mi panel de vecino →
+
+                        </a>
+
+                        <!-- ENLACE PUBLICO -->
 
                         <a class="boton boton-secundario"
                            href="#como-funciona">
+
                             Conoce cómo funciona
+
                         </a>
+
                     </div>
+
                 </div>
 
+                <!-- TARJETA DE PRESENTACION -->
+
                 <div class="hero-tarjeta">
+
                     <div class="hero-icono">
                         ♻
                     </div>
@@ -531,17 +698,22 @@
                         reciclables en puntos
                         para obtener recompensas.
                     </p>
+
                 </div>
+
             </div>
+
         </section>
 
         <!-- =================================
              BENEFICIOS
         ================================= -->
+
         <section class="seccion"
                  id="beneficios">
 
             <div class="seccion-titulo">
+
                 <h2>
                     ¿Por qué reciclar con nosotros?
                 </h2>
@@ -551,10 +723,13 @@
                     mediante un sistema digital
                     de incentivos y recompensas.
                 </p>
+
             </div>
 
             <div class="tarjetas">
+
                 <article class="tarjeta">
+
                     <div class="tarjeta-icono">
                         ♻
                     </div>
@@ -569,9 +744,11 @@
                         y contribuye al cuidado
                         del medio ambiente.
                     </p>
+
                 </article>
 
                 <article class="tarjeta">
+
                     <div class="tarjeta-icono">
                         ★
                     </div>
@@ -585,9 +762,11 @@
                         con el peso y tipo
                         de material reciclado.
                     </p>
+
                 </article>
 
                 <article class="tarjeta">
+
                     <div class="tarjeta-icono">
                         🎁
                     </div>
@@ -602,19 +781,24 @@
                         productos disponibles
                         en nuestro catálogo.
                     </p>
+
                 </article>
+
             </div>
+
         </section>
 
         <!-- =================================
              COMO FUNCIONA
         ================================= -->
+
         <div class="proceso">
 
             <section class="seccion"
                      id="como-funciona">
 
                 <div class="seccion-titulo">
+
                     <h2>
                         ¿Cómo funciona PERÚ RECICLA?
                     </h2>
@@ -624,10 +808,13 @@
                         diseñado para ser
                         sencillo y accesible.
                     </p>
+
                 </div>
 
                 <div class="tarjetas">
+
                     <article class="tarjeta">
+
                         <div class="paso-numero">
                             1
                         </div>
@@ -641,9 +828,11 @@
                             vecino para participar
                             en el programa.
                         </p>
+
                     </article>
 
                     <article class="tarjeta">
+
                         <div class="paso-numero">
                             2
                         </div>
@@ -658,9 +847,11 @@
                             Los puntos se acreditarán
                             después de la validación.
                         </p>
+
                     </article>
 
                     <article class="tarjeta">
+
                         <div class="paso-numero">
                             3
                         </div>
@@ -675,34 +866,43 @@
                             para solicitar una
                             recompensa disponible.
                         </p>
+
                     </article>
+
                 </div>
+
             </section>
+
         </div>
 
         <!-- =================================
              MODULOS DEL SISTEMA
         ================================= -->
+
         <section class="seccion"
                  id="modulos">
 
             <div class="seccion-titulo">
+
                 <h2>
                     Módulos del sistema
                 </h2>
 
                 <p>
-                    PERÚ RECICLA contará
+                    PERÚ RECICLA cuenta
                     con tres perfiles principales,
                     cada uno con funcionalidades
                     específicas.
                 </p>
+
             </div>
 
             <div class="tarjetas">
 
                 <!-- VECINO -->
+
                 <article class="tarjeta modulo">
+
                     <div class="tarjeta-icono">
                         👤
                     </div>
@@ -719,12 +919,15 @@
                     </p>
 
                     <span class="modulo-estado">
-                        En implementación
+                        Disponible
                     </span>
+
                 </article>
 
                 <!-- RECOLECTOR -->
+
                 <article class="tarjeta modulo">
+
                     <div class="tarjeta-icono">
                         🚚
                     </div>
@@ -741,12 +944,15 @@
                     </p>
 
                     <span class="modulo-estado">
-                        En implementación
+                        Disponible
                     </span>
+
                 </article>
 
                 <!-- ADMINISTRADOR -->
+
                 <article class="tarjeta modulo">
+
                     <div class="tarjeta-icono">
                         ⚙
                     </div>
@@ -763,17 +969,21 @@
                     </p>
 
                     <span class="modulo-estado">
-                        En implementación
+                        Disponible
                     </span>
+
                 </article>
 
             </div>
+
         </section>
 
         <!-- =================================
-             INVITACION AL REGISTRO
+             INVITACION PARA VISITANTES
         ================================= -->
-        <section class="invitacion">
+
+        <section class="invitacion"
+                 sec:authorize="isAnonymous()">
 
             <h2>
                 ¡Comienza a reciclar hoy!
@@ -788,16 +998,70 @@
 
             <a class="boton"
                th:href="@{/registro}">
+
                 Registrarme ahora →
+
             </a>
 
         </section>
+
+        <!-- =================================
+             INVITACION PARA SESION ACTIVA
+        ================================= -->
+
+        <section class="invitacion"
+                 sec:authorize="isAuthenticated()">
+
+            <h2>
+                ¡Continúa participando en PERÚ RECICLA!
+            </h2>
+
+            <p>
+                Tu sesión está activa.
+                Regresa a tu panel para consultar
+                las funciones de tu cuenta.
+            </p>
+
+            <!-- ADMINISTRADOR -->
+
+            <a class="boton"
+               th:href="@{/admin}"
+               sec:authorize="hasAuthority('ROLE_administrador')">
+
+                Ir a mi panel →
+
+            </a>
+
+            <!-- RECOLECTOR -->
+
+            <a class="boton"
+               th:href="@{/recolector/panel}"
+               sec:authorize="hasAuthority('ROLE_recolector')">
+
+                Ir a mi panel →
+
+            </a>
+
+            <!-- VECINO -->
+
+            <a class="boton"
+               th:href="@{/vecino}"
+               sec:authorize="hasAuthority('ROLE_vecino')">
+
+                Ir a mi panel →
+
+            </a>
+
+        </section>
+
     </main>
 
     <!-- =====================================
          PIE DE PAGINA
     ===================================== -->
+
     <footer>
+
         <strong>
             ♻ PERÚ RECICLA
         </strong>
@@ -810,6 +1074,8 @@
         <p>
             Proyecto académico - Cibertec
         </p>
+
     </footer>
+
 </body>
 </html>

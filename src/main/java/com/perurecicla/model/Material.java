@@ -1,32 +1,29 @@
-
 package com.perurecicla.model;
 
 import jakarta.persistence.*;
 import java.math.BigDecimal;
 
 /**
- * PERU RECICLA
+ * PERU RECICLA - PASO 82
  *
- * Entidad Material
+ * Entidad de materiales reciclables.
  *
- * Representa los materiales reciclables
- * registrados en la base de datos MySQL.
+ * Conserva:
+ * - Nombre
+ * - Puntos por gramo
+ * - Imagen
+ * - Descripcion
  *
- * Tabla: Materiales
+ * Incorpora estado activo/inactivo.
  */
-
 @Entity
 @Table(name = "Materiales")
 public class Material {
-
-    // IDENTIFICADOR DEL MATERIAL
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_material")
     private Integer id_material;
-
-    // TIPO DE MATERIAL
 
     @Column(
         name = "tipo_material",
@@ -34,8 +31,6 @@ public class Material {
         length = 50
     )
     private String tipo_material;
-
-    // PUNTOS GENERADOS POR GRAMO
 
     @Column(
         name = "puntos_por_gramo",
@@ -45,15 +40,11 @@ public class Material {
     )
     private BigDecimal puntos_por_gramo;
 
-    // IMAGEN DEL MATERIAL
-
     @Column(
         name = "url_imagen",
         length = 255
     )
     private String url_imagen;
-
-    // DESCRIPCION DEL MATERIAL
 
     @Column(
         name = "descripcion",
@@ -61,12 +52,24 @@ public class Material {
     )
     private String descripcion;
 
-    // CONSTRUCTOR VACIO
+    // NUEVO: ESTADO DEL MATERIAL
+
+    @Enumerated(EnumType.STRING)
+    @Column(
+        name = "estado",
+        nullable = false,
+        columnDefinition = "ENUM('activo','inactivo')"
+    )
+    private EstadoMaterial estado =
+            EstadoMaterial.activo;
+
+    public enum EstadoMaterial {
+        activo,
+        inactivo
+    }
 
     public Material() {
     }
-
-    // GETTERS Y SETTERS
 
     public Integer getId_material() {
         return id_material;
@@ -90,6 +93,7 @@ public class Material {
 
     public void setPuntos_por_gramo(
             BigDecimal puntos_por_gramo) {
+
         this.puntos_por_gramo = puntos_por_gramo;
     }
 
@@ -107,5 +111,13 @@ public class Material {
 
     public void setDescripcion(String descripcion) {
         this.descripcion = descripcion;
+    }
+
+    public EstadoMaterial getEstado() {
+        return estado;
+    }
+
+    public void setEstado(EstadoMaterial estado) {
+        this.estado = estado;
     }
 }

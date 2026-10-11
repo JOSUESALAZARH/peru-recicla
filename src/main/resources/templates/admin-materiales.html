@@ -1,0 +1,775 @@
+<!DOCTYPE html>
+<html lang="es"
+      xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>
+        Gestión de materiales | PERÚ RECICLA
+    </title>
+
+    <style>
+        :root {
+            --verde: #16804d;
+            --oscuro: #105a38;
+            --fondo: #f6f9f6;
+            --gris: #60736a;
+            --borde: #dce9e0;
+            --texto: #20392b;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            background: var(--fondo);
+            color: var(--texto);
+            font-family: Arial, Helvetica, sans-serif;
+            line-height: 1.55;
+        }
+
+        a {
+            text-decoration: none;
+        }
+
+        .barra {
+            background: white;
+            padding: 18px max(
+                24px,
+                calc((100% - 1150px) / 2)
+            );
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 18px;
+            flex-wrap: wrap;
+            box-shadow: 0 2px 12px #0000000b;
+        }
+
+        .logo {
+            color: var(--oscuro);
+            font-size: 22px;
+            font-weight: bold;
+        }
+
+        nav {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 18px;
+        }
+
+        nav a {
+            color: var(--oscuro);
+            font-weight: bold;
+            font-size: 13px;
+        }
+
+        .salir {
+            background: white;
+            border: 1px solid var(--verde);
+            border-radius: 9px;
+            padding: 10px 14px;
+            color: var(--oscuro);
+            cursor: pointer;
+        }
+
+        main {
+            max-width: 1150px;
+            padding: 0 20px 70px;
+            margin: 38px auto;
+        }
+
+        .hero {
+            background: linear-gradient(
+                120deg,
+                #105a38,
+                #16804d
+            );
+            color: white;
+            border-radius: 20px;
+            padding: 36px;
+        }
+
+        .hero h1 {
+            margin: 10px 0;
+            font-size: 32px;
+        }
+
+        .hero p {
+            margin: 0;
+            color: #e3f4e9;
+        }
+
+        .etiqueta {
+            font-size: 12px;
+            background: #ffffff2e;
+            padding: 7px 12px;
+            border-radius: 24px;
+            display: inline-block;
+        }
+
+        .indicadores {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+            margin: 24px 0;
+        }
+
+        .indicador,
+        .card {
+            background: white;
+            border: 1px solid var(--borde);
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 4px 16px #00000008;
+        }
+
+        .indicador small {
+            color: var(--gris);
+        }
+
+        .indicador strong {
+            display: block;
+            color: var(--verde);
+            font-size: 32px;
+        }
+
+        .card {
+            margin-top: 22px;
+        }
+
+        h2 {
+            color: var(--oscuro);
+            margin: 0 0 10px;
+        }
+
+        .ayuda {
+            color: var(--gris);
+            font-size: 14px;
+        }
+
+        .cabecera {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 14px;
+            flex-wrap: wrap;
+            margin-bottom: 15px;
+        }
+
+        .boton {
+            background: var(--verde);
+            color: white;
+            padding: 11px 17px;
+            border: 0;
+            border-radius: 9px;
+            cursor: pointer;
+            font-weight: bold;
+            display: inline-block;
+            font-size: 13px;
+        }
+
+        .boton:hover {
+            background: var(--oscuro);
+        }
+
+        .secundario {
+            background: #e4f3e9;
+            color: var(--oscuro);
+        }
+
+        .secundario:hover {
+            background: #cde6d5;
+        }
+
+        .alerta {
+            border-radius: 10px;
+            padding: 14px 16px;
+            margin: 18px 0;
+        }
+
+        .exito {
+            color: #125d38;
+            background: #e0f5e6;
+            border: 1px solid #a0ddb0;
+        }
+
+        .error {
+            color: #962a2a;
+            background: #fce8e8;
+            border: 1px solid #eeb9b9;
+        }
+
+        label {
+            display: block;
+            margin: 0 0 7px;
+            font-weight: bold;
+            font-size: 13px;
+        }
+
+        input,
+        textarea,
+        select {
+            width: 100%;
+            border: 1px solid #ccdcd1;
+            border-radius: 9px;
+            padding: 12px;
+            font-size: 14px;
+            background: white;
+        }
+
+        textarea {
+            resize: vertical;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 18px;
+        }
+
+        .campo-ancho {
+            grid-column: 1 / -1;
+        }
+
+        .form-acciones {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-top: 20px;
+        }
+
+        .tabla-contenedor {
+            overflow-x: auto;
+            border: 1px solid var(--borde);
+            border-radius: 12px;
+            margin-top: 16px;
+        }
+
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            min-width: 850px;
+            font-size: 13px;
+        }
+
+        thead {
+            background: var(--oscuro);
+            color: white;
+        }
+
+        th,
+        td {
+            padding: 14px 12px;
+            text-align: left;
+            border-bottom: 1px solid var(--borde);
+        }
+
+        th {
+            border-color: transparent;
+        }
+
+        tbody tr:hover {
+            background: #f4faf6;
+        }
+
+        .nombre {
+            font-weight: bold;
+            color: var(--oscuro);
+        }
+
+        .badge {
+            padding: 6px 10px;
+            border-radius: 9px;
+            font-weight: bold;
+            font-size: 12px;
+            display: inline-block;
+        }
+
+        .activo {
+            background: #e0f5e6;
+            color: #125d38;
+        }
+
+        .inactivo {
+            background: #fce8e8;
+            color: #9c2929;
+        }
+
+        .acciones {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .acciones form {
+            margin: 0;
+        }
+
+        .nota {
+            background: #fff6e8;
+            border: 1px solid #eed8b4;
+            padding: 16px;
+            border-radius: 12px;
+            margin-top: 22px;
+            font-size: 14px;
+        }
+
+        footer {
+            text-align: center;
+            background: #123827;
+            color: white;
+            font-size: 13px;
+            padding: 25px;
+        }
+
+        @media (max-width: 720px) {
+
+            .indicadores {
+                grid-template-columns: 1fr;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .hero {
+                padding: 27px;
+            }
+
+            .campo-ancho {
+                grid-column: auto;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <header class="barra">
+
+        <a class="logo"
+           th:href="@{/admin}">
+            ♻ PERÚ RECICLA
+        </a>
+
+        <nav aria-label="Navegación administrativa">
+
+            <a th:href="@{/admin}">
+                Mi dashboard
+            </a>
+
+            <a th:href="@{/admin/recolectas}">
+                Validar recolectas
+            </a>
+
+            <a th:href="@{/admin/recompensas}">
+                Recompensas
+            </a>
+
+            <a th:href="@{/admin/materiales}">
+                Materiales
+            </a>
+
+            <form th:action="@{/logout}"
+                  method="post">
+
+                <button class="salir"
+                        type="submit">
+                    Cerrar sesión
+                </button>
+
+            </form>
+
+        </nav>
+    </header>
+
+    <main>
+
+        <!-- PRESENTACION -->
+
+        <section class="hero">
+
+            <span class="etiqueta">
+                PANEL ADMINISTRATIVO
+            </span>
+
+            <h1>
+                ♻ Gestión de materiales
+            </h1>
+
+            <p>
+                Bienvenido,
+
+                <strong th:text="${administrador}">
+                    Administrador
+                </strong>.
+
+                Registra, edita y controla
+                la disponibilidad de
+                materiales reciclables.
+            </p>
+
+        </section>
+
+        <!-- INDICADORES -->
+
+        <section class="indicadores">
+
+            <article class="indicador">
+
+                <small>
+                    Materiales registrados
+                </small>
+
+                <strong th:text="${totalMateriales}">
+                    0
+                </strong>
+
+            </article>
+
+            <article class="indicador">
+
+                <small>
+                    Materiales activos
+                </small>
+
+                <strong th:text="${totalActivos}">
+                    0
+                </strong>
+
+            </article>
+
+            <article class="indicador">
+
+                <small>
+                    Materiales inactivos
+                </small>
+
+                <strong th:text="${totalInactivos}">
+                    0
+                </strong>
+
+            </article>
+
+        </section>
+
+        <!-- MENSAJES -->
+
+        <div class="alerta exito"
+             role="status"
+             th:if="${exito != null}"
+             th:text="${exito}">
+        </div>
+
+        <div class="alerta error"
+             role="alert"
+             th:if="${error != null}"
+             th:text="${error}">
+        </div>
+
+        <div class="alerta error"
+             role="alert"
+             th:if="${errorPagina != null}"
+             th:text="${errorPagina}">
+        </div>
+
+        <!-- FORMULARIO DE REGISTRO Y EDICION -->
+
+        <section class="card"
+                 th:if="${materialFormulario != null}"
+                 id="formulario">
+
+            <h2 th:text="${editando ? 'Editar material' : 'Registrar material'}">
+                Registrar material
+            </h2>
+
+            <p class="ayuda">
+                Los cambios de tarifa se aplican
+                a pesajes nuevos y no recalculan
+                los puntos históricos.
+            </p>
+
+            <form th:action="@{/admin/materiales/guardar}"
+                  method="post">
+
+                <input type="hidden"
+                       name="id"
+                       th:if="${editando}"
+                       th:value="${materialFormulario.id_material}">
+
+                <input type="hidden"
+                       th:name="${_csrf.parameterName}"
+                       th:value="${_csrf.token}">
+
+                <div class="form-grid">
+
+                    <div>
+
+                        <label for="tipo_material">
+                            Nombre del material
+                        </label>
+
+                        <input
+                            id="tipo_material"
+                            name="tipo_material"
+                            maxlength="50"
+                            required
+                            th:value="${materialFormulario.tipo_material}"
+                            placeholder="Ejemplo: Botellas PET">
+
+                    </div>
+
+                    <div>
+
+                        <label for="puntos_por_gramo">
+                            Puntos por gramo
+                        </label>
+
+                        <input
+                            id="puntos_por_gramo"
+                            name="puntos_por_gramo"
+                            type="text"
+                            inputmode="decimal"
+                            required
+                            pattern="[0-9]+([.,][0-9]{1,4})?"
+                            th:value="${materialFormulario.puntos_por_gramo}"
+                            placeholder="Ejemplo: 0.0500">
+
+                    </div>
+
+                    <div>
+
+                        <label for="estado">
+                            Estado
+                        </label>
+
+                        <select id="estado"
+                                name="estado"
+                                required>
+
+                            <option value="activo"
+                                    th:selected="${materialFormulario.estado == null or materialFormulario.estado.name() == 'activo'}">
+                                Activo
+                            </option>
+
+                            <option value="inactivo"
+                                    th:selected="${materialFormulario.estado != null and materialFormulario.estado.name() == 'inactivo'}">
+                                Inactivo
+                            </option>
+
+                        </select>
+
+                    </div>
+
+                    <div class="campo-ancho">
+
+                        <label for="descripcion">
+                            Descripción
+                        </label>
+
+                        <textarea
+                            id="descripcion"
+                            name="descripcion"
+                            rows="3"
+                            maxlength="2000"
+                            th:text="${materialFormulario.descripcion}"></textarea>
+
+                    </div>
+
+                </div>
+
+                <div class="form-acciones">
+
+                    <button class="boton"
+                            type="submit">
+                        Guardar material
+                    </button>
+
+                    <a class="boton secundario"
+                       th:href="@{/admin/materiales}">
+                        Cancelar
+                    </a>
+
+                </div>
+
+            </form>
+
+        </section>
+
+        <!-- LISTADO -->
+
+        <section class="card">
+
+            <div class="cabecera">
+
+                <div>
+
+                    <h2>
+                        Materiales registrados
+                    </h2>
+
+                    <p class="ayuda">
+                        Los materiales inactivos
+                        no se ofrecen en nuevos pesajes.
+                    </p>
+
+                </div>
+
+                <a class="boton"
+                   th:href="@{/admin/materiales(nuevo=true)}">
+                    + Nuevo material
+                </a>
+
+            </div>
+
+            <div class="tabla-contenedor"
+                 th:if="${!#lists.isEmpty(materiales)}">
+
+                <table>
+
+                    <thead>
+
+                        <tr>
+                            <th>ID</th>
+                            <th>Material</th>
+                            <th>Descripción</th>
+                            <th>Puntos/gramo</th>
+                            <th>Estado</th>
+                            <th>Acciones</th>
+                        </tr>
+
+                    </thead>
+
+                    <tbody>
+
+                        <tr th:each="m : ${materiales}">
+
+                            <td th:text="${m.id_material}">
+                                1
+                            </td>
+
+                            <td class="nombre"
+                                th:text="${m.tipo_material}">
+                                Plástico PET
+                            </td>
+
+                            <td th:text="${m.descripcion != null ? m.descripcion : '-'}">
+                                Descripción
+                            </td>
+
+                            <td th:text="${m.puntos_por_gramo}">
+                                0.0500
+                            </td>
+
+                            <td>
+
+                                <span class="badge"
+                                      th:classappend="${m.estado.name()}"
+                                      th:text="${m.estado}">
+                                    activo
+                                </span>
+
+                            </td>
+
+                            <td>
+
+                                <div class="acciones">
+
+                                    <a class="boton secundario"
+                                       th:href="@{/admin/materiales(editar=${m.id_material})}">
+                                        Editar
+                                    </a>
+
+                                    <form
+                                        th:action="@{/admin/materiales/cambiar-estado}"
+                                        method="post"
+                                        onsubmit="return confirm('¿Confirmas el cambio de disponibilidad de este material?');">
+
+                                        <input type="hidden"
+                                               name="id"
+                                               th:value="${m.id_material}">
+
+                                        <input type="hidden"
+                                               name="estado"
+                                               th:value="${m.estado.name() == 'activo' ? 'inactivo' : 'activo'}">
+
+                                        <input type="hidden"
+                                               th:name="${_csrf.parameterName}"
+                                               th:value="${_csrf.token}">
+
+                                        <button
+                                            class="boton"
+                                            type="submit"
+                                            th:classappend="${m.estado.name() == 'activo' ? 'secundario' : ''}"
+                                            th:text="${m.estado.name() == 'activo' ? 'Desactivar' : 'Activar'}">
+
+                                            Desactivar
+
+                                        </button>
+
+                                    </form>
+
+                                </div>
+
+                            </td>
+
+                        </tr>
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+            <p class="ayuda"
+               th:if="${#lists.isEmpty(materiales)}">
+
+                Todavía no existen materiales.
+                Registra el primero.
+
+            </p>
+
+        </section>
+
+        <!-- NOTA -->
+
+        <div class="nota">
+
+            <strong>Importante:</strong>
+
+            desactivar no elimina el material
+            ni sus recolectas.
+
+            Cambiar la tarifa no recalcula
+            los puntos guardados.
+
+            Los nuevos pesajes utilizarán
+            la tarifa vigente cuando se registren.
+
+        </div>
+
+    </main>
+
+    <footer>
+
+        <strong>
+            ♻ PERÚ RECICLA
+        </strong>
+
+        <div>
+            Gestión administrativa de materiales
+        </div>
+
+    </footer>
+
+</body>
+</html>

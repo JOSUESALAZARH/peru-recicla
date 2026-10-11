@@ -1,4 +1,3 @@
-
 package com.perurecicla.model;
 
 import jakarta.persistence.*;
@@ -101,6 +100,20 @@ public class Canje {
     }
 
     // =====================================
+    // AUDITORIA DE CANCELACION - PASO 83
+    // Solo se completa si fue cancelado.
+    // =====================================
+
+    @Column(name = "motivo_cancelacion", length = 300)
+    private String motivo_cancelacion;
+
+    @Column(name = "fecha_cancelacion")
+    private LocalDateTime fecha_cancelacion;
+
+    @Column(name = "id_administrador_cancelacion")
+    private Integer id_administrador_cancelacion;
+
+    // =====================================
     // CONSTRUCTOR VACIO
     // =====================================
 
@@ -169,5 +182,29 @@ public class Canje {
     public void setEstado(
             EstadoCanje estado) {
         this.estado = estado;
+    }
+
+    public String getMotivo_cancelacion() {
+        return motivo_cancelacion;
+    }
+
+    public void setMotivo_cancelacion(String motivo_cancelacion) {
+        this.motivo_cancelacion = motivo_cancelacion;
+    }
+
+    public LocalDateTime getFecha_cancelacion() {
+        return fecha_cancelacion;
+    }
+
+    public void setFecha_cancelacion(LocalDateTime fecha_cancelacion) {
+        this.fecha_cancelacion = fecha_cancelacion;
+    }
+
+    public Integer getId_administrador_cancelacion() {
+        return id_administrador_cancelacion;
+    }
+
+    public void setId_administrador_cancelacion(Integer id_administrador_cancelacion) {
+        this.id_administrador_cancelacion = id_administrador_cancelacion;
     }
 }

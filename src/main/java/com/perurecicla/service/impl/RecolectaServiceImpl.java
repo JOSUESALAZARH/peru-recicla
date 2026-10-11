@@ -1,4 +1,3 @@
-
 package com.perurecicla.service.impl;
 
 import com.perurecicla.model.Material;
@@ -24,18 +23,20 @@ import java.util.List;
 import java.util.Locale;
 
 /**
- * PERU RECICLA - PASO 61
+ * PERU RECICLA - PASO 82
+ *
+ * Mantiene registros y puntos historicos.
  *
  * Conserva:
- * - Registro de pesajes
- * - Calculo de puntos
- * - Registro pendiente
- * - Consultas e historial
- *
- * Refuerza:
- * - Validacion de recolectas
+ * - Registrar recolectas
+ * - Calcular y guardar puntos
+ * - Aprobar o rechazar recolectas
  * - Acreditacion unica
- * - Proteccion contra validaciones simultaneas
+ * - Historial y consultas
+ *
+ * Incorpora:
+ * - Validacion de material activo
+ * - Lectura protegida de la tarifa
  */
 @Service
 public class RecolectaServiceImpl
@@ -44,10 +45,6 @@ public class RecolectaServiceImpl
     private static final BigDecimal LIMITE =
         new BigDecimal("99999999.99");
 
-    // =====================================
-    // REPOSITORIOS
-    // =====================================
-
     private final RecolectaRepository recolectaRepository;
 
     private final UsuarioRepository usuarioRepository;
@@ -55,10 +52,6 @@ public class RecolectaServiceImpl
     private final MaterialRepository materialRepository;
 
     private final EntityManager entityManager;
-
-    // =====================================
-    // CONSTRUCTOR
-    // =====================================
 
     public RecolectaServiceImpl(
             RecolectaRepository recolectaRepository,
@@ -73,13 +66,13 @@ public class RecolectaServiceImpl
     }
 
     // =====================================
-    // REGISTRAR PESO
-    // LOGICA CONSERVADA
+    // REGISTRAR RECOLECTA
     // =====================================
 
     @Override
     @Transactional
-    public Recolecta registrarPeso(Recolecta recolecta) {
+    public Recolecta registrarPeso(
+            Recolecta recolecta) {
 
         if (recolecta == null) {
 
@@ -88,7 +81,8 @@ public class RecolectaServiceImpl
             );
         }
 
-        BigDecimal peso = recolecta.getPeso();
+        BigDecimal peso =
+            recolecta.getPeso();
 
         if (peso == null
                 || peso.compareTo(BigDecimal.ZERO) <= 0) {
@@ -123,15 +117,17 @@ public class RecolectaServiceImpl
             );
         }
 
-        Usuario vecino = usuarioRepository
-            .findById(
-                recolecta.getVecino().getId_usuario()
-            )
-            .orElseThrow(() ->
-                new IllegalArgumentException(
-                    "El vecino no existe"
+        Usuario vecino =
+            usuarioRepository
+                .findById(
+                    recolecta.getVecino()
+                        .getId_usuario()
                 )
-            );
+                .orElseThrow(() ->
+                    new IllegalArgumentException(
+                        "El vecino no existe"
+                    )
+                );
 
         if (vecino.getRol()
                 != Usuario.Rol.ROLE_vecino) {
@@ -154,16 +150,17 @@ public class RecolectaServiceImpl
             );
         }
 
-        Usuario recolector = usuarioRepository
-            .findById(
-                recolecta.getRecolector()
-                    .getId_usuario()
-            )
-            .orElseThrow(() ->
-                new IllegalArgumentException(
-                    "El recolector no existe"
+        Usuario recolector =
+            usuarioRepository
+                .findById(
+                    recolecta.getRecolector()
+                        .getId_usuario()
                 )
-            );
+                .orElseThrow(() ->
+                    new IllegalArgumentException(
+                        "El recolector no existe"
+                    )
+                );
 
         if (recolector.getRol()
                 != Usuario.Rol.ROLE_recolector) {
@@ -186,28 +183,47 @@ public class RecolectaServiceImpl
             );
         }
 
-        Material material = materialRepository
-            .findById(
-                recolecta.getMaterial()
-                    .getId_material()
-            )
-            .orElseThrow(() ->
-                new IllegalArgumentException(
-                    "El material no existe"
+        Material material =
+            materialRepository
+                .findById(
+                    recolecta.getMaterial()
+                        .getId_material()
                 )
+                .orElseThrow(() ->
+                    new IllegalArgumentException(
+                        "El material no existe"
+                    )
+                );
+
+        // =================================
+        // PROTEGER LECTURA DE LA TARIFA
+        // =================================
+
+        entityManager.refresh(
+            material,
+            LockModeType.PESSIMISTIC_READ
+        );
+
+        // NUEVO: VALIDAR ESTADO ACTIVO
+
+        if (material.getEstado()
+                != Material.EstadoMaterial.activo) {
+
+            throw new IllegalArgumentException(
+                "El material esta inactivo "
+                + "y no admite nuevos pesajes"
             );
+        }
 
         // =================================
         // CALCULAR PUNTOS
         // =================================
 
-        BigDecimal puntosPorGramo =
+        BigDecimal factor =
             material.getPuntos_por_gramo();
 
-        if (puntosPorGramo == null
-                || puntosPorGramo.compareTo(
-                    BigDecimal.ZERO
-                ) <= 0) {
+        if (factor == null
+                || factor.compareTo(BigDecimal.ZERO) <= 0) {
 
             throw new IllegalArgumentException(
                 "El material no tiene una puntuacion valida"
@@ -215,15 +231,14 @@ public class RecolectaServiceImpl
         }
 
         BigDecimal puntosGenerados =
-            peso.multiply(puntosPorGramo)
+            peso.multiply(factor)
                 .setScale(
                     2,
                     RoundingMode.HALF_UP
                 );
 
         if (puntosGenerados.compareTo(
-                BigDecimal.ZERO
-            ) <= 0) {
+                BigDecimal.ZERO) <= 0) {
 
             throw new IllegalArgumentException(
                 "El peso registrado no genera puntos"
@@ -238,18 +253,29 @@ public class RecolectaServiceImpl
         }
 
         // =================================
-        // PREPARAR NUEVA RECOLECTA
+        // REGISTRAR VALOR HISTORICO
         // =================================
 
         recolecta.setId_recolecta(null);
 
-        recolecta.setVecino(vecino);
+        recolecta.setVecino(
+            vecino
+        );
 
-        recolecta.setRecolector(recolector);
+        recolecta.setRecolector(
+            recolector
+        );
 
-        recolecta.setMaterial(material);
+        recolecta.setMaterial(
+            material
+        );
 
-        recolecta.setPeso(peso);
+        recolecta.setPeso(
+            peso
+        );
+
+        // Este valor permanece guardado
+        // aunque cambie la tarifa.
 
         recolecta.setPuntos_generados(
             puntosGenerados
@@ -270,7 +296,6 @@ public class RecolectaServiceImpl
 
     // =====================================
     // VALIDAR O RECHAZAR RECOLECTA
-    // REFORZADO - PASO 61
     // =====================================
 
     @Override
@@ -279,11 +304,8 @@ public class RecolectaServiceImpl
             Integer idRecolecta,
             String estado) {
 
-        // =================================
-        // VALIDAR PARAMETROS
-        // =================================
-
-        if (idRecolecta == null || idRecolecta <= 0) {
+        if (idRecolecta == null
+                || idRecolecta <= 0) {
 
             throw new IllegalArgumentException(
                 "El ID de recolecta no es valido"
@@ -298,7 +320,9 @@ public class RecolectaServiceImpl
         }
 
         String nuevoEstado =
-            estado.strip().toLowerCase(Locale.ROOT);
+            estado.strip().toLowerCase(
+                Locale.ROOT
+            );
 
         if (!nuevoEstado.equals("validado")
                 && !nuevoEstado.equals("rechazado")) {
@@ -308,19 +332,19 @@ public class RecolectaServiceImpl
             );
         }
 
-        // =================================
-        // BLOQUEAR RECOLECTA
-        // =================================
+        // Bloqueo existente del PASO 61.
 
-        Recolecta recolecta = recolectaRepository
-            .buscarPorIdParaValidacion(idRecolecta)
-            .orElseThrow(() ->
-                new IllegalArgumentException(
-                    "La recolecta no existe"
+        Recolecta recolecta =
+            recolectaRepository
+                .buscarPorIdParaValidacion(
+                    idRecolecta
                 )
-            );
+                .orElseThrow(() ->
+                    new IllegalArgumentException(
+                        "La recolecta no existe"
+                    )
+                );
 
-        // Una recolecta procesada no se repite.
         if (recolecta.getEstado_validacion()
                 != Recolecta.EstadoValidacion.pendiente) {
 
@@ -329,11 +353,11 @@ public class RecolectaServiceImpl
             );
         }
 
-        // =================================
-        // APROBAR
-        // =================================
-
         if (nuevoEstado.equals("validado")) {
+
+            // =============================
+            // APROBAR Y ACREDITAR
+            // =============================
 
             if (recolecta.getVecino() == null
                     || recolecta.getVecino()
@@ -344,19 +368,18 @@ public class RecolectaServiceImpl
                 );
             }
 
-            Usuario vecino = usuarioRepository
-                .findById(
-                    recolecta.getVecino()
-                        .getId_usuario()
-                )
-                .orElseThrow(() ->
-                    new IllegalArgumentException(
-                        "El vecino no existe"
+            Usuario vecino =
+                usuarioRepository
+                    .findById(
+                        recolecta.getVecino()
+                            .getId_usuario()
                     )
-                );
+                    .orElseThrow(() ->
+                        new IllegalArgumentException(
+                            "El vecino no existe"
+                        )
+                    );
 
-            // Bloquear y actualizar los datos
-            // del vecino dentro de la transaccion.
             entityManager.refresh(
                 vecino,
                 LockModeType.PESSIMISTIC_WRITE
@@ -372,13 +395,15 @@ public class RecolectaServiceImpl
                 );
             }
 
+            // Tomar los puntos guardados,
+            // NO la tarifa actual del material.
+
             BigDecimal puntosGenerados =
                 recolecta.getPuntos_generados();
 
             if (puntosGenerados == null
-                    || puntosGenerados.compareTo(
-                        BigDecimal.ZERO
-                    ) <= 0) {
+                    || puntosGenerados
+                        .compareTo(BigDecimal.ZERO) <= 0) {
 
                 throw new IllegalStateException(
                     "La recolecta no tiene puntos validos"
@@ -391,7 +416,9 @@ public class RecolectaServiceImpl
                     : vecino.getPuntos_acumulados();
 
             BigDecimal nuevoSaldo =
-                saldoActual.add(puntosGenerados);
+                saldoActual.add(
+                    puntosGenerados
+                );
 
             if (nuevoSaldo.compareTo(LIMITE) > 0) {
 
@@ -400,34 +427,36 @@ public class RecolectaServiceImpl
                 );
             }
 
-            // Acreditar puntos.
-            vecino.setPuntos_acumulados(nuevoSaldo);
+            vecino.setPuntos_acumulados(
+                nuevoSaldo
+            );
 
-            // Marcar la recolecta como validada.
             recolecta.setEstado_validacion(
                 Recolecta.EstadoValidacion.validado
             );
 
-            usuarioRepository.save(vecino);
+            usuarioRepository.save(
+                vecino
+            );
 
         } else {
 
-            // =================================
-            // RECHAZAR
-            // =================================
+            // =============================
+            // RECHAZAR RECOLECTA
+            // =============================
 
             recolecta.setEstado_validacion(
                 Recolecta.EstadoValidacion.rechazado
             );
         }
 
-        // Ambos cambios se confirman juntos
-        // dentro de la misma transaccion.
-        recolectaRepository.save(recolecta);
+        recolectaRepository.save(
+            recolecta
+        );
     }
 
     // =====================================
-    // LISTAR TODAS LAS RECOLECTAS
+    // LISTAR TODAS
     // =====================================
 
     @Override
@@ -438,7 +467,7 @@ public class RecolectaServiceImpl
     }
 
     // =====================================
-    // LISTAR RECOLECTAS PENDIENTES
+    // LISTAR PENDIENTES
     // =====================================
 
     @Override
@@ -459,20 +488,22 @@ public class RecolectaServiceImpl
     public List<Recolecta> listarHistorialPorVecino(
             Integer idUsuario) {
 
-        if (idUsuario == null || idUsuario <= 0) {
+        if (idUsuario == null
+                || idUsuario <= 0) {
 
             throw new IllegalArgumentException(
                 "El ID del usuario no es valido"
             );
         }
 
-        Usuario vecino = usuarioRepository
-            .findById(idUsuario)
-            .orElseThrow(() ->
-                new IllegalArgumentException(
-                    "El vecino no existe"
-                )
-            );
+        Usuario vecino =
+            usuarioRepository
+                .findById(idUsuario)
+                .orElseThrow(() ->
+                    new IllegalArgumentException(
+                        "El vecino no existe"
+                    )
+                );
 
         return recolectaRepository.findByVecino(
             vecino

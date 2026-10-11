@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="es"
       xmlns:th="http://www.thymeleaf.org">
@@ -11,6 +10,7 @@
         /* =====================================
            PERU RECICLA
            HISTORIAL DE CANJES DEL VECINO
+           PASO 84
         ===================================== */
         :root {
             --verde: #16804d;
@@ -226,6 +226,47 @@
             font-size: 12px;
             font-weight: bold;
             overflow-wrap: anywhere;
+        }
+        /* =====================================
+           PASO 84 - COLORES POR ESTADO
+           Pendiente: amarillo
+           Entregado: verde
+           Cancelado: rojo
+        ===================================== */
+        .estado.pendiente {
+            background: #fff1d9;
+            color: #825400;
+            border: 1px solid #f0d391;
+        }
+        .estado.entregado {
+            background: #e0f5e6;
+            color: #12633a;
+            border: 1px solid #b7e2c5;
+        }
+        .estado.cancelado {
+            background: #fce8e8;
+            color: #a52828;
+            border: 1px solid #edb8b8;
+        }
+        /* =====================================
+           LEYENDA DE ESTADOS
+        ===================================== */
+        .leyenda-estados {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 10px 16px;
+            margin: 0 0 22px;
+            font-size: 13px;
+            color: var(--gris);
+        }
+        .leyenda-estados .estado {
+            text-transform: capitalize;
+        }
+        .nota-puntos {
+            margin: 0 0 20px;
+            font-size: 13px;
+            color: var(--gris);
         }
         /* =====================================
            DESCARGA DEL COMPROBANTE PDF
@@ -457,6 +498,21 @@
                 puntos utilizados, estado y
                 descarga el comprobante PDF de cada operación.
             </p>
+            <!-- PASO 84: LEYENDA DE ESTADOS -->
+            <div class="leyenda-estados"
+                 th:if="${!#lists.isEmpty(canjes)}">
+                <span class="estado pendiente">Pendiente</span>
+                <span>Por entregar</span>
+                <span class="estado entregado">Entregado</span>
+                <span>Entrega confirmada</span>
+                <span class="estado cancelado">Cancelado</span>
+                <span>Puntos devueltos</span>
+            </div>
+            <p class="nota-puntos"
+               th:if="${!#lists.isEmpty(canjes)}">
+                La columna de puntos muestra el costo original del ticket.
+                Si el canje fue cancelado, esos puntos ya se devolvieron a tu saldo.
+            </p>
             <!-- =================================
                  CUANDO NO EXISTEN CANJES
             ================================= -->
@@ -487,7 +543,7 @@
                             <th>Código de ticket</th>
                             <th>Fecha</th>
                             <th>Recompensa</th>
-                            <th>Puntos usados</th>
+                            <th>Puntos del ticket</th>
                             <th>Estado</th>
                             <th>Comprobante</th>
                         </tr>
@@ -509,7 +565,7 @@
                             <td th:text="${c.recompensa != null ? c.recompensa.nombre : 'No especificada'}">
                                 Recompensa
                             </td>
-                            <!-- PUNTOS DESCONTADOS -->
+                            <!-- PUNTOS DEL TICKET -->
                             <td class="puntos">
                                 <span th:text="${c.puntos_descontados != null ? c.puntos_descontados : 0}">
                                     0
@@ -519,6 +575,7 @@
                             <!-- ESTADO DEL CANJE -->
                             <td>
                                 <span class="estado"
+                                      th:classappend="${c.estado != null ? c.estado.name() : ''}"
                                       th:text="${c.estado != null ? c.estado : 'Sin estado'}">
                                     pendiente
                                 </span>

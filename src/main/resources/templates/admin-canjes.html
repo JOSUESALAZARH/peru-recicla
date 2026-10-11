@@ -264,6 +264,56 @@
             color: #a52828;
         }
 
+        /* PASO 83 - CANCELACION SEGURA */
+
+        .cancelacion {
+            margin-top: 22px;
+            padding: 23px;
+            background: #fff6f5;
+            border: 1px solid #e8c3bf;
+            border-radius: 12px;
+        }
+
+        .cancelacion h2 {
+            color: #922f29;
+        }
+
+        .cancelacion p {
+            color: #72534e;
+            font-size: 14px;
+        }
+
+        .cancelacion textarea {
+            display: block;
+            width: 100%;
+            max-width: 700px;
+            min-height: 95px;
+            resize: vertical;
+            padding: 12px;
+            border: 1px solid #cca6a2;
+            border-radius: 10px;
+            font: inherit;
+            margin-bottom: 15px;
+        }
+
+        .boton-cancelar {
+            background: #a52f2f;
+            color: white;
+        }
+
+        .boton-cancelar:hover {
+            background: #812020;
+        }
+
+        .dato-cancelacion {
+            background: #fff6f5;
+            border: 1px solid #efd0ca;
+            border-radius: 10px;
+            padding: 16px;
+            margin-top: 18px;
+            overflow-wrap: anywhere;
+        }
+
         .confirmacion {
             margin-top: 28px;
             padding: 24px;
@@ -546,7 +596,9 @@
 
                 Consulta los tickets pendientes,
                 verifica los datos y registra
-                las entregas físicas.
+                las entregas físicas
+                o cancela canjes pendientes
+                con devolución de puntos y stock.
             </p>
 
         </section>
@@ -712,6 +764,56 @@
 
             </div>
 
+            <!-- PASO 83 - CANCELACION SOLO PENDIENTE -->
+
+            <div class="cancelacion"
+                 th:if="${canje.estado != null and canje.estado.name() == 'pendiente'}">
+
+                <h2>Cancelar este canje</h2>
+
+                <p>
+                    Esta acción devuelve al vecino exactamente los puntos
+                    descontados en el ticket y restituye una unidad
+                    de stock. No podrá repetirse ni aplicarse a tickets entregados.
+                </p>
+
+                <form th:action="@{/admin/canjes/cancelar}"
+                      method="post"
+                      onsubmit="return confirm('¿Confirmas la CANCELACIÓN de este canje y la devolución de sus puntos y stock?');">
+
+                    <input type="hidden"
+                           name="codigo"
+                           th:value="${canje.codigo_ticket}">
+
+                    <input type="hidden"
+                           name="pagina"
+                           th:value="${paginaActual}">
+
+                    <input type="hidden"
+                           th:name="${_csrf.parameterName}"
+                           th:value="${_csrf.token}">
+
+                    <label for="motivoCancelacion">
+                        Motivo de la cancelación
+                    </label>
+
+                    <textarea
+                        id="motivoCancelacion"
+                        name="motivo"
+                        minlength="8"
+                        maxlength="300"
+                        required
+                        placeholder="Ejemplo: El vecino solicitó anular el canje antes de retirar el producto."></textarea>
+
+                    <button type="submit"
+                            class="boton boton-cancelar">
+                        ✕ Cancelar canje y devolver puntos
+                    </button>
+
+                </form>
+
+            </div>
+
             <!-- ESTADO FINAL -->
 
             <div class="mensaje exito"
@@ -728,11 +830,39 @@
                 Este canje está cancelado
                 y no puede entregarse.
 
+                <div class="dato-cancelacion">
+
+                    <p>
+                        <strong>Motivo:</strong>
+
+                        <span th:text="${canje.motivo_cancelacion != null ? canje.motivo_cancelacion : 'No registrado'}">
+                            Motivo
+                        </span>
+                    </p>
+
+                    <p>
+                        <strong>Fecha:</strong>
+
+                        <span th:text="${canje.fecha_cancelacion != null ? #temporals.format(canje.fecha_cancelacion, 'dd/MM/yyyy HH:mm') : 'No registrada'}">
+                            Fecha
+                        </span>
+                    </p>
+
+                    <p>
+                        <strong>ID del administrador:</strong>
+
+                        <span th:text="${canje.id_administrador_cancelacion != null ? canje.id_administrador_cancelacion : 'No registrado'}">
+                            ID
+                        </span>
+                    </p>
+
+                </div>
+
             </div>
 
         </section>
 
-        <!-- NUEVO: LISTADO DE CANJES PENDIENTES -->
+        <!-- LISTADO DE CANJES PENDIENTES -->
 
         <section class="card"
                  id="pendientes">
@@ -833,7 +963,7 @@
                             <!-- RECOMPENSA -->
 
                             <td th:text="${fila.recompensa}">
-                                Aceite de oliva
+                                Recompensa
                             </td>
 
                             <!-- PUNTOS -->
@@ -864,14 +994,13 @@
 
                                 <div class="acciones-tabla">
 
-                                    <!-- VER DETALLE -->
+                                    <!-- VER DETALLE Y CANCELAR -->
 
                                     <a
                                         class="boton-tabla boton-ver"
-
                                         th:href="@{/admin/canjes(codigo=${fila.codigo},pagina=${paginaActual})}">
 
-                                        Ver detalle
+                                        Ver / cancelar
 
                                     </a>
 
@@ -879,9 +1008,7 @@
 
                                     <form
                                         th:action="@{/admin/canjes/entregar}"
-
                                         method="post"
-
                                         onsubmit="return confirm('¿Confirmas que esta recompensa ya fue entregada físicamente?');">
 
                                         <input
@@ -1005,6 +1132,14 @@
             Esta operación no vuelve a
             descontar puntos ni reduce
             nuevamente el stock.
+
+            Si corresponde cancelar un canje pendiente,
+            abre <strong>Ver / cancelar</strong>, indica el motivo
+            y confirma la operación.
+
+            La cancelación devuelve
+            exactamente los puntos originales y una unidad de stock;
+            las entregas y cancelaciones anteriores no se pueden cancelar.
 
         </div>
 

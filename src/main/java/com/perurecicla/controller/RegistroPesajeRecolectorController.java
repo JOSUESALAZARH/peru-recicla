@@ -1,4 +1,3 @@
-
 package com.perurecicla.controller;
 
 import com.perurecicla.model.Material;
@@ -7,13 +6,11 @@ import com.perurecicla.model.Usuario;
 
 import com.perurecicla.repository.MaterialRepository;
 import com.perurecicla.repository.UsuarioRepository;
-
 import com.perurecicla.service.RecolectaService;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
-
 import org.springframework.ui.Model;
 
 import org.springframework.web.bind.annotation.GetMapping;
@@ -31,23 +28,21 @@ import java.util.Comparator;
 import java.util.List;
 
 /**
- * PERU RECICLA - PASO 60
+ * PERU RECICLA - PASO 82
  *
- * Registro seguro de pesajes.
+ * Registro de pesajes con materiales activos.
  *
- * Solo recolectores activos.
- *
- * Reutiliza RecolectaService.registrarPeso().
- *
- * Las nuevas recolectas quedan pendientes.
- * No acredita puntos al vecino directamente.
+ * Se conservan las validaciones del
+ * vecino, recolector, peso y puntos.
  */
 @Controller
 @RequestMapping("/recolector/pesajes")
 public class RegistroPesajeRecolectorController {
 
     private final UsuarioRepository usuarioRepository;
+
     private final MaterialRepository materialRepository;
+
     private final RecolectaService recolectaService;
 
     private static final BigDecimal PESO_MAXIMO =
@@ -67,7 +62,7 @@ public class RegistroPesajeRecolectorController {
     }
 
     // =====================================
-    // VALIDAR RECOLECTOR AUTENTICADO
+    // VALIDAR RECOLECTOR
     // =====================================
 
     private Usuario obtenerRecolector(
@@ -81,14 +76,15 @@ public class RegistroPesajeRecolectorController {
             );
         }
 
-        Usuario recolector = usuarioRepository
-            .findByCorreo(principal.getName())
-            .orElseThrow(() ->
-                new ResponseStatusException(
-                    HttpStatus.FORBIDDEN,
-                    "Usuario no encontrado"
-                )
-            );
+        Usuario recolector =
+            usuarioRepository
+                .findByCorreo(principal.getName())
+                .orElseThrow(() ->
+                    new ResponseStatusException(
+                        HttpStatus.FORBIDDEN,
+                        "Usuario no encontrado"
+                    )
+                );
 
         if (recolector.getRol()
                 != Usuario.Rol.ROLE_recolector
@@ -119,13 +115,14 @@ public class RegistroPesajeRecolectorController {
             obtenerRecolector(principal);
 
         // Solo vecinos activos.
+
         List<Usuario> vecinos =
             usuarioRepository.findAll()
                 .stream()
-                .filter(usuario ->
-                    usuario.getRol()
+                .filter(u ->
+                    u.getRol()
                         == Usuario.Rol.ROLE_vecino
-                    && usuario.getEstado()
+                    && u.getEstado()
                         == Usuario.Estado.activo
                 )
                 .sorted(
@@ -138,13 +135,17 @@ public class RegistroPesajeRecolectorController {
                 )
                 .toList();
 
-        // Solo materiales con factor positivo.
+        // NUEVO: solo materiales activos.
+
         List<Material> materiales =
-            materialRepository.findAll()
+            materialRepository
+                .findByEstado(
+                    Material.EstadoMaterial.activo
+                )
                 .stream()
-                .filter(material ->
-                    material.getPuntos_por_gramo() != null
-                    && material.getPuntos_por_gramo()
+                .filter(m ->
+                    m.getPuntos_por_gramo() != null
+                    && m.getPuntos_por_gramo()
                         .compareTo(BigDecimal.ZERO) > 0
                 )
                 .sorted(
@@ -177,7 +178,7 @@ public class RegistroPesajeRecolectorController {
     }
 
     // =====================================
-    // REGISTRAR NUEVA RECOLECTA
+    // REGISTRAR PESAJE
     // =====================================
 
     @PostMapping("/registrar")
@@ -194,22 +195,21 @@ public class RegistroPesajeRecolectorController {
 
             Principal principal,
 
-            RedirectAttributes redirectAttributes) {
-
-        // =================================
-        // 1. IDENTIFICAR RECOLECTOR
-        // =================================
+            RedirectAttributes mensajes) {
 
         Usuario recolector =
             obtenerRecolector(principal);
 
         // =================================
-        // 2. VERIFICAR VECINO
+        // VALIDAR VECINO
         // =================================
 
         Usuario vecino =
-            usuarioRepository.findById(idVecino)
-                .orElse(null);
+            idVecino == null
+                ? null
+                : usuarioRepository
+                    .findById(idVecino)
+                    .orElse(null);
 
         if (vecino == null
                 || vecino.getRol()
@@ -218,33 +218,38 @@ public class RegistroPesajeRecolectorController {
                     != Usuario.Estado.activo) {
 
             return error(
-                redirectAttributes,
+                mensajes,
                 "Debes seleccionar un vecino activo."
             );
         }
 
         // =================================
-        // 3. VERIFICAR MATERIAL
+        // VALIDAR MATERIAL
         // =================================
 
         Material material =
-            materialRepository.findById(idMaterial)
-                .orElse(null);
+            idMaterial == null
+                ? null
+                : materialRepository
+                    .findById(idMaterial)
+                    .orElse(null);
 
         if (material == null
+                || material.getEstado()
+                    != Material.EstadoMaterial.activo
                 || material.getPuntos_por_gramo() == null
                 || material.getPuntos_por_gramo()
                     .compareTo(BigDecimal.ZERO) <= 0) {
 
             return error(
-                redirectAttributes,
-                "Selecciona un material "
+                mensajes,
+                "Selecciona un material activo "
                 + "con factor de puntos valido."
             );
         }
 
         // =================================
-        // 4. VALIDAR PESO
+        // VALIDAR PESO
         // =================================
 
         String textoPeso =
@@ -252,13 +257,12 @@ public class RegistroPesajeRecolectorController {
                 ? ""
                 : pesoGramos.strip();
 
-        // Permite 250.50 o 250,50.
         if (!textoPeso.matches(
                 "[0-9]{1,7}([.,][0-9]{1,2})?"
             )) {
 
             return error(
-                redirectAttributes,
+                mensajes,
                 "Ingresa un peso valido en gramos "
                 + "con hasta dos decimales."
             );
@@ -275,7 +279,7 @@ public class RegistroPesajeRecolectorController {
         } catch (NumberFormatException e) {
 
             return error(
-                redirectAttributes,
+                mensajes,
                 "El peso ingresado no es valido."
             );
         }
@@ -284,113 +288,110 @@ public class RegistroPesajeRecolectorController {
                 || peso.compareTo(PESO_MAXIMO) > 0) {
 
             return error(
-                redirectAttributes,
+                mensajes,
                 "El peso debe ser mayor a cero "
                 + "y no superar 1000000 gramos."
             );
         }
 
         // =================================
-        // 5. VERIFICAR PUNTOS ESTIMADOS
+        // COMPROBAR PUNTOS ESTIMADOS
         // =================================
 
         BigDecimal puntosEstimados =
             peso.multiply(
                 material.getPuntos_por_gramo()
-            ).setScale(
+            )
+            .setScale(
                 2,
                 RoundingMode.HALF_UP
             );
 
-        if (puntosEstimados
-                .compareTo(BigDecimal.ZERO) <= 0) {
+        if (puntosEstimados.compareTo(
+                BigDecimal.ZERO) <= 0) {
 
             return error(
-                redirectAttributes,
+                mensajes,
                 "Este pesaje genera menos de "
                 + "0.01 puntos. Verifica el peso."
             );
         }
 
-        if (puntosEstimados
-                .compareTo(PUNTOS_MAXIMOS) > 0) {
+        if (puntosEstimados.compareTo(
+                PUNTOS_MAXIMOS) > 0) {
 
             return error(
-                redirectAttributes,
+                mensajes,
                 "El valor de puntos supera "
                 + "el limite permitido."
             );
         }
 
         // =================================
-        // 6. CONSTRUIR LA RECOLECTA
+        // CREAR RECOLECTA
         // =================================
 
         Recolecta recolecta =
             new Recolecta();
 
-        recolecta.setVecino(vecino);
+        recolecta.setVecino(
+            vecino
+        );
 
-        // Siempre el recolector de la sesion.
-        recolecta.setRecolector(recolector);
+        recolecta.setRecolector(
+            recolector
+        );
 
-        recolecta.setMaterial(material);
+        recolecta.setMaterial(
+            material
+        );
 
-        recolecta.setPeso(peso);
+        recolecta.setPeso(
+            peso
+        );
 
-        // No recibimos puntos ni estado
-        // desde el navegador.
-        //
-        // Los calcula y asigna el servicio.
-
-        // =================================
-        // 7. GUARDAR MEDIANTE EL SERVICIO
-        // =================================
-
-        Recolecta guardada;
+        // El servicio recalcula la tarifa
+        // vigente y guarda puntos_generados.
+        // No recibe puntos desde el navegador.
 
         try {
 
-            guardada =
+            Recolecta guardada =
                 recolectaService.registrarPeso(
                     recolecta
                 );
 
+            mensajes.addFlashAttribute(
+                "exito",
+                "Recolecta N.° "
+                + guardada.getId_recolecta()
+                + " registrada correctamente. "
+                + "Puntos calculados: "
+                + guardada.getPuntos_generados()
+                + ". Estado: pendiente."
+            );
+
+            return "redirect:/recolector/pesajes/nuevo";
+
         } catch (IllegalArgumentException e) {
 
             return error(
-                redirectAttributes,
+                mensajes,
                 "No se pudo registrar el pesaje. "
-                + "Verifica los datos ingresados."
+                + e.getMessage()
             );
         }
-
-        // =================================
-        // 8. CONFIRMAR REGISTRO
-        // =================================
-
-        redirectAttributes.addFlashAttribute(
-            "exito",
-            "Recolecta N.° "
-            + guardada.getId_recolecta()
-            + " registrada correctamente. "
-            + "Puntos calculados: "
-            + guardada.getPuntos_generados()
-            + ". Estado: pendiente."
-        );
-
-        return "redirect:/recolector/pesajes/nuevo";
     }
 
     // =====================================
-    // MENSAJES DE VALIDACION
+    // MOSTRAR ERRORES
     // =====================================
 
     private String error(
-            RedirectAttributes redirectAttributes,
+            RedirectAttributes mensajes,
             String mensaje) {
 
-        redirectAttributes.addFlashAttribute(
+        mensajes.addFlashAttribute(
             "error",
             mensaje
         );

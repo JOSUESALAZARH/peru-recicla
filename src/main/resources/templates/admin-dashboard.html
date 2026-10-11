@@ -1,10 +1,13 @@
 <!DOCTYPE html>
-<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<html lang="es"
+      xmlns:th="http://www.thymeleaf.org">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport"
           content="width=device-width, initial-scale=1.0">
     <meta name="_csrf" th:content="${_csrf.token}">
+
     <title>Panel administrativo | PERÚ RECICLA</title>
 
     <style>
@@ -34,8 +37,6 @@
         a {
             text-decoration: none;
         }
-
-        /* ENCABEZADO */
 
         .encabezado {
             background: white;
@@ -90,19 +91,17 @@
             background: var(--verde-claro);
         }
 
-        /* CONTENEDOR */
-
         .contenedor {
             max-width: 1180px;
             margin: auto;
             padding: 45px 24px 80px;
         }
 
-        /* PRESENTACION */
-
         .presentacion {
             background: linear-gradient(
-                130deg, #105a38, #16804d
+                130deg,
+                #105a38,
+                #16804d
             );
             padding: 42px;
             border-radius: 22px;
@@ -160,8 +159,6 @@
             color: white;
         }
 
-        /* SECCIONES */
-
         .seccion {
             margin-top: 45px;
         }
@@ -177,8 +174,6 @@
             font-size: 14px;
             margin: 0 0 24px;
         }
-
-        /* INDICADORES */
 
         .indicadores {
             display: grid;
@@ -240,8 +235,6 @@
             margin-bottom: 5px;
         }
 
-        /* MODULOS ADMINISTRATIVOS */
-
         .modulos {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
@@ -287,8 +280,6 @@
             background: var(--verde-oscuro);
         }
 
-        /* TABLA ULTIMOS CANJES */
-
         .tabla-contenedor {
             background: white;
             border: 1px solid var(--borde);
@@ -309,7 +300,8 @@
             color: white;
         }
 
-        th, td {
+        th,
+        td {
             text-align: left;
             padding: 17px 15px;
         }
@@ -373,8 +365,6 @@
             border-radius: 17px;
         }
 
-        /* PIE DE PAGINA */
-
         footer {
             background: #123827;
             color: white;
@@ -388,8 +378,6 @@
             margin: 7px;
         }
 
-        /* RESPONSIVE */
-
         @media (max-width: 1000px) {
             .indicadores {
                 grid-template-columns: repeat(2, 1fr);
@@ -397,6 +385,7 @@
         }
 
         @media (max-width: 700px) {
+
             .barra {
                 flex-direction: column;
             }
@@ -428,7 +417,7 @@
 
 <body>
 
-    <!-- ENCABEZADO -->
+    <!-- NAVEGACION -->
 
     <header class="encabezado">
 
@@ -455,6 +444,12 @@
 
                 <a th:href="@{/admin/recompensas}">
                     Recompensas
+                </a>
+
+                <!-- NUEVO PASO 82 -->
+
+                <a th:href="@{/admin/materiales}">
+                    Materiales
                 </a>
 
                 <a th:href="@{/admin/canjes}">
@@ -497,6 +492,7 @@
 
             <p>
                 Bienvenido,
+
                 <strong th:text="${administrador}">
                     Administrador
                 </strong>.
@@ -526,20 +522,21 @@
 
         </section>
 
-        <!-- INDICADORES PRINCIPALES -->
+        <!-- RESUMEN DE CANJES -->
 
         <section class="seccion">
 
             <h2>Resumen de canjes</h2>
 
             <p class="descripcion">
-                Indicadores calculados a partir de los
-                registros existentes en MySQL.
+                Indicadores calculados a partir
+                de los registros existentes
+                en MySQL.
             </p>
 
             <div class="indicadores">
 
-                <!-- TOTAL CANJES -->
+                <!-- TOTAL -->
 
                 <article class="tarjeta">
 
@@ -547,7 +544,9 @@
                         🎟
                     </div>
 
-                    <h3>Total de canjes</h3>
+                    <h3>
+                        Total de canjes
+                    </h3>
 
                     <div class="numero"
                          th:text="${totalCanjes}">
@@ -561,7 +560,7 @@
 
                 </article>
 
-                <!-- CANJES PENDIENTES -->
+                <!-- PENDIENTES -->
 
                 <article class="tarjeta">
 
@@ -569,7 +568,9 @@
                         ⏳
                     </div>
 
-                    <h3>Canjes pendientes</h3>
+                    <h3>
+                        Canjes pendientes
+                    </h3>
 
                     <div class="numero"
                          th:text="${pendientes}">
@@ -583,7 +584,7 @@
 
                 </article>
 
-                <!-- CANJES ENTREGADOS -->
+                <!-- ENTREGADOS -->
 
                 <article class="tarjeta">
 
@@ -591,7 +592,9 @@
                         ✅
                     </div>
 
-                    <h3>Canjes entregados</h3>
+                    <h3>
+                        Canjes entregados
+                    </h3>
 
                     <div class="numero"
                          th:text="${entregados}">
@@ -605,7 +608,7 @@
 
                 </article>
 
-                <!-- CANJES CANCELADOS -->
+                <!-- CANCELADOS -->
 
                 <article class="tarjeta">
 
@@ -613,7 +616,9 @@
                         🚫
                     </div>
 
-                    <h3>Canjes cancelados</h3>
+                    <h3>
+                        Canjes cancelados
+                    </h3>
 
                     <div class="numero"
                          th:text="${cancelados}">
@@ -683,7 +688,9 @@
 
         <section class="seccion">
 
-            <h2>Gestión administrativa</h2>
+            <h2>
+                Gestión administrativa
+            </h2>
 
             <p class="descripcion">
                 Accede a las funciones disponibles
@@ -692,7 +699,7 @@
 
             <div class="modulos">
 
-                <!-- MODULO USUARIOS -->
+                <!-- USUARIOS -->
 
                 <article class="modulo">
 
@@ -700,7 +707,9 @@
                         👥
                     </div>
 
-                    <h3>Gestión de usuarios</h3>
+                    <h3>
+                        Gestión de usuarios
+                    </h3>
 
                     <p>
                         Consulta las cuentas registradas,
@@ -716,7 +725,7 @@
 
                 </article>
 
-                <!-- MODULO RECOLECTAS -->
+                <!-- RECOLECTAS -->
 
                 <article class="modulo">
 
@@ -724,7 +733,9 @@
                         ♻
                     </div>
 
-                    <h3>Validación de recolectas</h3>
+                    <h3>
+                        Validación de recolectas
+                    </h3>
 
                     <p>
                         Revisa los materiales y pesajes
@@ -740,7 +751,36 @@
 
                 </article>
 
-                <!-- NUEVO MODULO RECOMPENSAS -->
+                <!-- NUEVO: GESTION DE MATERIALES -->
+
+                <article class="modulo">
+
+                    <div class="modulo-icono">
+                        ♻
+                    </div>
+
+                    <h3>
+                        Gestión de materiales
+                    </h3>
+
+                    <p>
+                        Registra y edita materiales
+                        reciclables, sus puntos por gramo
+                        y su disponibilidad para nuevos
+                        pesajes.
+
+                        Conserva el historial de las
+                        recolectas anteriores.
+                    </p>
+
+                    <a class="enlace-modulo"
+                       th:href="@{/admin/materiales}">
+                        Gestionar materiales →
+                    </a>
+
+                </article>
+
+                <!-- RECOMPENSAS -->
 
                 <article class="modulo">
 
@@ -748,7 +788,9 @@
                         🎁
                     </div>
 
-                    <h3>Gestión de recompensas</h3>
+                    <h3>
+                        Gestión de recompensas
+                    </h3>
 
                     <p>
                         Registra nuevos productos,
@@ -766,7 +808,7 @@
 
                 </article>
 
-                <!-- MODULO CANJES -->
+                <!-- CANJES -->
 
                 <article class="modulo">
 
@@ -774,7 +816,9 @@
                         🎟
                     </div>
 
-                    <h3>Validación de canjes</h3>
+                    <h3>
+                        Validación de canjes
+                    </h3>
 
                     <p>
                         Busca un ticket por su código,
@@ -790,7 +834,7 @@
 
                 </article>
 
-                <!-- MODULO SEGUIMIENTO -->
+                <!-- SEGUIMIENTO -->
 
                 <article class="modulo">
 
@@ -798,7 +842,9 @@
                         📈
                     </div>
 
-                    <h3>Seguimiento de operaciones</h3>
+                    <h3>
+                        Seguimiento de operaciones
+                    </h3>
 
                     <p>
                         Consulta los últimos canjes
@@ -849,7 +895,7 @@
 
             </div>
 
-            <!-- TABLA DE ULTIMOS CANJES -->
+            <!-- TABLA -->
 
             <div class="tabla-contenedor"
                  th:if="${!#lists.isEmpty(ultimosCanjes)}">
@@ -857,6 +903,7 @@
                 <table>
 
                     <thead>
+
                         <tr>
                             <th>Código de ticket</th>
                             <th>Fecha</th>
@@ -865,6 +912,7 @@
                             <th>Puntos</th>
                             <th>Estado</th>
                         </tr>
+
                     </thead>
 
                     <tbody>
@@ -872,10 +920,12 @@
                         <tr th:each="c : ${ultimosCanjes}">
 
                             <td>
+
                                 <span class="codigo"
                                       th:text="${c.codigo}">
                                     TK-EJEMPLO
                                 </span>
+
                             </td>
 
                             <td th:text="${c.fecha}">
@@ -896,11 +946,13 @@
                             </td>
 
                             <td>
+
                                 <span class="estado"
                                       th:classappend="${c.estado}"
                                       th:text="${c.estado}">
                                     pendiente
                                 </span>
+
                             </td>
 
                         </tr>

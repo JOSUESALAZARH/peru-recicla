@@ -1,4 +1,3 @@
-
 package com.perurecicla.repository;
 
 import com.perurecicla.model.Material;
@@ -6,27 +5,25 @@ import com.perurecicla.model.Material;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-/**
- * PERU RECICLA
- *
- * Repositorio de Materiales
- *
- * Permite realizar operaciones CRUD
- * sobre la tabla Materiales mediante
- * Spring Data JPA e Hibernate.
- *
- * Operaciones:
- *
- * CREATE - Registrar materiales
- * READ   - Consultar materiales
- * UPDATE - Actualizar materiales
- * DELETE - Eliminar materiales
- *
- * Tabla MySQL: Materiales
- */
+import java.util.List;
 
+/**
+ * PERU RECICLA - PASO 82
+ *
+ * Consultas de materiales reciclables.
+ *
+ * Permite consultar todos, filtrar
+ * por estado y contar materiales activos.
+ */
 @Repository
 public interface MaterialRepository
         extends JpaRepository<Material, Integer> {
 
+    List<Material> findByEstado(
+        Material.EstadoMaterial estado
+    );
+
+    long countByEstado(
+        Material.EstadoMaterial estado
+    );
 }

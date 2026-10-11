@@ -1,9 +1,11 @@
-
 package com.perurecicla.service.impl;
 
 import com.perurecicla.model.Material;
 import com.perurecicla.repository.MaterialRepository;
 import com.perurecicla.service.MaterialService;
+
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.LockModeType;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -12,42 +14,36 @@ import java.math.BigDecimal;
 import java.util.List;
 
 /**
- * PERU RECICLA
+ * PERU RECICLA - PASO 82
  *
- * Implementacion del mantenimiento
- * completo de materiales reciclables.
+ * Mantenimiento de materiales reciclables.
  *
  * CREATE - Registrar materiales
  * READ   - Consultar materiales
  * UPDATE - Editar materiales
- * DELETE - Eliminar materiales
+ * DELETE - Desactivar sin borrar historial
  *
- * Arquitectura:
- * Controller -> Service -> Repository -> MySQL
+ * Los cambios de puntos por gramo solo
+ * afectan los pesajes posteriores.
  */
-
 @Service
 public class MaterialServiceImpl
         implements MaterialService {
 
-    // =====================================
-    // REPOSITORIO DE MATERIALES
-    // =====================================
-
     private final MaterialRepository materialRepository;
 
-    // =====================================
-    // CONSTRUCTOR
-    // =====================================
+    private final EntityManager entityManager;
 
     public MaterialServiceImpl(
-            MaterialRepository materialRepository) {
+            MaterialRepository materialRepository,
+            EntityManager entityManager) {
 
         this.materialRepository = materialRepository;
+        this.entityManager = entityManager;
     }
 
     // =====================================
-    // READ - LISTAR TODOS LOS MATERIALES
+    // LISTAR TODOS LOS MATERIALES
     // =====================================
 
     @Override
@@ -58,7 +54,7 @@ public class MaterialServiceImpl
     }
 
     // =====================================
-    // READ - BUSCAR MATERIAL POR ID
+    // BUSCAR POR ID
     // =====================================
 
     @Override
@@ -75,18 +71,14 @@ public class MaterialServiceImpl
     }
 
     // =====================================
-    // CREATE - REGISTRAR NUEVO MATERIAL
+    // REGISTRAR MATERIAL NUEVO
     // =====================================
 
     @Override
     @Transactional
     public void guardar(Material material) {
 
-        // Validar los datos recibidos
-
         validarMaterial(material);
-
-        // El registro nuevo no debe tener ID
 
         if (material.getId_material() != null) {
 
@@ -95,19 +87,15 @@ public class MaterialServiceImpl
             );
         }
 
-        // Limpiar el nombre del material
-
         material.setTipo_material(
             material.getTipo_material().trim()
         );
-
-        // Registrar material en MySQL
 
         materialRepository.save(material);
     }
 
     // =====================================
-    // UPDATE - ACTUALIZAR MATERIAL
+    // ACTUALIZAR MATERIAL
     // =====================================
 
     @Override
@@ -116,8 +104,6 @@ public class MaterialServiceImpl
             Integer id,
             Material datosActualizados) {
 
-        // Validar el identificador
-
         if (id == null || id <= 0) {
 
             throw new IllegalArgumentException(
@@ -125,11 +111,7 @@ public class MaterialServiceImpl
             );
         }
 
-        // Validar nuevos datos
-
         validarMaterial(datosActualizados);
-
-        // Buscar el registro original
 
         Material materialExistente =
             materialRepository.findById(id)
@@ -140,7 +122,13 @@ public class MaterialServiceImpl
                     )
                 );
 
-        // Actualizar nombre
+        // Bloquear el registro mientras
+        // se modifican sus datos y tarifa.
+
+        entityManager.refresh(
+            materialExistente,
+            LockModeType.PESSIMISTIC_WRITE
+        );
 
         materialExistente.setTipo_material(
             datosActualizados
@@ -148,25 +136,21 @@ public class MaterialServiceImpl
                 .trim()
         );
 
-        // Actualizar puntos por gramo
-
         materialExistente.setPuntos_por_gramo(
             datosActualizados.getPuntos_por_gramo()
         );
-
-        // Actualizar descripcion
 
         materialExistente.setDescripcion(
             datosActualizados.getDescripcion()
         );
 
-        // Actualizar imagen
-
         materialExistente.setUrl_imagen(
             datosActualizados.getUrl_imagen()
         );
 
-        // Guardar cambios sin alterar el ID
+        materialExistente.setEstado(
+            datosActualizados.getEstado()
+        );
 
         return materialRepository.save(
             materialExistente
@@ -174,14 +158,12 @@ public class MaterialServiceImpl
     }
 
     // =====================================
-    // DELETE - ELIMINAR MATERIAL
+    // BAJA LOGICA, SIN BORRAR HISTORIAL
     // =====================================
 
     @Override
     @Transactional
     public void eliminar(Integer id) {
-
-        // Validar identificador
 
         if (id == null || id <= 0) {
 
@@ -189,8 +171,6 @@ public class MaterialServiceImpl
                 "El ID del material no es valido"
             );
         }
-
-        // Verificar que exista
 
         Material materialExistente =
             materialRepository.findById(id)
@@ -201,17 +181,25 @@ public class MaterialServiceImpl
                     )
                 );
 
-        // Eliminar registro
-        // MySQL protege los materiales
-        // relacionados con recolectas.
+        // Nunca eliminar fisicamente
+        // un material historico.
 
-        materialRepository.delete(
+        entityManager.refresh(
+            materialExistente,
+            LockModeType.PESSIMISTIC_WRITE
+        );
+
+        materialExistente.setEstado(
+            Material.EstadoMaterial.inactivo
+        );
+
+        materialRepository.save(
             materialExistente
         );
     }
 
     // =====================================
-    // VALIDAR DATOS DEL MATERIAL
+    // VALIDACIONES DE LOS DATOS
     // =====================================
 
     private void validarMaterial(Material material) {
@@ -223,10 +211,8 @@ public class MaterialServiceImpl
             );
         }
 
-        // Validar tipo de material
-
-        if (material.getTipo_material() == null ||
-            material.getTipo_material().isBlank()) {
+        if (material.getTipo_material() == null
+                || material.getTipo_material().isBlank()) {
 
             throw new IllegalArgumentException(
                 "El nombre del material es obligatorio"
@@ -240,31 +226,34 @@ public class MaterialServiceImpl
             );
         }
 
-        // Validar puntos por gramo
-
         BigDecimal puntos =
             material.getPuntos_por_gramo();
 
-        if (puntos == null ||
-            puntos.compareTo(BigDecimal.ZERO) <= 0) {
+        if (puntos == null
+                || puntos.compareTo(BigDecimal.ZERO) <= 0) {
 
             throw new IllegalArgumentException(
                 "Los puntos por gramo deben ser mayores a cero"
             );
         }
 
-        if (puntos.scale() > 4 ||
-            puntos.precision() - puntos.scale() > 6) {
+        if (puntos.scale() > 4
+                || puntos.precision() - puntos.scale() > 6) {
 
             throw new IllegalArgumentException(
                 "Los puntos deben ajustarse al formato DECIMAL(10,4)"
             );
         }
 
-        // Validar longitud de imagen
+        if (material.getEstado() == null) {
 
-        if (material.getUrl_imagen() != null &&
-            material.getUrl_imagen().length() > 255) {
+            throw new IllegalArgumentException(
+                "Selecciona un estado valido"
+            );
+        }
+
+        if (material.getUrl_imagen() != null
+                && material.getUrl_imagen().length() > 255) {
 
             throw new IllegalArgumentException(
                 "La URL de imagen es demasiado larga"
