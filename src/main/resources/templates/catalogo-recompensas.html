@@ -1,6 +1,5 @@
 <!DOCTYPE html>
-<html lang="es"
-      xmlns:th="http://www.thymeleaf.org">
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
 
 <head>
     <meta charset="UTF-8">
@@ -11,9 +10,7 @@
     <meta name="_csrf"
           th:content="${_csrf.token}">
 
-    <title>
-        Recompensas | PERÚ RECICLA
-    </title>
+    <title>Recompensas | PERÚ RECICLA</title>
 
     <style>
         :root {
@@ -43,7 +40,9 @@
             text-decoration: none;
         }
 
-        /* ENCABEZADO */
+        /* =====================================
+           ENCABEZADO ORIGINAL
+        ===================================== */
 
         .encabezado {
             background: white;
@@ -97,15 +96,15 @@
             background: var(--verde-claro);
         }
 
-        /* CONTENEDOR */
+        /* =====================================
+           CONTENEDOR Y PRESENTACION
+        ===================================== */
 
         .contenedor {
             max-width: 1150px;
             margin: auto;
             padding: 50px 24px 80px;
         }
-
-        /* PRESENTACION */
 
         .presentacion {
             background: linear-gradient(
@@ -138,7 +137,10 @@
             margin: 0;
         }
 
-        /* RESUMEN */
+        /* =====================================
+           DASHBOARD ORIGINAL
+           NO SE MODIFICA SU LOGICA
+        ===================================== */
 
         .resumen {
             display: grid;
@@ -175,7 +177,9 @@
             margin-top: 12px;
         }
 
-        /* SECCIONES */
+        /* =====================================
+           SECCION DEL CATALOGO
+        ===================================== */
 
         .seccion {
             margin-top: 50px;
@@ -193,7 +197,135 @@
             margin-bottom: 25px;
         }
 
-        /* CATALOGO */
+        /* =====================================
+           BUSCADOR Y FILTROS
+        ===================================== */
+
+        .filtros-panel {
+            background: white;
+            border: 1px solid var(--borde);
+            border-radius: 18px;
+            padding: 25px;
+            margin-bottom: 24px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.04);
+        }
+
+        .filtros-titulo {
+            color: var(--verde-oscuro);
+            font-size: 17px;
+            margin: 0 0 18px;
+        }
+
+        .filtros-busqueda label,
+        .filtros-categorias legend {
+            display: block;
+            color: var(--verde-oscuro);
+            font-size: 14px;
+            font-weight: bold;
+            margin-bottom: 9px;
+        }
+
+        .campo-busqueda {
+            width: 100%;
+            padding: 13px 15px;
+            border: 1px solid #bfcec3;
+            border-radius: 10px;
+            background: white;
+            color: var(--texto);
+            font: inherit;
+            font-size: 14px;
+        }
+
+        .campo-busqueda:focus,
+        .categoria-boton:focus-visible,
+        .limpiar-filtros:focus-visible {
+            outline: 3px solid #9bd7b1;
+            outline-offset: 2px;
+        }
+
+        .filtros-categorias {
+            margin: 20px 0 0;
+            padding: 0;
+            border: 0;
+            min-width: 0;
+        }
+
+        .categorias-botones {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 9px;
+        }
+
+        .categoria-boton {
+            padding: 9px 14px;
+            border: 1px solid #c8d9cf;
+            background: #f6faf7;
+            color: var(--verde-oscuro);
+            border-radius: 30px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: bold;
+        }
+
+        .categoria-boton:hover {
+            background: var(--verde-claro);
+        }
+
+        .categoria-boton.activo {
+            background: var(--verde-oscuro);
+            border-color: var(--verde-oscuro);
+            color: white;
+        }
+
+        .filtros-inferior {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .filtro-stock {
+            display: inline-flex;
+            align-items: center;
+            gap: 9px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .filtro-stock input {
+            width: 17px;
+            height: 17px;
+            margin: 0;
+            accent-color: var(--verde);
+            cursor: pointer;
+        }
+
+        .limpiar-filtros {
+            border: 1px solid var(--verde);
+            border-radius: 9px;
+            background: white;
+            color: var(--verde-oscuro);
+            padding: 10px 15px;
+            font-weight: bold;
+            font-size: 13px;
+            cursor: pointer;
+        }
+
+        .limpiar-filtros:hover {
+            background: var(--verde-claro);
+        }
+
+        .contador-filtros {
+            margin: 17px 0 0;
+            color: var(--gris);
+            font-size: 13px;
+        }
+
+        /* =====================================
+           TARJETAS DE RECOMPENSAS
+        ===================================== */
 
         .catalogo {
             display: grid;
@@ -211,6 +343,7 @@
             border: 1px solid var(--borde);
             border-radius: 18px;
             box-shadow: 0 5px 20px rgba(0,0,0,0.04);
+
             transition:
                 transform 0.2s ease,
                 box-shadow 0.2s ease;
@@ -221,7 +354,14 @@
             box-shadow: 0 12px 28px rgba(0,0,0,0.08);
         }
 
-        /* IMAGEN UNIFORME 4:3 */
+        /* OCULTAR PRODUCTOS FILTRADOS */
+
+        .recompensa[hidden],
+        .sin-resultados[hidden] {
+            display: none !important;
+        }
+
+        /* IMAGENES */
 
         .imagen {
             width: 100%;
@@ -249,7 +389,7 @@
             background: transparent;
         }
 
-        /* INFORMACION DEL PRODUCTO */
+        /* DATOS DE LA RECOMPENSA */
 
         .recompensa-contenido {
             display: flex;
@@ -347,7 +487,9 @@
             cursor: not-allowed;
         }
 
-        /* SIN PRODUCTOS */
+        /* =====================================
+           ESTADOS VACIOS
+        ===================================== */
 
         .sin-registros {
             background: white;
@@ -369,7 +511,13 @@
             color: var(--gris);
         }
 
-        /* VOLVER AL PANEL */
+        .sin-resultados {
+            margin-top: 20px;
+        }
+
+        /* =====================================
+           VOLVER AL PANEL
+        ===================================== */
 
         .acciones {
             margin-top: 35px;
@@ -377,7 +525,7 @@
 
         .boton-volver {
             display: inline-block;
-            background: #e6f5eb;
+            background: var(--verde-claro);
             color: var(--verde-oscuro);
             padding: 13px 20px;
             border-radius: 10px;
@@ -400,6 +548,10 @@
             margin: 6px 0;
             font-size: 13px;
         }
+
+        /* =====================================
+           DISEÑO RESPONSIVE
+        ===================================== */
 
         @media (max-width: 950px) {
             .catalogo {
@@ -439,22 +591,31 @@
             .numero {
                 font-size: 30px;
             }
-        }
-    </style>
 
+            .filtros-panel {
+                padding: 19px;
+            }
+
+            .filtros-inferior {
+                align-items: flex-start;
+            }
+        }
+
+    </style>
 </head>
 
 <body>
 
-    <!-- ENCABEZADO -->
+    <!-- =====================================
+         ENCABEZADO Y NAVEGACION
+    ===================================== -->
 
     <header class="encabezado">
 
         <nav class="barra"
              aria-label="Navegación principal">
 
-            <a class="logo"
-               th:href="@{/}">
+            <a class="logo" th:href="@{/}">
                 ♻ PERÚ RECICLA
             </a>
 
@@ -483,12 +644,9 @@
                 <form th:action="@{/logout}"
                       method="post">
 
-                    <button
-                        type="submit"
-                        class="cerrar-sesion">
-
+                    <button type="submit"
+                            class="cerrar-sesion">
                         Cerrar sesión
-
                     </button>
 
                 </form>
@@ -499,11 +657,11 @@
 
     </header>
 
-    <!-- CONTENIDO PRINCIPAL -->
-
     <main class="contenedor">
 
-        <!-- PRESENTACION -->
+        <!-- =====================================
+             TITULO ORIGINAL
+        ===================================== -->
 
         <section class="presentacion">
 
@@ -528,11 +686,14 @@
 
         </section>
 
-        <!-- RESUMEN DEL VECINO -->
+        <!-- =====================================
+             DASHBOARD ORIGINAL
+             TRES INDICADORES
+        ===================================== -->
 
         <section class="resumen">
 
-            <!-- PUNTOS -->
+            <!-- PUNTOS DISPONIBLES -->
 
             <article class="resumen-tarjeta">
 
@@ -552,7 +713,7 @@
 
                 <p class="detalle">
                     Saldo actual registrado
-                    en tu cuenta de MySQL.
+                    en tu cuenta.
                 </p>
 
             </article>
@@ -599,7 +760,9 @@
 
         </section>
 
-        <!-- CATALOGO DE PRODUCTOS -->
+        <!-- =====================================
+             CATALOGO Y FILTROS
+        ===================================== -->
 
         <section class="seccion">
 
@@ -613,7 +776,147 @@
                 en nuestra base de datos.
             </p>
 
-            <!-- CATALOGO VACIO -->
+            <!-- =====================================
+                 BUSCADOR Y FILTROS
+            ===================================== -->
+
+            <div class="filtros-panel"
+                 id="filtros-recompensas"
+                 th:if="${!#lists.isEmpty(recompensas)}">
+
+                <h3 class="filtros-titulo">
+                    🔎 Encuentra tu recompensa
+                </h3>
+
+                <!-- BUSQUEDA POR NOMBRE -->
+
+                <div class="filtros-busqueda">
+
+                    <label for="buscar-recompensa">
+                        Buscar recompensa por nombre
+                    </label>
+
+                    <input
+                        type="search"
+                        class="campo-busqueda"
+                        id="buscar-recompensa"
+                        placeholder="Ejemplo: aceite, detergente, vale..."
+                        autocomplete="off"
+                        aria-controls="lista-recompensas">
+
+                </div>
+
+                <!-- FILTRO DE CATEGORIAS -->
+
+                <fieldset class="filtros-categorias">
+
+                    <legend>
+                        Filtrar por categoría
+                    </legend>
+
+                    <div class="categorias-botones"
+                         id="botones-categorias">
+
+                        <button
+                            type="button"
+                            class="categoria-boton activo"
+                            data-categoria-filtro="todas"
+                            aria-pressed="true">
+                            Todas
+                        </button>
+
+                        <button
+                            type="button"
+                            class="categoria-boton"
+                            data-categoria-filtro="alimentos"
+                            aria-pressed="false">
+                            Alimentos
+                        </button>
+
+                        <button
+                            type="button"
+                            class="categoria-boton"
+                            data-categoria-filtro="hogar"
+                            aria-pressed="false">
+                            Hogar
+                        </button>
+
+                        <button
+                            type="button"
+                            class="categoria-boton"
+                            data-categoria-filtro="limpieza"
+                            aria-pressed="false">
+                            Limpieza
+                        </button>
+
+                        <button
+                            type="button"
+                            class="categoria-boton"
+                            data-categoria-filtro="tecnologia"
+                            aria-pressed="false">
+                            Tecnología
+                        </button>
+
+                    </div>
+
+                </fieldset>
+
+                <!-- DISPONIBILIDAD Y LIMPIAR FILTROS -->
+
+                <div class="filtros-inferior">
+
+                    <label class="filtro-stock"
+                           for="solo-disponibles">
+
+                        <input
+                            type="checkbox"
+                            id="solo-disponibles"
+                            aria-controls="lista-recompensas">
+
+                        Mostrar solo productos disponibles
+
+                    </label>
+
+                    <button
+                        type="button"
+                        class="limpiar-filtros"
+                        id="limpiar-filtros">
+
+                        Limpiar filtros
+
+                    </button>
+
+                </div>
+
+                <!-- CONTADOR DE RESULTADOS -->
+
+                <p class="contador-filtros"
+                   role="status"
+                   aria-live="polite">
+
+                    Mostrando
+
+                    <strong
+                        id="contador-resultados"
+                        th:text="${totalRecompensas}">
+                        0
+                    </strong>
+
+                    de
+
+                    <strong th:text="${totalRecompensas}">
+                        0
+                    </strong>
+
+                    recompensas
+
+                </p>
+
+            </div>
+
+            <!-- =====================================
+                 CATALOGO SIN RECOMPENSAS
+            ===================================== -->
 
             <div class="sin-registros"
                  th:if="${#lists.isEmpty(recompensas)}">
@@ -636,32 +939,34 @@
 
             </div>
 
-            <!-- TARJETAS DE PRODUCTOS -->
+            <!-- =====================================
+                 TARJETAS DE RECOMPENSAS
+            ===================================== -->
 
             <div class="catalogo"
+                 id="lista-recompensas"
                  th:if="${!#lists.isEmpty(recompensas)}">
 
-                <article class="recompensa"
-                         th:each="r : ${recompensas}">
+                <article
+                    class="recompensa"
+                    th:each="r : ${recompensas}"
+                    th:attr="data-categoria=${r.categoria},data-stock=${r.stock != null ? r.stock : 0}">
 
-                    <!-- IMAGEN -->
+                    <!-- IMAGEN ORIGINAL -->
 
                     <div class="imagen">
 
-                        <span class="imagen-icono"
-                              aria-hidden="true">
+                        <span
+                            class="imagen-icono"
+                            aria-hidden="true">
                             🎁
                         </span>
 
                         <img
                             th:if="${r.url_imagen != null and !#strings.isEmpty(r.url_imagen)}"
-
                             th:src="${#strings.startsWith(r.url_imagen, 'https://') ? r.url_imagen : (#strings.startsWith(r.url_imagen, '/') ? r.url_imagen : '/images/' + r.url_imagen)}"
-
                             th:alt="${r.nombre}"
-
                             onerror="this.style.display='none'"
-
                             loading="lazy">
 
                     </div>
@@ -686,8 +991,7 @@
 
                             <span class="costo-valor">
 
-                                <span
-                                    th:text="${r.costo_puntos}">
+                                <span th:text="${r.costo_puntos}">
                                     0
                                 </span>
 
@@ -712,7 +1016,7 @@
 
                         </div>
 
-                        <!-- DISPONIBLE -->
+                        <!-- PRODUCTO DISPONIBLE -->
 
                         <span
                             class="estado disponible"
@@ -722,7 +1026,7 @@
 
                         </span>
 
-                        <!-- AGOTADO -->
+                        <!-- PRODUCTO AGOTADO -->
 
                         <span
                             class="estado agotado"
@@ -732,11 +1036,11 @@
 
                         </span>
 
-                        <!-- CANJE -->
+                        <!-- BOTONES ORIGINALES -->
 
                         <div class="acciones-premio">
 
-                            <!-- PRODUCTO CON STOCK -->
+                            <!-- CANJE CON STOCK -->
 
                             <a
                                 class="boton-canjear"
@@ -747,7 +1051,7 @@
 
                             </a>
 
-                            <!-- PRODUCTO AGOTADO -->
+                            <!-- SIN STOCK -->
 
                             <button
                                 class="boton-pendiente"
@@ -767,9 +1071,39 @@
 
             </div>
 
+            <!-- =====================================
+                 SIN RESULTADOS DE BUSQUEDA
+            ===================================== -->
+
+            <div
+                class="sin-registros sin-resultados"
+                id="sin-resultados"
+                th:if="${!#lists.isEmpty(recompensas)}"
+                hidden>
+
+                <div class="icono"
+                     aria-hidden="true">
+                    🔎
+                </div>
+
+                <h3>
+                    No encontramos recompensas
+                </h3>
+
+                <p>
+                    Prueba con otro nombre,
+                    elige otra categoría
+                    o desactiva el filtro
+                    de productos disponibles.
+                </p>
+
+            </div>
+
         </section>
 
-        <!-- REGRESAR AL PANEL -->
+        <!-- =====================================
+             VOLVER AL PANEL
+        ===================================== -->
 
         <div class="acciones">
 
@@ -785,7 +1119,9 @@
 
     </main>
 
-    <!-- PIE DE PAGINA -->
+    <!-- =====================================
+         PIE DE PAGINA ORIGINAL
+    ===================================== -->
 
     <footer>
 
@@ -803,6 +1139,308 @@
         </p>
 
     </footer>
+
+    <!-- =====================================
+         PASO 88
+         JAVASCRIPT DE FILTRADO
+
+         - No modifica MySQL.
+         - No modifica puntos ni stock.
+         - No modifica el dashboard.
+         - No cambia los enlaces de canje.
+    ===================================== -->
+
+    <script>
+
+        document.addEventListener(
+            'DOMContentLoaded',
+            function () {
+
+                // ELEMENTOS DEL CATALOGO
+
+                const catalogo =
+                    document.getElementById(
+                        'lista-recompensas'
+                    );
+
+                const buscar =
+                    document.getElementById(
+                        'buscar-recompensa'
+                    );
+
+                const soloDisponibles =
+                    document.getElementById(
+                        'solo-disponibles'
+                    );
+
+                const limpiar =
+                    document.getElementById(
+                        'limpiar-filtros'
+                    );
+
+                const contador =
+                    document.getElementById(
+                        'contador-resultados'
+                    );
+
+                const sinResultados =
+                    document.getElementById(
+                        'sin-resultados'
+                    );
+
+                const botones =
+                    document.querySelectorAll(
+                        '[data-categoria-filtro]'
+                    );
+
+                // NO EJECUTAR FILTROS SI
+                // EL CATALOGO ESTA VACIO
+
+                if (
+                    !catalogo ||
+                    !buscar ||
+                    !soloDisponibles ||
+                    !contador
+                ) {
+                    return;
+                }
+
+                // OBTENER TODAS LAS TARJETAS
+
+                const tarjetas = Array.from(
+                    catalogo.querySelectorAll(
+                        '.recompensa'
+                    )
+                );
+
+                // CATEGORIA INICIAL
+
+                let categoriaSeleccionada = 'todas';
+
+                // =================================
+                // NORMALIZAR TEXTO
+                //
+                // Permite buscar sin distinguir:
+                // - Mayusculas y minusculas
+                // - Vocales con o sin tilde
+                // =================================
+
+                function normalizar(texto) {
+
+                    return String(texto || '')
+                        .toLowerCase()
+                        .normalize('NFD')
+                        .replace(
+                            /[\u0300-\u036f]/g,
+                            ''
+                        )
+                        .trim();
+
+                }
+
+                // =================================
+                // FILTRAR RECOMPENSAS
+                // =================================
+
+                function actualizarFiltros() {
+
+                    const nombreBuscado =
+                        normalizar(
+                            buscar.value
+                        );
+
+                    const exigirStock =
+                        soloDisponibles.checked;
+
+                    let encontrados = 0;
+
+                    tarjetas.forEach(
+                        function (tarjeta) {
+
+                            const titulo =
+                                tarjeta.querySelector(
+                                    'h3'
+                                );
+
+                            const nombre =
+                                normalizar(
+                                    titulo
+                                        ? titulo.textContent
+                                        : ''
+                                );
+
+                            const categoria =
+                                normalizar(
+                                    tarjeta.dataset.categoria
+                                );
+
+                            const stock = Number(
+                                tarjeta.dataset.stock || 0
+                            );
+
+                            // VALIDAR NOMBRE
+
+                            const coincideNombre =
+                                nombre.includes(
+                                    nombreBuscado
+                                );
+
+                            // VALIDAR CATEGORIA
+
+                            const coincideCategoria =
+                                categoriaSeleccionada === 'todas'
+                                ||
+                                categoria === categoriaSeleccionada;
+
+                            // VALIDAR STOCK
+
+                            const coincideStock =
+                                !exigirStock ||
+                                stock > 0;
+
+                            // TODOS LOS FILTROS
+                            // DEBEN COINCIDIR
+
+                            const visible =
+                                coincideNombre &&
+                                coincideCategoria &&
+                                coincideStock;
+
+                            // MOSTRAR U OCULTAR
+
+                            tarjeta.hidden = !visible;
+
+                            if (visible) {
+                                encontrados++;
+                            }
+
+                        }
+                    );
+
+                    // ACTUALIZAR CONTADOR
+
+                    contador.textContent =
+                        String(encontrados);
+
+                    // MOSTRAR MENSAJE VACIO
+
+                    if (sinResultados) {
+
+                        sinResultados.hidden =
+                            encontrados !== 0;
+
+                    }
+
+                }
+
+                // =================================
+                // CAMBIAR CATEGORIA
+                // =================================
+
+                function seleccionarCategoria(
+                    categoria
+                ) {
+
+                    categoriaSeleccionada =
+                        categoria;
+
+                    botones.forEach(
+                        function (boton) {
+
+                            const seleccionada =
+                                boton.dataset.categoriaFiltro
+                                === categoria;
+
+                            boton.classList.toggle(
+                                'activo',
+                                seleccionada
+                            );
+
+                            boton.setAttribute(
+                                'aria-pressed',
+                                String(seleccionada)
+                            );
+
+                        }
+                    );
+
+                    actualizarFiltros();
+
+                }
+
+                // =================================
+                // EVENTOS DE CATEGORIAS
+                // =================================
+
+                botones.forEach(
+                    function (boton) {
+
+                        boton.addEventListener(
+                            'click',
+                            function () {
+
+                                seleccionarCategoria(
+                                    boton.dataset.categoriaFiltro
+                                );
+
+                            }
+                        );
+
+                    }
+                );
+
+                // =================================
+                // BUSQUEDA EN TIEMPO REAL
+                // =================================
+
+                buscar.addEventListener(
+                    'input',
+                    actualizarFiltros
+                );
+
+                // =================================
+                // MOSTRAR SOLO DISPONIBLES
+                // =================================
+
+                soloDisponibles.addEventListener(
+                    'change',
+                    actualizarFiltros
+                );
+
+                // =================================
+                // LIMPIAR TODOS LOS FILTROS
+                // =================================
+
+                if (limpiar) {
+
+                    limpiar.addEventListener(
+                        'click',
+                        function () {
+
+                            buscar.value = '';
+
+                            soloDisponibles.checked =
+                                false;
+
+                            seleccionarCategoria(
+                                'todas'
+                            );
+
+                            buscar.focus();
+
+                        }
+                    );
+
+                }
+
+                // MOSTRAR ESTADO INICIAL
+
+                actualizarFiltros();
+
+            }
+        );
+
+    </script>
 
 </body>
 </html>
