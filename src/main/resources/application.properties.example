@@ -1,0 +1,79 @@
+# PROYECTO: PERU RECICLA
+# CONFIGURACION GENERAL
+
+spring.application.name=PeruRecicla
+server.port=8080
+
+# ============================================================
+# CONEXION MYSQL
+# ============================================================
+#
+# CONFIGURACION PERSONAL DE CADA INTEGRANTE
+#
+# Cambiar unicamente:
+#
+# 1. Puerto y nombre de la base de datos
+# 2. Usuario de MySQL
+# 3. Contrasena de MySQL
+#
+# Ejemplo de puertos:
+#
+# 3306 - MySQL de un integrante
+# 3307 - MySQL de otro integrante
+# 3308 - MySQL de otro integrante
+#
+# localhost significa que MySQL se encuentra
+# instalado en la misma computadora.
+#
+# IMPORTANTE:
+# Si existen variables de entorno DB_URL,
+# DB_USERNAME o DB_PASSWORD, tendran prioridad
+# sobre los valores predeterminados de abajo.
+# ============================================================
+
+spring.datasource.url=${DB_URL:jdbc:mysql://localhost:3306/perurecicla?serverTimezone=UTC}
+
+spring.datasource.username=${DB_USERNAME:admin}
+
+spring.datasource.password=${DB_PASSWORD:CAMBIAR_CONTRASENA_MYSQL}
+
+spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
+
+
+# ============================================================
+# JPA E HIBERNATE
+# ============================================================
+
+spring.jpa.hibernate.ddl-auto=validate
+
+spring.jpa.show-sql=false
+
+spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.MySQLDialect
+
+
+# ============================================================
+# THYMELEAF
+# ============================================================
+
+spring.thymeleaf.prefix=classpath:/templates/
+
+spring.thymeleaf.suffix=.html
+
+spring.thymeleaf.mode=HTML
+
+spring.thymeleaf.encoding=UTF-8
+
+spring.thymeleaf.cache=false
+
+
+# ============================================================
+# LOGS
+# ============================================================
+
+logging.level.org.hibernate.SQL=WARN
+
+
+# ============================================================
+# FIN DE LA CONFIGURACION
+# PERU RECICLA
+# ============================================================
