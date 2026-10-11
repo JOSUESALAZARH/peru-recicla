@@ -1,0 +1,698 @@
+
+<!DOCTYPE html>
+<html lang="es"
+      xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <!-- =====================================
+         CORRECCION DE REGISTRO - PASO 63.1
+
+         Inicializar CSRF al principio
+         de la plantilla para evitar crear
+         la sesion demasiado tarde.
+    ===================================== -->
+
+    <meta name="_csrf"
+          th:content="${_csrf.token}">
+
+    <title>Registro de Vecinos | PERÚ RECICLA</title>
+
+    <style>
+
+        /* =====================================
+           COLORES INSTITUCIONALES
+        ===================================== */
+
+        :root {
+            --verde: #16804d;
+            --verde-oscuro: #105a38;
+            --verde-claro: #e6f5eb;
+            --fondo: #f6f9f6;
+            --blanco: #ffffff;
+            --texto: #1c3027;
+            --gris: #60736a;
+            --borde: #dce8df;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, Helvetica, sans-serif;
+            color: var(--texto);
+            background: var(--fondo);
+            line-height: 1.5;
+        }
+
+        a {
+            text-decoration: none;
+        }
+
+        /* =====================================
+           ENCABEZADO
+        ===================================== */
+
+        .encabezado {
+            background: white;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.05);
+        }
+
+        .barra {
+            max-width: 1150px;
+            margin: auto;
+            padding: 20px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .logo {
+            color: var(--verde-oscuro);
+            font-size: 23px;
+            font-weight: bold;
+        }
+
+        .menu a {
+            color: var(--verde-oscuro);
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        .menu a:hover {
+            color: var(--verde);
+        }
+
+        /* =====================================
+           PRESENTACION
+        ===================================== */
+
+        .presentacion {
+            background: linear-gradient(
+                130deg,
+                #105a38,
+                #16804d
+            );
+            color: white;
+            text-align: center;
+            padding: 52px 20px 95px;
+        }
+
+        .presentacion h1 {
+            font-size: 36px;
+            margin: 12px 0;
+        }
+
+        .presentacion p {
+            color: #e3f4e9;
+            font-size: 16px;
+            margin: 0;
+        }
+
+        .etiqueta {
+            display: inline-block;
+            background: rgba(255,255,255,0.16);
+            padding: 7px 15px;
+            border-radius: 30px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        /* =====================================
+           CONTENEDOR PRINCIPAL
+        ===================================== */
+
+        .contenedor {
+            max-width: 860px;
+            margin: -55px auto 75px;
+            padding: 0 20px;
+            position: relative;
+        }
+
+        .tarjeta {
+            background: white;
+            border-radius: 20px;
+            padding: 42px;
+            box-shadow: 0 12px 40px rgba(0,0,0,0.08);
+            border: 1px solid var(--borde);
+        }
+
+        .titulo-formulario {
+            margin-bottom: 28px;
+        }
+
+        .titulo-formulario h2 {
+            color: var(--verde-oscuro);
+            margin: 0 0 8px;
+            font-size: 26px;
+        }
+
+        .titulo-formulario p {
+            color: var(--gris);
+            margin: 0;
+            font-size: 14px;
+        }
+
+        /* =====================================
+           FORMULARIO
+        ===================================== */
+
+        .formulario {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 22px;
+        }
+
+        .campo {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .campo.completo {
+            grid-column: 1 / -1;
+        }
+
+        label {
+            font-size: 14px;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+
+        .obligatorio {
+            color: #b42318;
+        }
+
+        input {
+            width: 100%;
+            padding: 14px 15px;
+            border: 1px solid #d5e0d9;
+            border-radius: 10px;
+            background: #fbfdfb;
+            color: var(--texto);
+            font-size: 15px;
+            font-family: inherit;
+            transition: border-color 0.2s,
+                        box-shadow 0.2s;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: var(--verde);
+            box-shadow: 0 0 0 3px
+                rgba(22,128,77,0.12);
+        }
+
+        input::placeholder {
+            color: #97a69d;
+        }
+
+        .ayuda {
+            color: var(--gris);
+            font-size: 12px;
+            margin-top: 6px;
+        }
+
+        /* =====================================
+           MENSAJES
+        ===================================== */
+
+        .alerta {
+            padding: 15px 18px;
+            margin-bottom: 24px;
+            border-radius: 10px;
+            font-size: 14px;
+        }
+
+        .alerta-error {
+            background: #fff0ef;
+            border: 1px solid #f6c4bf;
+            color: #a32720;
+        }
+
+        .alerta-exito {
+            background: #e6f5eb;
+            border: 1px solid #b7dfc5;
+            color: #105a38;
+        }
+
+        /* =====================================
+           BOTONES
+        ===================================== */
+
+        .acciones {
+            margin-top: 30px;
+        }
+
+        .boton {
+            width: 100%;
+            border: none;
+            border-radius: 11px;
+            background: var(--verde);
+            color: white;
+            font-size: 16px;
+            font-weight: bold;
+            padding: 16px 24px;
+            cursor: pointer;
+            transition: background 0.2s,
+                        transform 0.2s;
+        }
+
+        .boton:hover {
+            background: var(--verde-oscuro);
+            transform: translateY(-2px);
+        }
+
+        .enlace-inicio {
+            display: block;
+            text-align: center;
+            margin-top: 20px;
+            color: var(--verde-oscuro);
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        .enlace-inicio:hover {
+            text-decoration: underline;
+        }
+
+        /* =====================================
+           INFORMACION ADICIONAL
+        ===================================== */
+
+        .informacion {
+            background: var(--verde-claro);
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 30px;
+        }
+
+        .informacion h3 {
+            font-size: 16px;
+            color: var(--verde-oscuro);
+            margin: 0 0 10px;
+        }
+
+        .informacion p {
+            margin: 0;
+            color: #365d48;
+            font-size: 13px;
+        }
+
+        /* =====================================
+           PIE DE PAGINA
+        ===================================== */
+
+        footer {
+            background: #123827;
+            color: white;
+            text-align: center;
+            padding: 28px 20px;
+        }
+
+        footer p {
+            margin: 5px;
+            color: #c8dfd1;
+            font-size: 13px;
+        }
+
+        /* =====================================
+           ADAPTACION A CELULARES
+        ===================================== */
+
+        @media (max-width: 650px) {
+
+            .presentacion {
+                padding: 40px 20px 85px;
+            }
+
+            .presentacion h1 {
+                font-size: 28px;
+            }
+
+            .tarjeta {
+                padding: 25px 20px;
+            }
+
+            .formulario {
+                grid-template-columns: 1fr;
+            }
+
+            .campo.completo {
+                grid-column: auto;
+            }
+
+            .barra {
+                padding: 17px 20px;
+            }
+
+            .logo {
+                font-size: 19px;
+            }
+        }
+
+    </style>
+</head>
+
+<body>
+
+    <!-- =====================================
+         ENCABEZADO
+    ===================================== -->
+
+    <header class="encabezado">
+
+        <nav class="barra"
+             aria-label="Navegacion principal">
+
+            <a class="logo" th:href="@{/}">
+                ♻ PERÚ RECICLA
+            </a>
+
+            <div class="menu">
+
+                <a th:href="@{/}">
+                    Volver al inicio
+                </a>
+
+            </div>
+
+        </nav>
+
+    </header>
+
+    <!-- =====================================
+         PRESENTACION
+    ===================================== -->
+
+    <section class="presentacion">
+
+        <span class="etiqueta">
+            ÚNETE A PERÚ RECICLA
+        </span>
+
+        <h1>
+            Registro de Vecinos
+        </h1>
+
+        <p>
+            Crea tu cuenta y comienza
+            a transformar tu reciclaje
+            en recompensas.
+        </p>
+
+    </section>
+
+    <!-- =====================================
+         CONTENIDO PRINCIPAL
+    ===================================== -->
+
+    <main class="contenedor">
+
+        <div class="tarjeta">
+
+            <div class="titulo-formulario">
+
+                <h2>
+                    Crea tu cuenta
+                </h2>
+
+                <p>
+                    Completa tus datos personales
+                    para formar parte del programa
+                    PERÚ RECICLA.
+                </p>
+
+            </div>
+
+            <!-- =================================
+                 MENSAJE DE ERROR
+            ================================= -->
+
+            <div class="alerta alerta-error"
+                 th:if="${error != null}"
+                 th:text="${error}"
+                 role="alert">
+
+                Error en el registro.
+
+            </div>
+
+            <!-- =================================
+                 MENSAJE DE EXITO
+            ================================= -->
+
+            <div class="alerta alerta-exito"
+                 th:if="${mensajeExito != null}"
+                 role="status">
+
+                <strong>
+                    ¡Registro exitoso!
+                </strong>
+
+                <p th:text="${mensajeExito}">
+                    Tu cuenta ha sido registrada
+                    correctamente.
+                </p>
+
+                <p>
+                    Ahora podrás iniciar sesión
+                    cuando habilitemos
+                    el acceso de usuarios.
+                </p>
+
+            </div>
+
+            <!-- =================================
+                 FORMULARIO DE REGISTRO
+            ================================= -->
+
+            <form class="formulario"
+                  th:action="@{/registro}"
+                  method="post">
+
+                <!-- NOMBRE -->
+
+                <div class="campo">
+
+                    <label for="nombre">
+                        Nombres
+                        <span class="obligatorio">*</span>
+                    </label>
+
+                    <input
+                        type="text"
+                        id="nombre"
+                        name="nombre"
+                        placeholder="Ingresa tus nombres"
+                        th:value="${nombreIngresado}"
+                        maxlength="100"
+                        autocomplete="given-name"
+                        required>
+
+                </div>
+
+                <!-- APELLIDO -->
+
+                <div class="campo">
+
+                    <label for="apellido">
+                        Apellidos
+                        <span class="obligatorio">*</span>
+                    </label>
+
+                    <input
+                        type="text"
+                        id="apellido"
+                        name="apellido"
+                        placeholder="Ingresa tus apellidos"
+                        th:value="${apellidoIngresado}"
+                        maxlength="100"
+                        autocomplete="family-name"
+                        required>
+
+                </div>
+
+                <!-- DNI -->
+
+                <div class="campo">
+
+                    <label for="dni">
+                        DNI
+                        <span class="obligatorio">*</span>
+                    </label>
+
+                    <input
+                        type="text"
+                        id="dni"
+                        name="dni"
+                        placeholder="8 dígitos"
+                        th:value="${dniIngresado}"
+                        minlength="8"
+                        maxlength="8"
+                        pattern="[0-9]{8}"
+                        inputmode="numeric"
+                        autocomplete="off"
+                        title="Ingresa exactamente 8 dígitos"
+                        required>
+
+                    <span class="ayuda">
+                        Ingresa tu DNI de 8 dígitos.
+                    </span>
+
+                </div>
+
+                <!-- TELEFONO -->
+
+                <div class="campo">
+
+                    <label for="telefono">
+                        Teléfono
+                    </label>
+
+                    <input
+                        type="tel"
+                        id="telefono"
+                        name="telefono"
+                        placeholder="987654321"
+                        th:value="${telefonoIngresado}"
+                        maxlength="15"
+                        pattern="\+?[0-9]{7,15}"
+                        autocomplete="tel"
+                        title="Ingresa entre 7 y 15 dígitos">
+
+                    <span class="ayuda">
+                        Campo opcional.
+                    </span>
+
+                </div>
+
+                <!-- CORREO -->
+
+                <div class="campo completo">
+
+                    <label for="correo">
+                        Correo electrónico
+                        <span class="obligatorio">*</span>
+                    </label>
+
+                    <input
+                        type="email"
+                        id="correo"
+                        name="correo"
+                        placeholder="ejemplo@correo.com"
+                        th:value="${correoIngresado}"
+                        maxlength="150"
+                        autocomplete="email"
+                        required>
+
+                    <span class="ayuda">
+                        Utilizaremos este correo
+                        para identificar tu cuenta.
+                    </span>
+
+                </div>
+
+                <!-- CONTRASENA -->
+
+                <div class="campo completo">
+
+                    <label for="contrasena">
+                        Contraseña
+                        <span class="obligatorio">*</span>
+                    </label>
+
+                    <input
+                        type="password"
+                        id="contrasena"
+                        name="contrasena"
+                        placeholder="Crea una contraseña"
+                        minlength="8"
+                        maxlength="72"
+                        autocomplete="new-password"
+                        required>
+
+                    <span class="ayuda">
+                        Utiliza al menos 8 caracteres.
+                        No compartas tu contraseña.
+                    </span>
+
+                </div>
+
+                <!-- BOTON REGISTRAR -->
+
+                <div class="campo completo">
+
+                    <button
+                        type="submit"
+                        class="boton">
+
+                        Crear mi cuenta →
+
+                    </button>
+
+                    <a th:href="@{/}"
+                       class="enlace-inicio">
+
+                        ← Regresar a PERÚ RECICLA
+
+                    </a>
+
+                </div>
+
+            </form>
+
+            <!-- =================================
+                 INFORMACION COMPLEMENTARIA
+            ================================= -->
+
+            <div class="informacion">
+
+                <h3>
+                    ♻ ¿Qué obtendrás al registrarte?
+                </h3>
+
+                <p>
+                    Podrás consultar tus materiales
+                    reciclados, revisar tus puntos
+                    acumulados, acceder al catálogo
+                    de recompensas y consultar
+                    tu historial de canjes cuando
+                    los módulos estén habilitados.
+                </p>
+
+            </div>
+
+        </div>
+
+    </main>
+
+    <!-- =====================================
+         PIE DE PAGINA
+    ===================================== -->
+
+    <footer>
+
+        <strong>
+            ♻ PERÚ RECICLA
+        </strong>
+
+        <p>
+            Ecosistema Digital de Incentivos
+            para el Reciclaje
+        </p>
+
+        <p>
+            Proyecto académico - Cibertec
+        </p>
+
+    </footer>
+
+</body>
+</html>

@@ -1,0 +1,815 @@
+
+<!DOCTYPE html>
+<html lang="es"
+      xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+    <title th:text="${titulo} + ' | Inicio'">
+        PERÚ RECICLA | Inicio
+    </title>
+    <style>
+        /* =====================================
+           COLORES INSTITUCIONALES
+        ===================================== */
+        :root {
+            --verde: #16804d;
+            --verde-oscuro: #105a38;
+            --verde-claro: #e6f5eb;
+            --fondo: #f6f9f6;
+            --texto: #1c3027;
+            --gris: #60736a;
+            --blanco: #ffffff;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, Helvetica, sans-serif;
+            background: var(--fondo);
+            color: var(--texto);
+            line-height: 1.6;
+        }
+
+        a {
+            text-decoration: none;
+        }
+
+        /* =====================================
+           ENCABEZADO
+        ===================================== */
+        .encabezado {
+            background: var(--blanco);
+            box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+        }
+
+        .barra {
+            max-width: 1150px;
+            margin: auto;
+            padding: 19px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .logo {
+            color: var(--verde-oscuro);
+            font-size: 23px;
+            font-weight: bold;
+            white-space: nowrap;
+        }
+
+        .menu {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 24px;
+        }
+
+        .menu a {
+            color: var(--texto);
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .menu a:hover {
+            color: var(--verde);
+        }
+
+        /* =====================================
+           NUEVO BOTON INICIAR SESION
+        ===================================== */
+        .menu .boton-login {
+            display: inline-block;
+            padding: 10px 18px;
+            border: 1px solid var(--verde);
+            border-radius: 9px;
+            color: var(--verde-oscuro);
+            background: var(--blanco);
+            font-weight: bold;
+        }
+
+        .menu .boton-login:hover {
+            background: var(--verde-claro);
+            color: var(--verde-oscuro);
+        }
+
+        /* =====================================
+           BOTON DE REGISTRO EXISTENTE
+        ===================================== */
+        .menu .boton-registro {
+            background: var(--verde);
+            color: white;
+            padding: 11px 20px;
+            border-radius: 9px;
+        }
+
+        .menu .boton-registro:hover {
+            background: var(--verde-oscuro);
+            color: white;
+        }
+
+        /* =====================================
+           SECCION PRINCIPAL
+        ===================================== */
+        .hero {
+            background: linear-gradient(
+                130deg,
+                #105a38,
+                #16804d
+            );
+            color: white;
+            padding: 90px 24px;
+        }
+
+        .hero-contenido {
+            max-width: 1150px;
+            margin: auto;
+            display: grid;
+            grid-template-columns: 1.4fr 1fr;
+            gap: 50px;
+            align-items: center;
+        }
+
+        .hero h1 {
+            font-size: clamp(34px, 5vw, 58px);
+            line-height: 1.12;
+            margin: 18px 0;
+        }
+
+        .hero p {
+            font-size: 18px;
+            color: #e3f4e9;
+            max-width: 570px;
+        }
+
+        .hero .subtitulo {
+            font-size: 14px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .etiqueta {
+            display: inline-block;
+            padding: 7px 13px;
+            background: var(--verde-claro);
+            color: var(--verde-oscuro);
+            border-radius: 30px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        /* =====================================
+           BOTONES PRINCIPALES
+        ===================================== */
+        .acciones-hero {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 14px;
+            margin-top: 28px;
+        }
+
+        .boton {
+            display: inline-block;
+            background: white;
+            color: var(--verde-oscuro);
+            padding: 14px 26px;
+            border-radius: 10px;
+            font-weight: bold;
+            font-size: 14px;
+            transition: transform 0.2s;
+        }
+
+        .boton:hover {
+            transform: translateY(-3px);
+        }
+
+        .boton-secundario {
+            background: transparent;
+            color: white;
+            border: 1px solid rgba(255,255,255,0.7);
+        }
+
+        .boton-secundario:hover {
+            background: rgba(255,255,255,0.12);
+        }
+
+        /* =====================================
+           TARJETA DE PRESENTACION
+        ===================================== */
+        .hero-tarjeta {
+            background: rgba(255,255,255,0.12);
+            border: 1px solid rgba(255,255,255,0.25);
+            border-radius: 22px;
+            padding: 35px;
+            text-align: center;
+        }
+
+        .hero-icono {
+            font-size: 75px;
+            margin-bottom: 15px;
+        }
+
+        .hero-tarjeta h2 {
+            font-size: 25px;
+            margin: 10px 0;
+        }
+
+        .hero-tarjeta p {
+            font-size: 15px;
+            margin: auto;
+        }
+
+        /* =====================================
+           SECCIONES GENERALES
+        ===================================== */
+        .seccion {
+            max-width: 1150px;
+            margin: auto;
+            padding: 76px 24px;
+        }
+
+        .seccion-titulo {
+            text-align: center;
+            margin-bottom: 38px;
+        }
+
+        .seccion-titulo h2 {
+            font-size: 34px;
+            margin-bottom: 10px;
+        }
+
+        .seccion-titulo p {
+            color: var(--gris);
+            max-width: 620px;
+            margin: auto;
+        }
+
+        .tarjetas {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 24px;
+        }
+
+        .tarjeta {
+            background: var(--blanco);
+            padding: 32px 26px;
+            border-radius: 17px;
+            box-shadow: 0 6px 24px rgba(0,0,0,0.05);
+            border: 1px solid #e6ede7;
+        }
+
+        .tarjeta-icono {
+            font-size: 40px;
+            margin-bottom: 12px;
+        }
+
+        .tarjeta h3 {
+            color: var(--verde-oscuro);
+            margin: 8px 0 12px;
+            font-size: 20px;
+        }
+
+        .tarjeta p {
+            color: var(--gris);
+            font-size: 15px;
+            margin: 0;
+        }
+
+        /* =====================================
+           COMO FUNCIONA
+        ===================================== */
+        .proceso {
+            background: var(--verde-claro);
+        }
+
+        .paso-numero {
+            width: 43px;
+            height: 43px;
+            background: var(--verde);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-weight: bold;
+            font-size: 19px;
+            margin-bottom: 14px;
+        }
+
+        /* =====================================
+           MODULOS
+        ===================================== */
+        .modulo {
+            border-top: 4px solid var(--verde);
+        }
+
+        .modulo-estado {
+            display: inline-block;
+            margin-top: 20px;
+            font-size: 12px;
+            font-weight: bold;
+            background: var(--verde-claro);
+            padding: 7px 12px;
+            border-radius: 8px;
+            color: var(--verde-oscuro);
+        }
+
+        /* =====================================
+           INVITACION AL REGISTRO
+        ===================================== */
+        .invitacion {
+            background: var(--verde-claro);
+            padding: 65px 24px;
+            text-align: center;
+        }
+
+        .invitacion h2 {
+            font-size: 32px;
+            color: var(--verde-oscuro);
+            margin: 0 0 12px;
+        }
+
+        .invitacion p {
+            color: #365d48;
+            max-width: 550px;
+            margin: 0 auto 25px;
+        }
+
+        .invitacion .boton {
+            background: var(--verde);
+            color: white;
+        }
+
+        .invitacion .boton:hover {
+            background: var(--verde-oscuro);
+        }
+
+        /* =====================================
+           PIE DE PAGINA
+        ===================================== */
+        footer {
+            background: #123827;
+            color: white;
+            text-align: center;
+            padding: 35px 20px;
+        }
+
+        footer p {
+            color: #c8dfd1;
+            margin: 8px;
+            font-size: 14px;
+        }
+
+        /* =====================================
+           DISEÑO RESPONSIVE
+        ===================================== */
+        @media (max-width: 900px) {
+            .barra {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .menu {
+                justify-content: center;
+            }
+
+            .hero-contenido {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 800px) {
+            .hero {
+                padding: 55px 20px;
+            }
+
+            .tarjetas {
+                grid-template-columns: 1fr;
+            }
+
+            .seccion {
+                padding: 55px 20px;
+            }
+
+            .seccion-titulo h2 {
+                font-size: 28px;
+            }
+
+            .invitacion h2 {
+                font-size: 27px;
+            }
+        }
+
+        @media (max-width: 500px) {
+            .menu {
+                gap: 14px;
+            }
+
+            .acciones-hero {
+                flex-direction: column;
+            }
+
+            .acciones-hero .boton {
+                text-align: center;
+            }
+
+            .logo {
+                font-size: 20px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- =====================================
+         ENCABEZADO
+    ===================================== -->
+    <header class="encabezado">
+
+        <nav class="barra"
+             aria-label="Navegacion principal">
+
+            <a class="logo" th:href="@{/}">
+                ♻ PERÚ RECICLA
+            </a>
+
+            <div class="menu">
+                <a th:href="@{/}">
+                    Inicio
+                </a>
+
+                <a href="#como-funciona">
+                    ¿Cómo funciona?
+                </a>
+
+                <a href="#beneficios">
+                    Beneficios
+                </a>
+
+                <a href="#modulos">
+                    Módulos
+                </a>
+
+                <!-- NUEVO BOTON INICIAR SESION -->
+                <a class="boton-login"
+                   th:href="@{/login}">
+                    Iniciar sesión
+                </a>
+
+                <!-- BOTON DE REGISTRO EXISTENTE -->
+                <a class="boton-registro"
+                   th:href="@{/registro}">
+                    Registrarse
+                </a>
+            </div>
+        </nav>
+    </header>
+
+    <!-- =====================================
+         SECCION PRINCIPAL
+    ===================================== -->
+    <main>
+        <section class="hero">
+            <div class="hero-contenido">
+
+                <div>
+                    <span class="etiqueta">
+                        PROYECTO PERÚ RECICLA
+                    </span>
+
+                    <h1 th:text="${titulo}">
+                        PERÚ RECICLA
+                    </h1>
+
+                    <p class="subtitulo"
+                       th:text="${subtitulo}">
+                        Ecosistema Digital de
+                        Incentivos para el Reciclaje
+                    </p>
+
+                    <p th:text="${mensaje}">
+                        Recicla, acumula puntos
+                        y canjea recompensas.
+                    </p>
+
+                    <!-- BOTONES PRINCIPALES -->
+                    <div class="acciones-hero">
+
+                        <a class="boton"
+                           th:href="@{/registro}">
+                            Crear mi cuenta →
+                        </a>
+
+                        <a class="boton boton-secundario"
+                           href="#como-funciona">
+                            Conoce cómo funciona
+                        </a>
+                    </div>
+                </div>
+
+                <div class="hero-tarjeta">
+                    <div class="hero-icono">
+                        ♻
+                    </div>
+
+                    <h2>
+                        Tu reciclaje tiene valor
+                    </h2>
+
+                    <p>
+                        Transforma tus residuos
+                        reciclables en puntos
+                        para obtener recompensas.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- =================================
+             BENEFICIOS
+        ================================= -->
+        <section class="seccion"
+                 id="beneficios">
+
+            <div class="seccion-titulo">
+                <h2>
+                    ¿Por qué reciclar con nosotros?
+                </h2>
+
+                <p>
+                    Promovemos el reciclaje
+                    mediante un sistema digital
+                    de incentivos y recompensas.
+                </p>
+            </div>
+
+            <div class="tarjetas">
+                <article class="tarjeta">
+                    <div class="tarjeta-icono">
+                        ♻
+                    </div>
+
+                    <h3>
+                        Reciclaje responsable
+                    </h3>
+
+                    <p>
+                        Registra la entrega
+                        de materiales reciclables
+                        y contribuye al cuidado
+                        del medio ambiente.
+                    </p>
+                </article>
+
+                <article class="tarjeta">
+                    <div class="tarjeta-icono">
+                        ★
+                    </div>
+
+                    <h3>
+                        Acumula puntos
+                    </h3>
+
+                    <p>
+                        Obtén puntos de acuerdo
+                        con el peso y tipo
+                        de material reciclado.
+                    </p>
+                </article>
+
+                <article class="tarjeta">
+                    <div class="tarjeta-icono">
+                        🎁
+                    </div>
+
+                    <h3>
+                        Canjea recompensas
+                    </h3>
+
+                    <p>
+                        Utiliza tus puntos
+                        acumulados para solicitar
+                        productos disponibles
+                        en nuestro catálogo.
+                    </p>
+                </article>
+            </div>
+        </section>
+
+        <!-- =================================
+             COMO FUNCIONA
+        ================================= -->
+        <div class="proceso">
+
+            <section class="seccion"
+                     id="como-funciona">
+
+                <div class="seccion-titulo">
+                    <h2>
+                        ¿Cómo funciona PERÚ RECICLA?
+                    </h2>
+
+                    <p>
+                        Nuestro sistema está
+                        diseñado para ser
+                        sencillo y accesible.
+                    </p>
+                </div>
+
+                <div class="tarjetas">
+                    <article class="tarjeta">
+                        <div class="paso-numero">
+                            1
+                        </div>
+
+                        <h3>
+                            Regístrate
+                        </h3>
+
+                        <p>
+                            Crea una cuenta como
+                            vecino para participar
+                            en el programa.
+                        </p>
+                    </article>
+
+                    <article class="tarjeta">
+                        <div class="paso-numero">
+                            2
+                        </div>
+
+                        <h3>
+                            Entrega tus materiales
+                        </h3>
+
+                        <p>
+                            El recolector registrará
+                            el material y su peso.
+                            Los puntos se acreditarán
+                            después de la validación.
+                        </p>
+                    </article>
+
+                    <article class="tarjeta">
+                        <div class="paso-numero">
+                            3
+                        </div>
+
+                        <h3>
+                            Canjea tus puntos
+                        </h3>
+
+                        <p>
+                            Consulta el catálogo
+                            y utiliza tus puntos
+                            para solicitar una
+                            recompensa disponible.
+                        </p>
+                    </article>
+                </div>
+            </section>
+        </div>
+
+        <!-- =================================
+             MODULOS DEL SISTEMA
+        ================================= -->
+        <section class="seccion"
+                 id="modulos">
+
+            <div class="seccion-titulo">
+                <h2>
+                    Módulos del sistema
+                </h2>
+
+                <p>
+                    PERÚ RECICLA contará
+                    con tres perfiles principales,
+                    cada uno con funcionalidades
+                    específicas.
+                </p>
+            </div>
+
+            <div class="tarjetas">
+
+                <!-- VECINO -->
+                <article class="tarjeta modulo">
+                    <div class="tarjeta-icono">
+                        👤
+                    </div>
+
+                    <h3>
+                        Vecino
+                    </h3>
+
+                    <p>
+                        Consultar puntos,
+                        historial de reciclaje,
+                        recompensas disponibles
+                        y canjes realizados.
+                    </p>
+
+                    <span class="modulo-estado">
+                        En implementación
+                    </span>
+                </article>
+
+                <!-- RECOLECTOR -->
+                <article class="tarjeta modulo">
+                    <div class="tarjeta-icono">
+                        🚚
+                    </div>
+
+                    <h3>
+                        Recolector
+                    </h3>
+
+                    <p>
+                        Registrar entregas,
+                        seleccionar materiales,
+                        ingresar pesos
+                        y consultar recolectas.
+                    </p>
+
+                    <span class="modulo-estado">
+                        En implementación
+                    </span>
+                </article>
+
+                <!-- ADMINISTRADOR -->
+                <article class="tarjeta modulo">
+                    <div class="tarjeta-icono">
+                        ⚙
+                    </div>
+
+                    <h3>
+                        Administrador
+                    </h3>
+
+                    <p>
+                        Gestionar usuarios,
+                        materiales, recompensas,
+                        validaciones y reportes
+                        del sistema.
+                    </p>
+
+                    <span class="modulo-estado">
+                        En implementación
+                    </span>
+                </article>
+
+            </div>
+        </section>
+
+        <!-- =================================
+             INVITACION AL REGISTRO
+        ================================= -->
+        <section class="invitacion">
+
+            <h2>
+                ¡Comienza a reciclar hoy!
+            </h2>
+
+            <p>
+                Forma parte de PERÚ RECICLA.
+                Regístrate como vecino y prepárate
+                para transformar tus materiales
+                reciclables en recompensas.
+            </p>
+
+            <a class="boton"
+               th:href="@{/registro}">
+                Registrarme ahora →
+            </a>
+
+        </section>
+    </main>
+
+    <!-- =====================================
+         PIE DE PAGINA
+    ===================================== -->
+    <footer>
+        <strong>
+            ♻ PERÚ RECICLA
+        </strong>
+
+        <p>
+            Ecosistema Digital de Incentivos
+            para el Reciclaje
+        </p>
+
+        <p>
+            Proyecto académico - Cibertec
+        </p>
+    </footer>
+</body>
+</html>

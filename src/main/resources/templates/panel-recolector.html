@@ -1,0 +1,922 @@
+
+<!DOCTYPE html>
+<html lang="es"
+      xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>
+        Panel del recolector | PERÚ RECICLA
+    </title>
+
+    <style>
+        /* =====================================
+           PERU RECICLA - PASO 65
+           DASHBOARD DEL RECOLECTOR
+
+           INTEGRACION:
+           - Registro de pesajes
+           - Historial completo
+           - Ultimas cinco recolectas
+        ===================================== */
+
+        :root {
+            --verde: #16804d;
+            --oscuro: #105a38;
+            --claro: #e6f5eb;
+            --fondo: #f6f9f6;
+            --texto: #20392b;
+            --gris: #60736a;
+            --borde: #dde9e0;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            background: var(--fondo);
+            color: var(--texto);
+            font-family: Arial, Helvetica, sans-serif;
+            line-height: 1.55;
+        }
+
+        a {
+            text-decoration: none;
+        }
+
+        /* =====================================
+           NAVEGACION
+        ===================================== */
+
+        .barra {
+            background: white;
+            padding: 19px max(
+                24px,
+                calc((100% - 1150px) / 2)
+            );
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 18px;
+            box-shadow: 0 2px 12px #0000000b;
+        }
+
+        .logo {
+            color: var(--oscuro);
+            font-size: 23px;
+            font-weight: bold;
+        }
+
+        .navegacion {
+            display: flex;
+            align-items: center;
+            gap: 18px;
+            flex-wrap: wrap;
+        }
+
+        .navegacion a {
+            color: var(--oscuro);
+            font-size: 13px;
+            font-weight: bold;
+        }
+
+        .navegacion a:hover {
+            color: var(--verde);
+        }
+
+        .salir {
+            background: white;
+            color: var(--oscuro);
+            border: 1px solid var(--verde);
+            border-radius: 9px;
+            padding: 10px 16px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .salir:hover {
+            background: var(--claro);
+        }
+
+        /* =====================================
+           CONTENEDOR
+        ===================================== */
+
+        main {
+            max-width: 1150px;
+            margin: 40px auto 75px;
+            padding: 0 20px;
+        }
+
+        /* =====================================
+           PRESENTACION
+        ===================================== */
+
+        .hero {
+            background: linear-gradient(
+                120deg,
+                #105a38,
+                #16804d
+            );
+            padding: 42px;
+            color: white;
+            border-radius: 20px;
+        }
+
+        .etiqueta {
+            display: inline-block;
+            background: #ffffff30;
+            border-radius: 30px;
+            padding: 7px 13px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .hero h1 {
+            font-size: 35px;
+            margin: 17px 0 10px;
+        }
+
+        .hero p {
+            color: #e3f4e9;
+            margin: 0;
+        }
+
+        .correo {
+            display: inline-block;
+            margin-top: 12px;
+            color: #e4f7eb;
+            font-size: 13px;
+            overflow-wrap: anywhere;
+        }
+
+        /* =====================================
+           SECCIONES
+        ===================================== */
+
+        .seccion {
+            margin-top: 40px;
+        }
+
+        .seccion h2 {
+            color: var(--oscuro);
+            font-size: 25px;
+            margin: 0 0 9px;
+        }
+
+        .descripcion {
+            color: var(--gris);
+            font-size: 14px;
+            margin: 0 0 22px;
+        }
+
+        /* =====================================
+           INDICADORES
+        ===================================== */
+
+        .indicadores {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 19px;
+        }
+
+        .tarjeta {
+            background: white;
+            padding: 26px;
+            border: 1px solid var(--borde);
+            border-radius: 16px;
+            box-shadow: 0 5px 20px #00000008;
+        }
+
+        .tarjeta-icono {
+            font-size: 31px;
+            margin-bottom: 12px;
+        }
+
+        .tarjeta h3 {
+            color: var(--gris);
+            font-size: 14px;
+            margin: 0 0 11px;
+        }
+
+        .numero {
+            color: var(--verde);
+            font-size: 37px;
+            line-height: 1.2;
+            font-weight: bold;
+        }
+
+        .tarjeta p {
+            color: var(--gris);
+            font-size: 12px;
+            margin: 11px 0 0;
+        }
+
+        /* =====================================
+           INFORMACION Y MODULOS
+        ===================================== */
+
+        .informacion {
+            background: white;
+            padding: 28px;
+            border: 1px solid var(--borde);
+            border-radius: 17px;
+            box-shadow: 0 5px 20px #00000008;
+        }
+
+        .informacion h3 {
+            margin: 0 0 12px;
+            color: var(--oscuro);
+            font-size: 20px;
+        }
+
+        .informacion p {
+            margin: 0 0 12px;
+            color: var(--gris);
+            font-size: 14px;
+        }
+
+        .informacion p:last-child {
+            margin-bottom: 0;
+        }
+
+        .modulos {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
+
+        .modulo {
+            background: white;
+            padding: 27px;
+            border: 1px solid var(--borde);
+            border-top: 4px solid var(--verde);
+            border-radius: 17px;
+            box-shadow: 0 5px 20px #00000008;
+        }
+
+        .modulo-icono {
+            font-size: 35px;
+        }
+
+        .modulo h3 {
+            color: var(--oscuro);
+            font-size: 20px;
+            margin: 12px 0 9px;
+        }
+
+        .modulo p {
+            color: var(--gris);
+            font-size: 14px;
+            margin: 0 0 18px;
+        }
+
+        .disponibilidad {
+            display: inline-block;
+            background: var(--claro);
+            color: var(--oscuro);
+            padding: 8px 13px;
+            border-radius: 9px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .enlace {
+            display: inline-block;
+            background: var(--verde);
+            color: white;
+            border-radius: 9px;
+            padding: 11px 18px;
+            font-weight: bold;
+            font-size: 13px;
+        }
+
+        .enlace:hover {
+            background: var(--oscuro);
+        }
+
+        .enlace-secundario {
+            display: inline-block;
+            background: var(--claro);
+            color: var(--oscuro);
+            border-radius: 9px;
+            padding: 11px 18px;
+            font-weight: bold;
+            font-size: 13px;
+        }
+
+        .enlace-secundario:hover {
+            background: #cfead7;
+        }
+
+        /* =====================================
+           TABLA DE RECOLECTAS
+        ===================================== */
+
+        .tabla-contenedor {
+            background: white;
+            border: 1px solid var(--borde);
+            border-radius: 17px;
+            overflow-x: auto;
+            box-shadow: 0 5px 20px #00000008;
+        }
+
+        table {
+            width: 100%;
+            min-width: 900px;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+
+        thead {
+            background: var(--oscuro);
+            color: white;
+        }
+
+        th,
+        td {
+            text-align: left;
+            padding: 16px 14px;
+        }
+
+        td {
+            border-bottom: 1px solid var(--borde);
+        }
+
+        tbody tr:hover {
+            background: #f1f8f3;
+        }
+
+        tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        .material {
+            color: var(--oscuro);
+            font-weight: bold;
+        }
+
+        .puntos {
+            color: var(--verde);
+            font-weight: bold;
+        }
+
+        .estado {
+            display: inline-block;
+            padding: 6px 11px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: bold;
+            background: #edf2ee;
+            color: #425c4a;
+            text-transform: capitalize;
+        }
+
+        .estado.pendiente {
+            background: #fff1d9;
+            color: #825400;
+        }
+
+        .estado.validado {
+            background: #e0f5e6;
+            color: #12633a;
+        }
+
+        .estado.rechazado {
+            background: #fce8e8;
+            color: #a52828;
+        }
+
+        .sin-registros {
+            background: white;
+            border: 1px solid var(--borde);
+            border-radius: 17px;
+            padding: 42px 25px;
+            text-align: center;
+            color: var(--gris);
+        }
+
+        .sin-registros h3 {
+            color: var(--oscuro);
+            margin: 0 0 9px;
+        }
+
+        .acciones-historial {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-top: 20px;
+        }
+
+        /* =====================================
+           PIE DE PAGINA
+        ===================================== */
+
+        footer {
+            background: #123827;
+            color: white;
+            text-align: center;
+            padding: 30px 20px;
+            font-size: 13px;
+        }
+
+        footer p {
+            color: #c8dfd1;
+            margin: 7px;
+        }
+
+        /* =====================================
+           RESPONSIVE
+        ===================================== */
+
+        @media (max-width: 950px) {
+
+            .indicadores {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 700px) {
+
+            .barra,
+            .navegacion {
+                justify-content: center;
+            }
+
+            .hero {
+                padding: 29px;
+            }
+
+            .hero h1 {
+                font-size: 28px;
+            }
+
+            .indicadores,
+            .modulos {
+                grid-template-columns: 1fr;
+            }
+
+            .tarjeta,
+            .informacion,
+            .modulo {
+                padding: 22px;
+            }
+        }
+
+    </style>
+</head>
+
+<body>
+
+    <!-- =====================================
+         ENCABEZADO
+    ===================================== -->
+
+    <header class="barra">
+
+        <a class="logo"
+           th:href="@{/recolector/panel}">
+            ♻ PERÚ RECICLA
+        </a>
+
+        <nav class="navegacion"
+             aria-label="Navegación del recolector">
+
+            <a th:href="@{/recolector/panel}">
+                Mi panel
+            </a>
+
+            <!-- PASO 63: REGISTRAR PESAJE -->
+
+            <a th:href="@{/recolector/pesajes/nuevo}">
+                Registrar pesaje
+            </a>
+
+            <!-- CONSERVAMOS EL ACCESO RAPIDO -->
+
+            <a href="#ultimas-recolectas">
+                Mis recolectas
+            </a>
+
+            <!-- =================================
+                 PASO 65: HISTORIAL COMPLETO
+            ================================= -->
+
+            <a th:href="@{/recolector/historial-completo}">
+                Historial completo
+            </a>
+
+            <form th:action="@{/logout}"
+                  method="post">
+
+                <button class="salir"
+                        type="submit">
+                    Cerrar sesión
+                </button>
+
+            </form>
+
+        </nav>
+
+    </header>
+
+    <main>
+
+        <!-- =====================================
+             PRESENTACION
+        ===================================== -->
+
+        <section class="hero">
+
+            <span class="etiqueta">
+                PANEL DEL RECOLECTOR
+            </span>
+
+            <h1>
+                🚚 Gestión de recolectas
+            </h1>
+
+            <p>
+                Bienvenido,
+                <strong th:text="${recolector}">
+                    Recolector
+                </strong>.
+                Consulta las operaciones de
+                reciclaje asociadas a tu cuenta.
+            </p>
+
+            <span class="correo"
+                  th:text="${correo}">
+                recolector@ejemplo.com
+            </span>
+
+        </section>
+
+        <!-- =====================================
+             RESUMEN DE OPERACIONES
+        ===================================== -->
+
+        <section class="seccion">
+
+            <h2>Resumen de recolectas</h2>
+
+            <p class="descripcion">
+                Indicadores calculados desde MySQL
+                para el recolector que inició sesión.
+            </p>
+
+            <div class="indicadores">
+
+                <!-- TOTAL -->
+
+                <article class="tarjeta">
+
+                    <div class="tarjeta-icono">
+                        ♻
+                    </div>
+
+                    <h3>Total de recolectas</h3>
+
+                    <div class="numero"
+                         th:text="${totalRecolectas}">
+                        0
+                    </div>
+
+                    <p>
+                        Recolectas registradas
+                        a tu nombre.
+                    </p>
+
+                </article>
+
+                <!-- PENDIENTES -->
+
+                <article class="tarjeta">
+
+                    <div class="tarjeta-icono">
+                        ⏳
+                    </div>
+
+                    <h3>Pendientes</h3>
+
+                    <div class="numero"
+                         th:text="${pendientes}">
+                        0
+                    </div>
+
+                    <p>
+                        Operaciones que requieren
+                        validación.
+                    </p>
+
+                </article>
+
+                <!-- VALIDADAS -->
+
+                <article class="tarjeta">
+
+                    <div class="tarjeta-icono">
+                        ✅
+                    </div>
+
+                    <h3>Validadas</h3>
+
+                    <div class="numero"
+                         th:text="${validadas}">
+                        0
+                    </div>
+
+                    <p>
+                        Recolectas confirmadas
+                        por el sistema.
+                    </p>
+
+                </article>
+
+                <!-- RECHAZADAS -->
+
+                <article class="tarjeta">
+
+                    <div class="tarjeta-icono">
+                        ❌
+                    </div>
+
+                    <h3>Rechazadas</h3>
+
+                    <div class="numero"
+                         th:text="${rechazadas}">
+                        0
+                    </div>
+
+                    <p>
+                        Operaciones que no fueron
+                        aprobadas.
+                    </p>
+
+                </article>
+
+            </div>
+
+        </section>
+
+        <!-- =====================================
+             INFORMACION GENERAL
+        ===================================== -->
+
+        <section class="seccion">
+
+            <div class="informacion">
+
+                <h3>
+                    📦 Materiales disponibles
+                </h3>
+
+                <p>
+                    El sistema tiene
+                    <strong th:text="${materialesRegistrados}">
+                        0
+                    </strong>
+                    tipos de materiales registrados.
+                </p>
+
+                <p>
+                    Los materiales se utilizarán en
+                    el formulario de registro de pesaje.
+                </p>
+
+            </div>
+
+        </section>
+
+        <!-- =====================================
+             OPERACIONES DEL RECOLECTOR
+        ===================================== -->
+
+        <section class="seccion">
+
+            <h2>Operaciones del recolector</h2>
+
+            <p class="descripcion">
+                Funcionalidades para registrar
+                y consultar las entregas de materiales.
+            </p>
+
+            <div class="modulos">
+
+                <!-- =================================
+                     REGISTRAR PESAJE
+                ================================= -->
+
+                <article class="modulo">
+
+                    <div class="modulo-icono">
+                        ⚖
+                    </div>
+
+                    <h3>Registrar pesaje</h3>
+
+                    <p>
+                        Seleccionar vecino, identificar
+                        el material, registrar el peso
+                        en gramos y calcular los
+                        puntos correspondientes.
+                    </p>
+
+                    <a class="enlace"
+                       th:href="@{/recolector/pesajes/nuevo}">
+                        Registrar nuevo pesaje →
+                    </a>
+
+                </article>
+
+                <!-- =================================
+                     PASO 65: HISTORIAL COMPLETO
+                ================================= -->
+
+                <article class="modulo">
+
+                    <div class="modulo-icono">
+                        📋
+                    </div>
+
+                    <h3>Historial de recolectas</h3>
+
+                    <p>
+                        Consulta todas tus operaciones,
+                        revisa sus estados de validación
+                        y utiliza filtros por material,
+                        estado y rango de fechas.
+                    </p>
+
+                    <!-- AHORA ABRE LA PANTALLA DEL
+                         PASO 64 CON SUS FILTROS -->
+
+                    <a class="enlace"
+                       th:href="@{/recolector/historial-completo}">
+                        Ver historial completo →
+                    </a>
+
+                </article>
+
+            </div>
+
+        </section>
+
+        <!-- =====================================
+             ULTIMAS RECOLECTAS
+             SE MANTIENE EL RESUMEN DE 5
+        ===================================== -->
+
+        <section class="seccion"
+                 id="ultimas-recolectas">
+
+            <h2>Últimas recolectas</h2>
+
+            <p class="descripcion">
+                Se muestran tus cinco
+                operaciones más recientes.
+                Para ver más registros o filtrarlos,
+                utiliza el historial completo.
+            </p>
+
+            <!-- SIN REGISTROS -->
+
+            <div class="sin-registros"
+                 th:if="${#lists.isEmpty(ultimasRecolectas)}">
+
+                <h3>
+                    Todavía no tienes recolectas
+                </h3>
+
+                <p>
+                    Aquí aparecerán las operaciones
+                    cuando comiences a registrar
+                    entregas de materiales.
+                </p>
+
+            </div>
+
+            <!-- TABLA CON REGISTROS -->
+
+            <div class="tabla-contenedor"
+                 th:if="${!#lists.isEmpty(ultimasRecolectas)}">
+
+                <table>
+
+                    <thead>
+
+                        <tr>
+                            <th>ID</th>
+                            <th>Fecha</th>
+                            <th>Vecino</th>
+                            <th>Material</th>
+                            <th>Peso</th>
+                            <th>Puntos</th>
+                            <th>Estado</th>
+                        </tr>
+
+                    </thead>
+
+                    <tbody>
+
+                        <tr th:each="r : ${ultimasRecolectas}">
+
+                            <td th:text="${r.id}">
+                                1
+                            </td>
+
+                            <td th:text="${r.fecha}">
+                                10/10/2026
+                            </td>
+
+                            <td th:text="${r.vecino}">
+                                Vecino
+                            </td>
+
+                            <td class="material"
+                                th:text="${r.material}">
+                                Material
+                            </td>
+
+                            <td th:text="|${r.peso} g|">
+                                0 g
+                            </td>
+
+                            <td class="puntos"
+                                th:text="|${r.puntos} pts|">
+                                0 pts
+                            </td>
+
+                            <td>
+
+                                <span
+                                    class="estado"
+                                    th:classappend="${r.estado}"
+                                    th:text="${r.estado}">
+
+                                    pendiente
+
+                                </span>
+
+                            </td>
+
+                        </tr>
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+            <!-- =================================
+                 PASO 65: ACCESO ADICIONAL
+            ================================= -->
+
+            <div class="acciones-historial">
+
+                <a class="enlace"
+                   th:href="@{/recolector/historial-completo}">
+                    Consultar todas mis recolectas →
+                </a>
+
+                <a class="enlace-secundario"
+                   th:href="@{/recolector/pesajes/nuevo}">
+                    Registrar otro pesaje
+                </a>
+
+            </div>
+
+        </section>
+
+    </main>
+
+    <!-- =====================================
+         PIE DE PAGINA
+    ===================================== -->
+
+    <footer>
+
+        <strong>
+            ♻ PERÚ RECICLA
+        </strong>
+
+        <p>
+            Ecosistema Digital de Incentivos
+            para el Reciclaje
+        </p>
+
+        <p>
+            Panel de operaciones del recolector
+        </p>
+
+    </footer>
+
+</body>
+</html>

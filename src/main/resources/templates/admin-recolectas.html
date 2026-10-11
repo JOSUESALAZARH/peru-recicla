@@ -1,0 +1,831 @@
+
+<!DOCTYPE html>
+<html lang="es"
+      xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Validar recolectas | PERÚ RECICLA</title>
+
+    <style>
+        :root {
+            --verde: #16804d;
+            --oscuro: #105a38;
+            --claro: #e6f5eb;
+            --fondo: #f6f9f6;
+            --texto: #20392b;
+            --gris: #60736a;
+            --borde: #dde9e0;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            background: var(--fondo);
+            color: var(--texto);
+            font-family: Arial, Helvetica, sans-serif;
+            line-height: 1.55;
+        }
+
+        a {
+            text-decoration: none;
+        }
+
+        /* =====================================
+           MENU
+        ===================================== */
+
+        .barra {
+            background: white;
+            padding: 20px max(
+                24px,
+                calc((100% - 1150px)/2)
+            );
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 18px;
+            flex-wrap: wrap;
+            box-shadow: 0 2px 12px #0000000b;
+        }
+
+        .logo {
+            color: var(--oscuro);
+            font-size: 23px;
+            font-weight: bold;
+        }
+
+        .navegacion {
+            display: flex;
+            gap: 18px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .navegacion a {
+            color: var(--oscuro);
+            font-size: 13px;
+            font-weight: bold;
+        }
+
+        .navegacion a:hover {
+            color: var(--verde);
+        }
+
+        .salir {
+            padding: 10px 16px;
+            background: white;
+            border: 1px solid var(--verde);
+            border-radius: 9px;
+            color: var(--oscuro);
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        /* =====================================
+           CONTENIDO
+        ===================================== */
+
+        main {
+            max-width: 1150px;
+            margin: 40px auto 75px;
+            padding: 0 20px;
+        }
+
+        .hero {
+            background: linear-gradient(
+                120deg,
+                var(--oscuro),
+                var(--verde)
+            );
+            color: white;
+            padding: 40px;
+            border-radius: 20px;
+        }
+
+        .etiqueta {
+            display: inline-block;
+            background: #ffffff30;
+            padding: 7px 13px;
+            border-radius: 30px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .hero h1 {
+            font-size: 33px;
+            margin: 17px 0 10px;
+        }
+
+        .hero p {
+            margin: 0;
+            color: #e3f4e9;
+        }
+
+        /* =====================================
+           INDICADORES
+        ===================================== */
+
+        .indicadores {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 18px;
+            margin-top: 25px;
+        }
+
+        .indicador,
+        .card {
+            background: white;
+            border: 1px solid var(--borde);
+            border-radius: 17px;
+            box-shadow: 0 5px 20px #00000008;
+        }
+
+        .indicador {
+            padding: 24px;
+        }
+
+        .indicador h3 {
+            font-size: 14px;
+            color: var(--gris);
+            margin: 0 0 10px;
+        }
+
+        .numero {
+            font-size: 35px;
+            font-weight: bold;
+            color: var(--verde);
+        }
+
+        /* =====================================
+           TARJETAS
+        ===================================== */
+
+        .card {
+            margin-top: 28px;
+            padding: 29px;
+        }
+
+        h2 {
+            color: var(--oscuro);
+            font-size: 23px;
+            margin: 0 0 8px;
+        }
+
+        .ayuda {
+            color: var(--gris);
+            font-size: 14px;
+            margin: 0 0 22px;
+        }
+
+        /* =====================================
+           FILTROS
+        ===================================== */
+
+        .filtros {
+            display: flex;
+            align-items: end;
+            gap: 13px;
+            flex-wrap: wrap;
+        }
+
+        label {
+            display: block;
+            font-size: 13px;
+            font-weight: bold;
+            margin-bottom: 7px;
+        }
+
+        select {
+            padding: 11px 14px;
+            border: 1px solid #ccdcd1;
+            border-radius: 9px;
+            font-size: 14px;
+            background: white;
+            min-width: 175px;
+        }
+
+        /* =====================================
+           BOTONES
+        ===================================== */
+
+        .boton {
+            border: none;
+            background: var(--verde);
+            color: white;
+            border-radius: 9px;
+            padding: 12px 16px;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 13px;
+        }
+
+        .boton:hover {
+            background: var(--oscuro);
+        }
+
+        .aprobar {
+            background: var(--verde);
+        }
+
+        .rechazar {
+            background: #a43c3c;
+        }
+
+        .rechazar:hover {
+            background: #7c2d2d;
+        }
+
+        .boton-secundario {
+            background: var(--claro);
+            color: var(--oscuro);
+        }
+
+        .boton-secundario:hover {
+            background: #ccead5;
+        }
+
+        /* =====================================
+           MENSAJES
+        ===================================== */
+
+        .mensaje {
+            margin-top: 22px;
+            padding: 16px 20px;
+            border-radius: 11px;
+            font-size: 14px;
+        }
+
+        .exito {
+            background: #e0f5e6;
+            border: 1px solid #a0ddb0;
+            color: #125d38;
+        }
+
+        .error {
+            background: #fff0e6;
+            border: 1px solid #efc5ac;
+            color: #8d4010;
+        }
+
+        /* =====================================
+           TABLA
+        ===================================== */
+
+        .tabla-contenedor {
+            overflow-x: auto;
+            border: 1px solid var(--borde);
+            border-radius: 12px;
+        }
+
+        table {
+            width: 100%;
+            min-width: 1050px;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+
+        thead {
+            background: var(--oscuro);
+            color: white;
+        }
+
+        th,
+        td {
+            text-align: left;
+            padding: 15px 12px;
+        }
+
+        td {
+            border-bottom: 1px solid var(--borde);
+        }
+
+        tbody tr:hover {
+            background: #f0f8f2;
+        }
+
+        tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        .material,
+        .puntos {
+            font-weight: bold;
+            color: var(--oscuro);
+        }
+
+        .puntos {
+            color: var(--verde);
+        }
+
+        .estado {
+            display: inline-block;
+            padding: 6px 10px;
+            font-weight: bold;
+            border-radius: 8px;
+            font-size: 12px;
+            text-transform: capitalize;
+        }
+
+        .estado.pendiente {
+            background: #fff1d9;
+            color: #825400;
+        }
+
+        .estado.validado {
+            background: #e0f5e6;
+            color: #12633a;
+        }
+
+        .estado.rechazado {
+            background: #fce8e8;
+            color: #a52828;
+        }
+
+        .acciones-fila {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .acciones-fila form {
+            margin: 0;
+        }
+
+        .sin-registros {
+            padding: 35px;
+            color: var(--gris);
+            text-align: center;
+        }
+
+        .nota {
+            color: #795221;
+            background: #fff5e9;
+            border: 1px solid #ead3b5;
+            border-radius: 11px;
+            padding: 18px;
+            margin-top: 24px;
+            font-size: 14px;
+        }
+
+        /* =====================================
+           PIE DE PAGINA
+        ===================================== */
+
+        footer {
+            padding: 27px;
+            background: #123827;
+            text-align: center;
+            color: white;
+            font-size: 13px;
+        }
+
+        footer p {
+            color: #c8dfd1;
+        }
+
+        /* =====================================
+           RESPONSIVE
+        ===================================== */
+
+        @media (max-width: 950px) {
+            .indicadores {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 650px) {
+
+            .barra,
+            .navegacion {
+                justify-content: center;
+            }
+
+            .hero {
+                padding: 27px;
+            }
+
+            .hero h1 {
+                font-size: 27px;
+            }
+
+            .card {
+                padding: 20px;
+            }
+
+            .indicadores {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- =====================================
+         NAVEGACION ADMINISTRATIVA
+    ===================================== -->
+
+    <header class="barra">
+
+        <a class="logo" th:href="@{/admin}">
+            ♻ PERÚ RECICLA
+        </a>
+
+        <nav class="navegacion"
+             aria-label="Navegación administrativa">
+
+            <a th:href="@{/admin}">
+                Mi dashboard
+            </a>
+
+            <a th:href="@{/admin/usuarios}">
+                Usuarios
+            </a>
+
+            <a th:href="@{/admin/recolectores}">
+                Recolectores
+            </a>
+
+            <a th:href="@{/admin/recolectas}">
+                Validar recolectas
+            </a>
+
+            <a th:href="@{/admin/canjes}">
+                Validar canjes
+            </a>
+
+            <form th:action="@{/logout}"
+                  method="post">
+
+                <button class="salir"
+                        type="submit">
+                    Cerrar sesión
+                </button>
+
+            </form>
+
+        </nav>
+
+    </header>
+
+    <main>
+
+        <!-- =====================================
+             PRESENTACION
+        ===================================== -->
+
+        <section class="hero">
+
+            <span class="etiqueta">
+                PANEL ADMINISTRATIVO
+            </span>
+
+            <h1>♻ Validación de recolectas</h1>
+
+            <p>
+                Bienvenido,
+                <strong th:text="${administrador}">
+                    Administrador
+                </strong>.
+                Revisa las entregas registradas
+                y aprueba o rechaza cada recolecta.
+            </p>
+
+        </section>
+
+        <!-- =====================================
+             INDICADORES
+        ===================================== -->
+
+        <div class="indicadores">
+
+            <article class="indicador">
+
+                <h3>Total de recolectas</h3>
+
+                <div class="numero"
+                     th:text="${totalRecolectas}">
+                    0
+                </div>
+
+            </article>
+
+            <article class="indicador">
+
+                <h3>Pendientes</h3>
+
+                <div class="numero"
+                     th:text="${pendientes}">
+                    0
+                </div>
+
+            </article>
+
+            <article class="indicador">
+
+                <h3>Validadas</h3>
+
+                <div class="numero"
+                     th:text="${validadas}">
+                    0
+                </div>
+
+            </article>
+
+            <article class="indicador">
+
+                <h3>Rechazadas</h3>
+
+                <div class="numero"
+                     th:text="${rechazadas}">
+                    0
+                </div>
+
+            </article>
+
+        </div>
+
+        <!-- =====================================
+             MENSAJES
+        ===================================== -->
+
+        <div class="mensaje exito"
+             role="status"
+             th:if="${exito != null}"
+             th:text="${exito}">
+        </div>
+
+        <div class="mensaje error"
+             role="alert"
+             th:if="${error != null}"
+             th:text="${error}">
+        </div>
+
+        <!-- =====================================
+             FILTRO
+        ===================================== -->
+
+        <section class="card">
+
+            <h2>Consultar recolectas</h2>
+
+            <p class="ayuda">
+                Filtra las operaciones según
+                su estado.
+            </p>
+
+            <form class="filtros"
+                  th:action="@{/admin/recolectas}"
+                  method="get">
+
+                <div>
+
+                    <label for="estado">
+                        Estado de recolecta
+                    </label>
+
+                    <select id="estado" name="estado">
+
+                        <option value="todos"
+                                th:selected="${filtro == 'todos'}">
+                            Todos los estados
+                        </option>
+
+                        <option value="pendiente"
+                                th:selected="${filtro == 'pendiente'}">
+                            Pendientes
+                        </option>
+
+                        <option value="validado"
+                                th:selected="${filtro == 'validado'}">
+                            Validadas
+                        </option>
+
+                        <option value="rechazado"
+                                th:selected="${filtro == 'rechazado'}">
+                            Rechazadas
+                        </option>
+
+                    </select>
+
+                </div>
+
+                <button class="boton" type="submit">
+                    Aplicar filtro
+                </button>
+
+                <a class="boton boton-secundario"
+                   th:href="@{/admin/recolectas}">
+                    Limpiar
+                </a>
+
+            </form>
+
+        </section>
+
+        <!-- =====================================
+             LISTADO
+        ===================================== -->
+
+        <section class="card">
+
+            <h2>Recolectas registradas</h2>
+
+            <p class="ayuda">
+                Solo las recolectas pendientes
+                pueden aprobarse o rechazarse.
+                Al aprobar se acreditan los puntos
+                del vecino una única vez.
+            </p>
+
+            <div class="sin-registros"
+                 th:if="${#lists.isEmpty(recolectas)}">
+
+                No se encontraron recolectas
+                con el filtro seleccionado.
+
+            </div>
+
+            <div class="tabla-contenedor"
+                 th:if="${!#lists.isEmpty(recolectas)}">
+
+                <table>
+
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Fecha</th>
+                            <th>Vecino</th>
+                            <th>Recolector</th>
+                            <th>Material</th>
+                            <th>Peso</th>
+                            <th>Puntos</th>
+                            <th>Estado</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+
+                        <tr th:each="r : ${recolectas}">
+
+                            <td th:text="${r.id}">
+                                1
+                            </td>
+
+                            <td th:text="${r.fecha}">
+                                10/10/2026
+                            </td>
+
+                            <td th:text="${r.vecino}">
+                                Vecino
+                            </td>
+
+                            <td th:text="${r.recolector}">
+                                Recolector
+                            </td>
+
+                            <td class="material"
+                                th:text="${r.material}">
+                                Material
+                            </td>
+
+                            <td th:text="|${r.peso} g|">
+                                500 g
+                            </td>
+
+                            <td class="puntos"
+                                th:text="|${r.puntos} pts|">
+                                50 pts
+                            </td>
+
+                            <td>
+
+                                <span class="estado"
+                                      th:classappend="${r.estado}"
+                                      th:text="${r.estado}">
+                                    pendiente
+                                </span>
+
+                            </td>
+
+                            <td>
+
+                                <div class="acciones-fila"
+                                     th:if="${r.estado == 'pendiente'}">
+
+                                    <!-- APROBAR -->
+
+                                    <form
+                                        th:action="@{/admin/recolectas/procesar}"
+                                        method="post"
+                                        onsubmit="return confirm('¿Aprobar esta recolecta y acreditar los puntos al vecino?');">
+
+                                        <input
+                                            type="hidden"
+                                            name="idRecolecta"
+                                            th:value="${r.id}">
+
+                                        <input
+                                            type="hidden"
+                                            name="accion"
+                                            value="validado">
+
+                                        <input
+                                            type="hidden"
+                                            th:name="${_csrf.parameterName}"
+                                            th:value="${_csrf.token}">
+
+                                        <button
+                                            class="boton aprobar"
+                                            type="submit">
+                                            Aprobar
+                                        </button>
+
+                                    </form>
+
+                                    <!-- RECHAZAR -->
+
+                                    <form
+                                        th:action="@{/admin/recolectas/procesar}"
+                                        method="post"
+                                        onsubmit="return confirm('¿Rechazar esta recolecta? No se acreditarán puntos.');">
+
+                                        <input
+                                            type="hidden"
+                                            name="idRecolecta"
+                                            th:value="${r.id}">
+
+                                        <input
+                                            type="hidden"
+                                            name="accion"
+                                            value="rechazado">
+
+                                        <input
+                                            type="hidden"
+                                            th:name="${_csrf.parameterName}"
+                                            th:value="${_csrf.token}">
+
+                                        <button
+                                            class="boton rechazar"
+                                            type="submit">
+                                            Rechazar
+                                        </button>
+
+                                    </form>
+
+                                </div>
+
+                                <span th:if="${r.estado != 'pendiente'}">
+                                    Procesada
+                                </span>
+
+                            </td>
+
+                        </tr>
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+            <div class="nota">
+
+                <strong>Importante:</strong>
+                los puntos solo se acreditan cuando
+                la recolecta se aprueba. Rechazarla
+                no cambia el saldo del vecino.
+                Una recolecta procesada no puede
+                validarse de nuevo.
+
+            </div>
+
+        </section>
+
+    </main>
+
+    <footer>
+
+        <strong>♻ PERÚ RECICLA</strong>
+
+        <p>
+            Ecosistema Digital de Incentivos
+            para el Reciclaje
+        </p>
+
+        <p>
+            Panel administrativo de validaciones
+        </p>
+
+    </footer>
+
+</body>
+</html>

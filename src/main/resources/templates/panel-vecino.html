@@ -1,0 +1,875 @@
+
+<!DOCTYPE html>
+<html lang="es"
+      xmlns:th="http://www.thymeleaf.org">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Panel del Vecino | PERÚ RECICLA</title>
+
+    <style>
+
+        /* =====================================
+           PERU RECICLA
+           PANEL PRINCIPAL DEL VECINO
+
+           Java 21
+           Spring Boot 3.4.2
+           Thymeleaf
+           MySQL
+        ===================================== */
+
+        :root {
+            --verde: #16804d;
+            --verde-oscuro: #105a38;
+            --verde-claro: #e6f5eb;
+            --fondo: #f6f9f6;
+            --blanco: #ffffff;
+            --texto: #1c3027;
+            --gris: #60736a;
+            --borde: #e1ebe4;
+        }
+
+        /* =====================================
+           CONFIGURACION GENERAL
+        ===================================== */
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, Helvetica, sans-serif;
+            background: var(--fondo);
+            color: var(--texto);
+            line-height: 1.6;
+        }
+
+        a {
+            text-decoration: none;
+        }
+
+        /* =====================================
+           ENCABEZADO
+        ===================================== */
+
+        .encabezado {
+            background: var(--blanco);
+            box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+        }
+
+        .barra {
+            max-width: 1150px;
+            margin: auto;
+            padding: 19px 24px;
+
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+
+            gap: 20px;
+        }
+
+        .logo {
+            font-size: 23px;
+            font-weight: bold;
+            color: var(--verde-oscuro);
+        }
+
+        .menu {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .menu a {
+            font-size: 14px;
+            font-weight: bold;
+            color: var(--verde-oscuro);
+        }
+
+        .menu a:hover {
+            color: var(--verde);
+        }
+
+        .cerrar-sesion {
+            background: transparent;
+            border: 1px solid var(--verde);
+            color: var(--verde-oscuro);
+
+            padding: 10px 17px;
+            border-radius: 9px;
+
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .cerrar-sesion:hover {
+            background: var(--verde-claro);
+        }
+
+        /* =====================================
+           CONTENEDOR PRINCIPAL
+        ===================================== */
+
+        .contenedor {
+            max-width: 1150px;
+            margin: auto;
+            padding: 50px 24px 80px;
+        }
+
+        /* =====================================
+           BIENVENIDA DEL VECINO
+        ===================================== */
+
+        .bienvenida {
+            background: linear-gradient(
+                130deg,
+                #105a38,
+                #16804d
+            );
+
+            border-radius: 22px;
+            padding: 40px;
+            color: white;
+
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 30px;
+        }
+
+        .bienvenida h1 {
+            font-size: 34px;
+            line-height: 1.2;
+            margin: 10px 0;
+        }
+
+        .bienvenida p {
+            color: #e3f4e9;
+            margin: 0;
+        }
+
+        .etiqueta {
+            display: inline-block;
+
+            background: rgba(255,255,255,0.17);
+            color: white;
+
+            font-size: 12px;
+            font-weight: bold;
+
+            padding: 7px 13px;
+            border-radius: 30px;
+        }
+
+        .icono-bienvenida {
+            font-size: 70px;
+        }
+
+        /* =====================================
+           RESUMEN DE CUENTA
+        ===================================== */
+
+        .resumen {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+
+            gap: 24px;
+            margin-top: 28px;
+        }
+
+        .tarjeta-resumen {
+            background: white;
+
+            border: 1px solid var(--borde);
+            border-radius: 17px;
+
+            padding: 30px;
+
+            box-shadow:
+                0 5px 20px rgba(0,0,0,0.04);
+        }
+
+        .tarjeta-resumen h2 {
+            color: var(--gris);
+            font-size: 15px;
+            margin: 0 0 12px;
+        }
+
+        .numero {
+            font-size: 43px;
+            font-weight: bold;
+            line-height: 1.2;
+
+            color: var(--verde);
+
+            overflow-wrap: anywhere;
+        }
+
+        .detalle {
+            color: var(--gris);
+            font-size: 13px;
+            margin-top: 12px;
+        }
+
+        /* =====================================
+           SECCIONES
+        ===================================== */
+
+        .seccion {
+            margin-top: 50px;
+        }
+
+        .seccion h2 {
+            color: var(--verde-oscuro);
+            font-size: 25px;
+            margin-bottom: 8px;
+        }
+
+        .seccion-descripcion {
+            color: var(--gris);
+            font-size: 14px;
+
+            margin: 0 0 24px;
+        }
+
+        /* =====================================
+           MODULOS PRINCIPALES
+        ===================================== */
+
+        .modulos {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 24px;
+        }
+
+        .modulo {
+            display: flex;
+            flex-direction: column;
+
+            background: white;
+
+            border: 1px solid var(--borde);
+            border-radius: 17px;
+
+            padding: 30px;
+
+            box-shadow:
+                0 5px 20px rgba(0,0,0,0.04);
+        }
+
+        .modulo-icono {
+            font-size: 39px;
+            margin-bottom: 15px;
+        }
+
+        .modulo h3 {
+            color: var(--verde-oscuro);
+
+            margin: 0 0 12px;
+            font-size: 20px;
+        }
+
+        .modulo p {
+            font-size: 14px;
+            color: var(--gris);
+
+            margin: 0 0 22px;
+        }
+
+        /* =====================================
+           ESTADOS DE MODULOS
+        ===================================== */
+
+        .estado {
+            display: inline-block;
+            width: fit-content;
+
+            margin-top: auto;
+            padding: 7px 12px;
+
+            border-radius: 8px;
+
+            background: var(--verde-claro);
+            color: var(--verde-oscuro);
+
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        /* =====================================
+           TARJETAS INTERACTIVAS
+        ===================================== */
+
+        .modulo-enlace {
+            color: inherit;
+            cursor: pointer;
+
+            transition:
+                transform 0.2s ease,
+                box-shadow 0.2s ease,
+                border-color 0.2s ease;
+        }
+
+        .modulo-enlace:hover {
+            transform: translateY(-5px);
+
+            border-color: var(--verde);
+
+            box-shadow:
+                0 12px 30px rgba(0,0,0,0.09);
+        }
+
+        .modulo-enlace:focus-visible {
+            outline: 3px solid var(--verde);
+            outline-offset: 4px;
+        }
+
+        .modulo-enlace .estado {
+            background: var(--verde);
+            color: white;
+        }
+
+        /* =====================================
+           DATOS DE CUENTA
+        ===================================== */
+
+        .cuenta {
+            background: white;
+
+            border: 1px solid var(--borde);
+            border-radius: 17px;
+
+            padding: 30px;
+        }
+
+        .dato {
+            display: flex;
+            justify-content: space-between;
+
+            gap: 15px;
+            padding: 16px 0;
+
+            border-bottom:
+                1px solid var(--borde);
+        }
+
+        .dato:last-child {
+            border-bottom: none;
+        }
+
+        .dato strong {
+            color: var(--gris);
+        }
+
+        .dato span {
+            text-align: right;
+            overflow-wrap: anywhere;
+        }
+
+        /* =====================================
+           PIE DE PAGINA
+        ===================================== */
+
+        footer {
+            background: #123827;
+            color: white;
+
+            text-align: center;
+            padding: 30px 20px;
+        }
+
+        footer p {
+            color: #c8dfd1;
+            font-size: 13px;
+            margin: 7px;
+        }
+
+        /* =====================================
+           ADAPTACION A PANTALLAS
+        ===================================== */
+
+        @media (max-width: 850px) {
+
+            .modulos {
+                grid-template-columns: 1fr;
+            }
+
+            .bienvenida {
+                flex-direction: column;
+                text-align: center;
+            }
+
+        }
+
+        @media (max-width: 650px) {
+
+            .barra {
+                flex-direction: column;
+            }
+
+            .menu {
+                justify-content: center;
+            }
+
+            .resumen {
+                grid-template-columns: 1fr;
+            }
+
+            .contenedor {
+                padding: 30px 16px 50px;
+            }
+
+            .bienvenida {
+                padding: 30px 20px;
+            }
+
+            .bienvenida h1 {
+                font-size: 28px;
+            }
+
+            .numero {
+                font-size: 34px;
+            }
+
+            .dato {
+                flex-direction: column;
+            }
+
+            .dato span {
+                text-align: left;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+    <!-- =====================================
+         ENCABEZADO DEL SISTEMA
+    ===================================== -->
+
+    <header class="encabezado">
+
+        <nav class="barra"
+             aria-label="Navegacion principal">
+
+            <!-- LOGO -->
+
+            <a th:href="@{/}"
+               class="logo">
+
+                ♻ PERÚ RECICLA
+
+            </a>
+
+            <!-- MENU -->
+
+            <div class="menu">
+
+                <!-- PAGINA PRINCIPAL -->
+
+                <a th:href="@{/}">
+                    Inicio
+                </a>
+
+                <!-- PANEL PERSONAL -->
+
+                <a th:href="@{/vecino}">
+                    Mi panel
+                </a>
+
+                <!-- HISTORIAL DE RECOLECTAS -->
+
+                <a th:href="@{/vecino/recolectas}">
+                    Mis recolectas
+                </a>
+
+                <!-- CATALOGO DE RECOMPENSAS -->
+
+                <a th:href="@{/vecino/recompensas}">
+                    Recompensas
+                </a>
+
+                <!-- HISTORIAL DE CANJES -->
+
+                <a th:href="@{/vecino/canjes}">
+                    Mis canjes
+                </a>
+
+                <!-- CERRAR SESION -->
+
+                <form th:action="@{/logout}"
+                      method="post">
+
+                    <button type="submit"
+                            class="cerrar-sesion">
+
+                        Cerrar sesión
+
+                    </button>
+
+                </form>
+
+            </div>
+
+        </nav>
+
+    </header>
+
+    <!-- =====================================
+         CONTENIDO PRINCIPAL
+    ===================================== -->
+
+    <main class="contenedor">
+
+        <!-- =================================
+             BIENVENIDA
+        ================================= -->
+
+        <section class="bienvenida">
+
+            <div>
+
+                <span class="etiqueta">
+                    PANEL DEL VECINO
+                </span>
+
+                <h1>
+
+                    ¡Hola,
+
+                    <span th:text="${nombre}">
+                        Vecino
+                    </span>!
+
+                </h1>
+
+                <p>
+                    Bienvenido a tu espacio
+                    personal de PERÚ RECICLA.
+                </p>
+
+            </div>
+
+            <div class="icono-bienvenida">
+                ♻
+            </div>
+
+        </section>
+
+        <!-- =================================
+             RESUMEN PERSONAL
+        ================================= -->
+
+        <section class="resumen"
+                 aria-label="Resumen personal">
+
+            <!-- PUNTOS ACUMULADOS -->
+
+            <article class="tarjeta-resumen">
+
+                <h2>
+                    ⭐ Mis puntos acumulados
+                </h2>
+
+                <div class="numero">
+
+                    <span th:text="${puntos}">
+                        0.00
+                    </span>
+
+                    <span>pts</span>
+
+                </div>
+
+                <p class="detalle">
+                    Este saldo corresponde
+                    a los puntos almacenados
+                    en tu cuenta de MySQL.
+                </p>
+
+            </article>
+
+            <!-- DATOS DEL VECINO -->
+
+            <article class="tarjeta-resumen">
+
+                <h2>
+                    👤 Mi cuenta
+                </h2>
+
+                <div>
+
+                    <strong th:text="${nombre}">
+                        Nombre
+                    </strong>
+
+                    <strong th:text="${apellido}">
+                        Apellido
+                    </strong>
+
+                </div>
+
+                <p class="detalle"
+                   th:text="${correo}">
+                    correo@ejemplo.com
+                </p>
+
+                <span class="estado">
+                    Cuenta activa
+                </span>
+
+            </article>
+
+        </section>
+
+        <!-- =====================================
+             FUNCIONALIDADES DEL VECINO
+        ===================================== -->
+
+        <section class="seccion">
+
+            <h2>
+                Mis funcionalidades
+            </h2>
+
+            <p class="seccion-descripcion">
+                Consulta tus recolectas,
+                explora las recompensas
+                disponibles y revisa
+                tu historial de canjes.
+            </p>
+
+            <!-- =================================
+                 GRID DE TRES MODULOS
+            ================================= -->
+
+            <div class="modulos">
+
+                <!-- =================================
+                     MODULO 1
+                     MIS RECOLECTAS
+                ================================= -->
+
+                <a class="modulo modulo-enlace"
+                   th:href="@{/vecino/recolectas}"
+                   aria-label="Ver mi historial de recolectas">
+
+                    <div class="modulo-icono">
+                        ♻
+                    </div>
+
+                    <h3>
+                        Mis recolectas
+                    </h3>
+
+                    <p>
+                        Consulta el historial
+                        de materiales entregados,
+                        pesos registrados,
+                        puntos generados
+                        y estados de validación.
+                    </p>
+
+                    <span class="estado">
+                        Ver historial →
+                    </span>
+
+                </a>
+
+                <!-- =================================
+                     MODULO 2
+                     RECOMPENSAS
+                ================================= -->
+
+                <a class="modulo modulo-enlace"
+                   th:href="@{/vecino/recompensas}"
+                   aria-label="Ver catalogo de recompensas">
+
+                    <div class="modulo-icono">
+                        🎁
+                    </div>
+
+                    <h3>
+                        Recompensas
+                    </h3>
+
+                    <p>
+                        Explora los premios
+                        disponibles, consulta
+                        sus costos en puntos,
+                        imágenes y stock
+                        registrado en MySQL.
+                    </p>
+
+                    <span class="estado">
+                        Ver recompensas →
+                    </span>
+
+                </a>
+
+                <!-- =================================
+                     MODULO 3
+                     MIS CANJES
+
+                     NUEVA FUNCIONALIDAD
+                ================================= -->
+
+                <a class="modulo modulo-enlace"
+                   th:href="@{/vecino/canjes}"
+                   aria-label="Ver mi historial de canjes">
+
+                    <div class="modulo-icono">
+                        📋
+                    </div>
+
+                    <h3>
+                        Mis canjes
+                    </h3>
+
+                    <p>
+                        Revisa los canjes
+                        realizados, consulta
+                        sus fechas, los puntos
+                        utilizados, estados
+                        y códigos de ticket.
+                    </p>
+
+                    <span class="estado">
+                        Ver mis canjes →
+                    </span>
+
+                </a>
+
+            </div>
+
+        </section>
+
+        <!-- =====================================
+             INFORMACION DE MI CUENTA
+        ===================================== -->
+
+        <section class="seccion">
+
+            <h2>
+                Información de mi cuenta
+            </h2>
+
+            <p class="seccion-descripcion">
+                Datos asociados a tu usuario
+                registrado en PERÚ RECICLA.
+            </p>
+
+            <div class="cuenta">
+
+                <!-- NOMBRES -->
+
+                <div class="dato">
+
+                    <strong>
+                        Nombres
+                    </strong>
+
+                    <span th:text="${nombre}">
+                        Nombre
+                    </span>
+
+                </div>
+
+                <!-- APELLIDOS -->
+
+                <div class="dato">
+
+                    <strong>
+                        Apellidos
+                    </strong>
+
+                    <span th:text="${apellido}">
+                        Apellido
+                    </span>
+
+                </div>
+
+                <!-- CORREO ELECTRONICO -->
+
+                <div class="dato">
+
+                    <strong>
+                        Correo electrónico
+                    </strong>
+
+                    <span th:text="${correo}">
+                        correo@ejemplo.com
+                    </span>
+
+                </div>
+
+                <!-- ROL -->
+
+                <div class="dato">
+
+                    <strong>
+                        Rol
+                    </strong>
+
+                    <span>
+                        Vecino
+                    </span>
+
+                </div>
+
+                <!-- ESTADO -->
+
+                <div class="dato">
+
+                    <strong>
+                        Estado
+                    </strong>
+
+                    <span>
+                        Activo
+                    </span>
+
+                </div>
+
+            </div>
+
+        </section>
+
+    </main>
+
+    <!-- =====================================
+         PIE DE PAGINA
+    ===================================== -->
+
+    <footer>
+
+        <strong>
+            ♻ PERÚ RECICLA
+        </strong>
+
+        <p>
+            Ecosistema Digital de Incentivos
+            para el Reciclaje
+        </p>
+
+        <p>
+            Proyecto académico - Cibertec
+        </p>
+
+    </footer>
+
+</body>
+</html>

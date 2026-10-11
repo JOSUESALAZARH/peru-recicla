@@ -1,0 +1,844 @@
+
+<!DOCTYPE html>
+<html lang="es"
+      xmlns:th="http://www.thymeleaf.org">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Gestión de usuarios | PERÚ RECICLA</title>
+
+    <style>
+
+        /* =====================================
+           PERU RECICLA - PASO 56
+           GESTION DE USUARIOS
+        ===================================== */
+
+        :root {
+            --verde: #16804d;
+            --oscuro: #105a38;
+            --claro: #e6f5eb;
+            --fondo: #f6f9f6;
+            --texto: #20392b;
+            --gris: #60736a;
+            --borde: #dde9e0;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            background: var(--fondo);
+            color: var(--texto);
+            font-family: Arial, Helvetica, sans-serif;
+            line-height: 1.55;
+        }
+
+        a {
+            text-decoration: none;
+        }
+
+        /* =====================================
+           NAVEGACION
+        ===================================== */
+
+        .barra {
+            background: white;
+            padding: 19px max(
+                24px,
+                calc((100% - 1150px) / 2)
+            );
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 18px;
+            flex-wrap: wrap;
+            box-shadow: 0 2px 12px #0000000b;
+        }
+
+        .logo {
+            color: var(--oscuro);
+            font-size: 23px;
+            font-weight: bold;
+        }
+
+        .navegacion {
+            display: flex;
+            align-items: center;
+            gap: 18px;
+            flex-wrap: wrap;
+        }
+
+        .navegacion a {
+            color: var(--oscuro);
+            font-size: 13px;
+            font-weight: bold;
+        }
+
+        .navegacion a:hover {
+            color: var(--verde);
+        }
+
+        .salir {
+            padding: 10px 16px;
+            background: white;
+            border: 1px solid var(--verde);
+            border-radius: 9px;
+            color: var(--oscuro);
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .salir:hover {
+            background: var(--claro);
+        }
+
+        /* =====================================
+           ESTRUCTURA PRINCIPAL
+        ===================================== */
+
+        main {
+            max-width: 1150px;
+            margin: 42px auto 75px;
+            padding: 0 20px;
+        }
+
+        /* =====================================
+           PRESENTACION
+        ===================================== */
+
+        .hero {
+            background: linear-gradient(
+                120deg,
+                #105a38,
+                #16804d
+            );
+            padding: 40px;
+            color: white;
+            border-radius: 20px;
+        }
+
+        .etiqueta {
+            display: inline-block;
+            background: #ffffff30;
+            padding: 7px 13px;
+            border-radius: 30px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .hero h1 {
+            margin: 16px 0 9px;
+            font-size: 33px;
+        }
+
+        .hero p {
+            color: #e3f4e9;
+            margin: 0;
+        }
+
+        /* =====================================
+           INDICADORES
+        ===================================== */
+
+        .indicadores {
+            margin-top: 27px;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 18px;
+        }
+
+        .indicador {
+            background: white;
+            padding: 24px;
+            border-radius: 16px;
+            border: 1px solid var(--borde);
+            box-shadow: 0 4px 18px #00000008;
+        }
+
+        .indicador h3 {
+            font-size: 13px;
+            color: var(--gris);
+            margin: 0 0 10px;
+        }
+
+        .indicador .numero {
+            color: var(--verde);
+            font-size: 35px;
+            font-weight: bold;
+            line-height: 1.2;
+        }
+
+        .resumen-activos {
+            margin: 18px 0 0;
+            font-size: 14px;
+            color: var(--gris);
+        }
+
+        .resumen-activos strong {
+            color: var(--verde);
+        }
+
+        /* =====================================
+           TARJETAS
+        ===================================== */
+
+        .card {
+            background: white;
+            border: 1px solid var(--borde);
+            border-radius: 17px;
+            padding: 29px;
+            margin-top: 27px;
+            box-shadow: 0 5px 20px #00000008;
+        }
+
+        h2 {
+            margin: 0 0 8px;
+            color: var(--oscuro);
+            font-size: 23px;
+        }
+
+        .ayuda {
+            color: var(--gris);
+            font-size: 14px;
+            margin: 0 0 24px;
+        }
+
+        /* =====================================
+           FILTROS
+        ===================================== */
+
+        .filtros {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr;
+            gap: 16px;
+        }
+
+        label {
+            display: block;
+            color: var(--texto);
+            font-size: 13px;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+
+        input,
+        select {
+            width: 100%;
+            padding: 13px;
+            border: 1px solid #ccdcd1;
+            border-radius: 10px;
+            background: white;
+            color: var(--texto);
+            font-size: 14px;
+        }
+
+        input:focus,
+        select:focus {
+            outline: 2px solid #85cda5;
+        }
+
+        .acciones {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-top: 22px;
+        }
+
+        .boton {
+            display: inline-block;
+            padding: 12px 21px;
+            background: var(--verde);
+            border: none;
+            border-radius: 9px;
+            color: white;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .boton:hover {
+            background: var(--oscuro);
+        }
+
+        .boton-secundario {
+            background: var(--claro);
+            color: var(--oscuro);
+        }
+
+        .boton-secundario:hover {
+            background: #cdebd7;
+        }
+
+        /* =====================================
+           TABLA DE USUARIOS
+        ===================================== */
+
+        .encabezado-listado {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+
+        .encabezado-listado h2 {
+            margin: 0;
+        }
+
+        .cantidad {
+            background: var(--claro);
+            color: var(--oscuro);
+            border-radius: 30px;
+            padding: 8px 14px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .tabla-contenedor {
+            overflow-x: auto;
+            border: 1px solid var(--borde);
+            border-radius: 12px;
+        }
+
+        table {
+            width: 100%;
+            min-width: 880px;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+
+        thead {
+            background: var(--oscuro);
+            color: white;
+        }
+
+        th,
+        td {
+            text-align: left;
+            padding: 15px 13px;
+        }
+
+        td {
+            border-bottom: 1px solid var(--borde);
+        }
+
+        tbody tr:hover {
+            background: #f0f8f2;
+        }
+
+        tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        .nombre {
+            font-weight: bold;
+            color: var(--oscuro);
+        }
+
+        .correo {
+            color: var(--gris);
+            overflow-wrap: anywhere;
+        }
+
+        .puntos {
+            font-weight: bold;
+            color: var(--verde);
+        }
+
+        .estado {
+            display: inline-block;
+            padding: 6px 11px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: bold;
+            background: #edf2ee;
+            color: #425c4a;
+            text-transform: capitalize;
+        }
+
+        .estado.activo {
+            background: #e0f5e6;
+            color: #125d38;
+        }
+
+        .estado.inactivo {
+            background: #fce8e8;
+            color: #9c2929;
+        }
+
+        .sin-registros {
+            text-align: center;
+            padding: 45px 20px;
+            color: var(--gris);
+        }
+
+        .sin-registros h3 {
+            color: var(--oscuro);
+            margin: 0 0 9px;
+        }
+
+        /* =====================================
+           PIE DE PAGINA
+        ===================================== */
+
+        footer {
+            background: #123827;
+            text-align: center;
+            padding: 28px 20px;
+            color: white;
+            font-size: 13px;
+        }
+
+        footer p {
+            margin: 7px;
+            color: #c8dfd1;
+        }
+
+        /* =====================================
+           RESPONSIVE
+        ===================================== */
+
+        @media (max-width: 950px) {
+
+            .indicadores {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .filtros {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 600px) {
+
+            .barra {
+                justify-content: center;
+            }
+
+            .navegacion {
+                justify-content: center;
+            }
+
+            main {
+                margin-top: 25px;
+            }
+
+            .hero {
+                padding: 28px;
+            }
+
+            .hero h1 {
+                font-size: 27px;
+            }
+
+            .indicadores {
+                gap: 12px;
+            }
+
+            .indicador {
+                padding: 18px;
+            }
+
+            .indicador .numero {
+                font-size: 28px;
+            }
+
+            .card {
+                padding: 19px;
+            }
+        }
+
+    </style>
+</head>
+
+<body>
+
+    <!-- =====================================
+         NAVEGACION ADMINISTRATIVA
+    ===================================== -->
+
+    <header class="barra">
+
+        <a class="logo" th:href="@{/admin}">
+            ♻ PERÚ RECICLA
+        </a>
+
+        <nav class="navegacion"
+             aria-label="Navegación administrativa">
+
+            <a th:href="@{/admin}">
+                Mi dashboard
+            </a>
+
+            <a th:href="@{/admin/usuarios}">
+                Usuarios
+            </a>
+
+            <a th:href="@{/admin/canjes}">
+                Validar canjes
+            </a>
+
+            <form th:action="@{/logout}"
+                  method="post">
+
+                <button class="salir"
+                        type="submit">
+                    Cerrar sesión
+                </button>
+
+            </form>
+
+        </nav>
+
+    </header>
+
+    <main>
+
+        <!-- =====================================
+             PRESENTACION
+        ===================================== -->
+
+        <section class="hero">
+
+            <span class="etiqueta">
+                PANEL ADMINISTRATIVO
+            </span>
+
+            <h1>
+                👥 Gestión de usuarios
+            </h1>
+
+            <p>
+                Bienvenido,
+                <strong th:text="${administrador}">
+                    Administrador
+                </strong>.
+                Consulta los usuarios registrados
+                en PERÚ RECICLA.
+            </p>
+
+        </section>
+
+        <!-- =====================================
+             INDICADORES
+        ===================================== -->
+
+        <section class="indicadores">
+
+            <article class="indicador">
+
+                <h3>👥 Total de usuarios</h3>
+
+                <div class="numero"
+                     th:text="${totalUsuarios}">
+                    0
+                </div>
+
+            </article>
+
+            <article class="indicador">
+
+                <h3>♻ Vecinos</h3>
+
+                <div class="numero"
+                     th:text="${totalVecinos}">
+                    0
+                </div>
+
+            </article>
+
+            <article class="indicador">
+
+                <h3>🚚 Recolectores</h3>
+
+                <div class="numero"
+                     th:text="${totalRecolectores}">
+                    0
+                </div>
+
+            </article>
+
+            <article class="indicador">
+
+                <h3>⚙ Administradores</h3>
+
+                <div class="numero"
+                     th:text="${totalAdministradores}">
+                    0
+                </div>
+
+            </article>
+
+        </section>
+
+        <p class="resumen-activos">
+            Usuarios activos en el sistema:
+            <strong th:text="${totalActivos}">
+                0
+            </strong>
+        </p>
+
+        <!-- =====================================
+             BUSCADOR Y FILTROS
+        ===================================== -->
+
+        <section class="card">
+
+            <h2>
+                Buscar usuarios
+            </h2>
+
+            <p class="ayuda">
+                Puedes buscar por nombre, apellido
+                o correo electrónico y combinar
+                los filtros de rol y estado.
+            </p>
+
+            <form th:action="@{/admin/usuarios}"
+                  method="get">
+
+                <div class="filtros">
+
+                    <!-- BUSQUEDA -->
+
+                    <div>
+
+                        <label for="buscar">
+                            Nombre o correo
+                        </label>
+
+                        <input
+                            id="buscar"
+                            type="text"
+                            name="buscar"
+                            maxlength="100"
+                            placeholder="Ejemplo: Usuario Prueba"
+                            th:value="${buscar}">
+
+                    </div>
+
+                    <!-- FILTRO POR ROL -->
+
+                    <div>
+
+                        <label for="rol">
+                            Tipo de usuario
+                        </label>
+
+                        <select id="rol"
+                                name="rol">
+
+                            <option value="todos"
+                                    th:selected="${rolSeleccionado == 'todos'}">
+                                Todos los roles
+                            </option>
+
+                            <option value="ROLE_vecino"
+                                    th:selected="${rolSeleccionado == 'ROLE_vecino'}">
+                                Vecinos
+                            </option>
+
+                            <option value="ROLE_recolector"
+                                    th:selected="${rolSeleccionado == 'ROLE_recolector'}">
+                                Recolectores
+                            </option>
+
+                            <option value="ROLE_administrador"
+                                    th:selected="${rolSeleccionado == 'ROLE_administrador'}">
+                                Administradores
+                            </option>
+
+                        </select>
+
+                    </div>
+
+                    <!-- FILTRO POR ESTADO -->
+
+                    <div>
+
+                        <label for="estado">
+                            Estado
+                        </label>
+
+                        <select id="estado"
+                                name="estado">
+
+                            <option value="todos"
+                                    th:selected="${estadoSeleccionado == 'todos'}">
+                                Todos los estados
+                            </option>
+
+                            <option value="activo"
+                                    th:selected="${estadoSeleccionado == 'activo'}">
+                                Activos
+                            </option>
+
+                            <option value="inactivo"
+                                    th:selected="${estadoSeleccionado == 'inactivo'}">
+                                Inactivos
+                            </option>
+
+                        </select>
+
+                    </div>
+
+                </div>
+
+                <div class="acciones">
+
+                    <button class="boton"
+                            type="submit">
+                        Buscar usuarios
+                    </button>
+
+                    <a class="boton boton-secundario"
+                       th:href="@{/admin/usuarios}">
+                        Limpiar filtros
+                    </a>
+
+                </div>
+
+            </form>
+
+        </section>
+
+        <!-- =====================================
+             LISTADO DE USUARIOS
+        ===================================== -->
+
+        <section class="card">
+
+            <div class="encabezado-listado">
+
+                <h2>
+                    Usuarios registrados
+                </h2>
+
+                <span class="cantidad"
+                      th:text="|${cantidadResultados} resultado(s)|">
+                    0 resultados
+                </span>
+
+            </div>
+
+            <!-- SIN RESULTADOS -->
+
+            <div class="sin-registros"
+                 th:if="${#lists.isEmpty(usuarios)}">
+
+                <h3>
+                    No se encontraron usuarios
+                </h3>
+
+                <p>
+                    Prueba con otro nombre,
+                    correo o combinación de filtros.
+                </p>
+
+            </div>
+
+            <!-- TABLA -->
+
+            <div class="tabla-contenedor"
+                 th:if="${!#lists.isEmpty(usuarios)}">
+
+                <table>
+
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Nombre completo</th>
+                            <th>Correo electrónico</th>
+                            <th>Rol</th>
+                            <th>Estado</th>
+                            <th>Puntos</th>
+                            <th>Fecha de registro</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+
+                        <tr th:each="usuario : ${usuarios}">
+
+                            <td th:text="${usuario.id}">
+                                1
+                            </td>
+
+                            <td class="nombre"
+                                th:text="${usuario.nombreCompleto}">
+                                Nombre Apellido
+                            </td>
+
+                            <td class="correo"
+                                th:text="${usuario.correo}">
+                                ejemplo@correo.com
+                            </td>
+
+                            <td th:text="${usuario.rol}">
+                                Vecino
+                            </td>
+
+                            <td>
+
+                                <span class="estado"
+                                      th:classappend="${usuario.estado}"
+                                      th:text="${usuario.estado}">
+                                    activo
+                                </span>
+
+                            </td>
+
+                            <td class="puntos"
+                                th:text="|${usuario.puntos} pts|">
+                                0 pts
+                            </td>
+
+                            <td th:text="${usuario.fechaRegistro}">
+                                10/10/2026
+                            </td>
+
+                        </tr>
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </section>
+
+    </main>
+
+    <!-- =====================================
+         PIE DE PAGINA
+    ===================================== -->
+
+    <footer>
+
+        <strong>
+            ♻ PERÚ RECICLA
+        </strong>
+
+        <p>
+            Ecosistema Digital de Incentivos
+            para el Reciclaje
+        </p>
+
+        <p>
+            Gestión de usuarios
+        </p>
+
+    </footer>
+
+</body>
+</html>

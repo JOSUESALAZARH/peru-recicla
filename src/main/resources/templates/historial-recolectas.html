@@ -1,0 +1,680 @@
+
+<!DOCTYPE html>
+<html lang="es"
+      xmlns:th="http://www.thymeleaf.org">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Mis Recolectas | PERÚ RECICLA</title>
+
+    <style>
+
+        /* =====================================
+           COLORES INSTITUCIONALES
+        ===================================== */
+
+        :root {
+            --verde: #16804d;
+            --verde-oscuro: #105a38;
+            --verde-claro: #e6f5eb;
+            --fondo: #f6f9f6;
+            --blanco: #ffffff;
+            --texto: #1c3027;
+            --gris: #60736a;
+            --borde: #e1ebe4;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, Helvetica, sans-serif;
+            background: var(--fondo);
+            color: var(--texto);
+            line-height: 1.6;
+        }
+
+        a {
+            text-decoration: none;
+        }
+
+        /* =====================================
+           ENCABEZADO
+        ===================================== */
+
+        .encabezado {
+            background: white;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+        }
+
+        .barra {
+            max-width: 1150px;
+            margin: auto;
+            padding: 19px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .logo {
+            color: var(--verde-oscuro);
+            font-size: 23px;
+            font-weight: bold;
+        }
+
+        .menu {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            align-items: center;
+        }
+
+        .menu a {
+            color: var(--verde-oscuro);
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        .boton-salir {
+            background: white;
+            border: 1px solid var(--verde);
+            color: var(--verde-oscuro);
+            border-radius: 9px;
+            padding: 10px 17px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .boton-salir:hover {
+            background: var(--verde-claro);
+        }
+
+        /* =====================================
+           CONTENEDOR PRINCIPAL
+        ===================================== */
+
+        .contenedor {
+            max-width: 1150px;
+            margin: auto;
+            padding: 50px 24px 80px;
+        }
+
+        /* =====================================
+           PRESENTACION
+        ===================================== */
+
+        .presentacion {
+            background: linear-gradient(
+                130deg,
+                #105a38,
+                #16804d
+            );
+            color: white;
+            border-radius: 22px;
+            padding: 40px;
+        }
+
+        .etiqueta {
+            display: inline-block;
+            background: rgba(255,255,255,0.17);
+            padding: 7px 13px;
+            border-radius: 30px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .presentacion h1 {
+            font-size: 34px;
+            margin: 15px 0 8px;
+        }
+
+        .presentacion p {
+            color: #e3f4e9;
+            margin: 0;
+        }
+
+        /* =====================================
+           TARJETAS DE RESUMEN
+        ===================================== */
+
+        .resumen {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 24px;
+            margin-top: 28px;
+        }
+
+        .tarjeta {
+            background: white;
+            border-radius: 17px;
+            border: 1px solid var(--borde);
+            padding: 30px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.04);
+        }
+
+        .tarjeta h2 {
+            color: var(--gris);
+            font-size: 15px;
+            margin: 0 0 12px;
+        }
+
+        .numero {
+            color: var(--verde);
+            font-size: 40px;
+            font-weight: bold;
+            line-height: 1.2;
+        }
+
+        .detalle {
+            color: var(--gris);
+            font-size: 13px;
+            margin: 12px 0 0;
+        }
+
+        /* =====================================
+           HISTORIAL DE RECOLECTAS
+        ===================================== */
+
+        .seccion {
+            margin-top: 50px;
+        }
+
+        .seccion h2 {
+            color: var(--verde-oscuro);
+            font-size: 25px;
+            margin-bottom: 8px;
+        }
+
+        .descripcion {
+            color: var(--gris);
+            font-size: 14px;
+            margin: 0 0 25px;
+        }
+
+        .tabla-contenedor {
+            background: white;
+            border: 1px solid var(--borde);
+            border-radius: 17px;
+            overflow-x: auto;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.04);
+        }
+
+        table {
+            width: 100%;
+            min-width: 790px;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+
+        thead {
+            background: var(--verde-oscuro);
+            color: white;
+        }
+
+        th {
+            padding: 17px 16px;
+            text-align: left;
+            font-weight: bold;
+        }
+
+        td {
+            padding: 17px 16px;
+            border-bottom: 1px solid var(--borde);
+            vertical-align: middle;
+        }
+
+        tbody tr:hover {
+            background: #f1f8f3;
+        }
+
+        tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        .puntos {
+            color: var(--verde);
+            font-weight: bold;
+        }
+
+        .estado {
+            display: inline-block;
+            background: var(--verde-claro);
+            color: var(--verde-oscuro);
+            padding: 7px 12px;
+            border-radius: 9px;
+            font-size: 12px;
+            font-weight: bold;
+            overflow-wrap: anywhere;
+        }
+
+        /* =====================================
+           HISTORIAL VACIO
+        ===================================== */
+
+        .sin-registros {
+            background: white;
+            border: 1px solid var(--borde);
+            border-radius: 17px;
+            padding: 60px 30px;
+            text-align: center;
+        }
+
+        .sin-registros .icono {
+            font-size: 65px;
+            margin-bottom: 15px;
+        }
+
+        .sin-registros h3 {
+            color: var(--verde-oscuro);
+            font-size: 23px;
+            margin: 10px 0;
+        }
+
+        .sin-registros p {
+            color: var(--gris);
+            font-size: 15px;
+            max-width: 460px;
+            margin: auto;
+        }
+
+        /* =====================================
+           NAVEGACION
+        ===================================== */
+
+        .acciones {
+            margin-top: 30px;
+        }
+
+        .boton {
+            display: inline-block;
+            background: var(--verde);
+            color: white;
+            padding: 13px 23px;
+            border-radius: 10px;
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        .boton:hover {
+            background: var(--verde-oscuro);
+        }
+
+        /* =====================================
+           PIE DE PAGINA
+        ===================================== */
+
+        footer {
+            background: #123827;
+            color: white;
+            text-align: center;
+            padding: 30px 20px;
+        }
+
+        footer p {
+            color: #c8dfd1;
+            font-size: 13px;
+            margin: 6px;
+        }
+
+        /* =====================================
+           RESPONSIVE
+        ===================================== */
+
+        @media (max-width: 750px) {
+
+            .barra {
+                flex-direction: column;
+            }
+
+            .menu {
+                justify-content: center;
+            }
+
+            .resumen {
+                grid-template-columns: 1fr;
+            }
+
+            .contenedor {
+                padding: 30px 16px 50px;
+            }
+
+            .presentacion {
+                padding: 30px 22px;
+            }
+
+            .presentacion h1 {
+                font-size: 27px;
+            }
+
+            .numero {
+                font-size: 32px;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+    <!-- =====================================
+         ENCABEZADO
+    ===================================== -->
+
+    <header class="encabezado">
+
+        <nav class="barra">
+
+            <a class="logo" th:href="@{/}">
+                ♻ PERÚ RECICLA
+            </a>
+
+            <div class="menu">
+
+                <a th:href="@{/}">
+                    Inicio
+                </a>
+
+                <a th:href="@{/vecino}">
+                    Mi panel
+                </a>
+
+                <a th:href="@{/vecino/recolectas}">
+                    Mis recolectas
+                </a>
+
+                <form th:action="@{/logout}"
+                      method="post">
+
+                    <button type="submit"
+                            class="boton-salir">
+
+                        Cerrar sesión
+
+                    </button>
+
+                </form>
+
+            </div>
+
+        </nav>
+
+    </header>
+
+    <!-- =====================================
+         CONTENIDO PRINCIPAL
+    ===================================== -->
+
+    <main class="contenedor">
+
+        <!-- PRESENTACION -->
+
+        <section class="presentacion">
+
+            <span class="etiqueta">
+                PANEL DEL VECINO
+            </span>
+
+            <h1>
+                ♻ Mis recolectas
+            </h1>
+
+            <p>
+                Consulta tus materiales
+                reciclados, pesos registrados
+                y puntos generados.
+            </p>
+
+        </section>
+
+        <!-- =================================
+             RESUMEN
+        ================================= -->
+
+        <section class="resumen">
+
+            <!-- TOTAL DE RECOLECTAS -->
+
+            <article class="tarjeta">
+
+                <h2>
+                    Total de recolectas
+                </h2>
+
+                <div class="numero"
+                     th:text="${totalRecolectas}">
+                    0
+                </div>
+
+                <p class="detalle">
+                    Registros de recolectas
+                    asociados a tu cuenta.
+                </p>
+
+            </article>
+
+            <!-- PUNTOS ACUMULADOS -->
+
+            <article class="tarjeta">
+
+                <h2>
+                    ⭐ Mis puntos acumulados
+                </h2>
+
+                <div class="numero">
+
+                    <span th:text="${puntos}">
+                        0.00
+                    </span>
+
+                    <span>pts</span>
+
+                </div>
+
+                <p class="detalle">
+                    Saldo actual de tu cuenta
+                    registrado en MySQL.
+                </p>
+
+            </article>
+
+        </section>
+
+        <!-- =================================
+             LISTADO DE RECOLECTAS
+        ================================= -->
+
+        <section class="seccion">
+
+            <h2>
+                Historial de reciclaje
+            </h2>
+
+            <p class="descripcion">
+
+                Hola,
+                <strong th:text="${nombre}">
+                    Vecino
+                </strong>.
+
+                Aquí puedes consultar las
+                recolectas registradas
+                a tu nombre.
+
+            </p>
+
+            <!-- =================================
+                 MENSAJE SIN RECOLECTAS
+            ================================= -->
+
+            <div class="sin-registros"
+                 th:if="${#lists.isEmpty(recolectas)}">
+
+                <div class="icono">
+                    ♻
+                </div>
+
+                <h3>
+                    Todavía no tienes recolectas
+                </h3>
+
+                <p>
+                    Cuando registremos tu primera
+                    entrega de materiales reciclables,
+                    aparecerá aquí con su peso,
+                    puntos y estado de validación.
+                </p>
+
+            </div>
+
+            <!-- =================================
+                 TABLA DE RECOLECTAS
+            ================================= -->
+
+            <div class="tabla-contenedor"
+                 th:if="${!#lists.isEmpty(recolectas)}">
+
+                <table>
+
+                    <thead>
+
+                        <tr>
+
+                            <th>ID</th>
+
+                            <th>Fecha</th>
+
+                            <th>Material</th>
+
+                            <th>Peso</th>
+
+                            <th>Puntos</th>
+
+                            <th>Estado</th>
+
+                        </tr>
+
+                    </thead>
+
+                    <tbody>
+
+                        <tr th:each="r : ${recolectas}">
+
+                            <!-- ID RECOLECTA -->
+
+                            <td th:text="${r.id_recolecta}">
+                                1
+                            </td>
+
+                            <!-- FECHA -->
+
+                            <td th:text="${r.fecha_recolecta != null ? #temporals.format(r.fecha_recolecta, 'dd/MM/yyyy HH:mm') : 'Sin fecha'}">
+
+                                10/10/2026
+
+                            </td>
+
+                            <!-- TIPO DE MATERIAL -->
+
+                            <td th:text="${r.material != null ? r.material.tipo_material : 'No especificado'}">
+
+                                Plástico
+
+                            </td>
+
+                            <!-- PESO -->
+
+                            <td>
+
+                                <span th:text="${r.peso}">
+                                    0.00
+                                </span>
+
+                                kg
+
+                            </td>
+
+                            <!-- PUNTOS GENERADOS -->
+
+                            <td class="puntos">
+
+                                <span th:text="${r.puntos_generados != null ? r.puntos_generados : 0}">
+                                    0.00
+                                </span>
+
+                                pts
+
+                            </td>
+
+                            <!-- ESTADO DE VALIDACION -->
+
+                            <td>
+
+                                <span class="estado"
+                                      th:text="${r.estado_validacion != null ? r.estado_validacion : 'Sin estado'}">
+
+                                    pendiente
+
+                                </span>
+
+                            </td>
+
+                        </tr>
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </section>
+
+        <!-- =================================
+             REGRESAR AL PANEL
+        ================================= -->
+
+        <div class="acciones">
+
+            <a th:href="@{/vecino}"
+               class="boton">
+
+                ← Volver a mi panel
+
+            </a>
+
+        </div>
+
+    </main>
+
+    <!-- =====================================
+         PIE DE PAGINA
+    ===================================== -->
+
+    <footer>
+
+        <strong>
+            ♻ PERÚ RECICLA
+        </strong>
+
+        <p>
+            Ecosistema Digital de Incentivos
+            para el Reciclaje
+        </p>
+
+        <p>
+            Proyecto académico - Cibertec
+        </p>
+
+    </footer>
+
+</body>
+</html>

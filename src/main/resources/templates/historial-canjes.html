@@ -1,0 +1,569 @@
+
+<!DOCTYPE html>
+<html lang="es"
+      xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+    <title>Mis Canjes | PERÚ RECICLA</title>
+    <style>
+        /* =====================================
+           PERU RECICLA
+           HISTORIAL DE CANJES DEL VECINO
+        ===================================== */
+        :root {
+            --verde: #16804d;
+            --verde-oscuro: #105a38;
+            --verde-claro: #e6f5eb;
+            --fondo: #f6f9f6;
+            --blanco: #ffffff;
+            --texto: #1c3027;
+            --gris: #60736a;
+            --borde: #e1ebe4;
+        }
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            margin: 0;
+            font-family: Arial, Helvetica, sans-serif;
+            background: var(--fondo);
+            color: var(--texto);
+            line-height: 1.6;
+        }
+        a {
+            text-decoration: none;
+        }
+        /* =====================================
+           ENCABEZADO
+        ===================================== */
+        .encabezado {
+            background: white;
+            box-shadow:
+                0 2px 12px rgba(0,0,0,0.06);
+        }
+        .barra {
+            max-width: 1150px;
+            margin: auto;
+            padding: 19px 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+        }
+        .logo {
+            font-size: 23px;
+            color: var(--verde-oscuro);
+            font-weight: bold;
+        }
+        .menu {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        .menu a {
+            color: var(--verde-oscuro);
+            font-size: 14px;
+            font-weight: bold;
+        }
+        .menu a:hover {
+            color: var(--verde);
+        }
+        .cerrar-sesion {
+            background: white;
+            border: 1px solid var(--verde);
+            color: var(--verde-oscuro);
+            border-radius: 9px;
+            padding: 10px 17px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .cerrar-sesion:hover {
+            background: var(--verde-claro);
+        }
+        /* =====================================
+           CONTENEDOR PRINCIPAL
+        ===================================== */
+        .contenedor {
+            max-width: 1150px;
+            margin: auto;
+            padding: 50px 24px 80px;
+        }
+        /* =====================================
+           PRESENTACION
+        ===================================== */
+        .presentacion {
+            background: linear-gradient(
+                130deg,
+                #105a38,
+                #16804d
+            );
+            border-radius: 22px;
+            padding: 40px;
+            color: white;
+        }
+        .etiqueta {
+            display: inline-block;
+            padding: 7px 13px;
+            border-radius: 30px;
+            background: rgba(255,255,255,0.17);
+            font-size: 12px;
+            font-weight: bold;
+        }
+        .presentacion h1 {
+            font-size: 34px;
+            margin: 15px 0 8px;
+        }
+        .presentacion p {
+            color: #e3f4e9;
+            margin: 0;
+        }
+        /* =====================================
+           RESUMEN DEL VECINO
+        ===================================== */
+        .resumen {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 24px;
+            margin-top: 28px;
+        }
+        .tarjeta {
+            background: white;
+            border: 1px solid var(--borde);
+            border-radius: 17px;
+            padding: 30px;
+            box-shadow:
+                0 5px 20px rgba(0,0,0,0.04);
+        }
+        .tarjeta h2 {
+            color: var(--gris);
+            font-size: 15px;
+            margin: 0 0 12px;
+        }
+        .numero {
+            color: var(--verde);
+            font-size: 40px;
+            font-weight: bold;
+            line-height: 1.2;
+        }
+        .detalle {
+            color: var(--gris);
+            font-size: 13px;
+            margin-top: 12px;
+        }
+        /* =====================================
+           SECCION DE HISTORIAL
+        ===================================== */
+        .seccion {
+            margin-top: 50px;
+        }
+        .seccion h2 {
+            color: var(--verde-oscuro);
+            font-size: 25px;
+            margin: 0 0 8px;
+        }
+        .descripcion {
+            color: var(--gris);
+            font-size: 14px;
+            margin: 0 0 25px;
+        }
+        /* =====================================
+           TABLA DE CANJES
+        ===================================== */
+        .tabla-contenedor {
+            background: white;
+            border: 1px solid var(--borde);
+            border-radius: 17px;
+            overflow-x: auto;
+            box-shadow:
+                0 5px 20px rgba(0,0,0,0.04);
+        }
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            min-width: 1020px;
+            font-size: 14px;
+        }
+        thead {
+            background: var(--verde-oscuro);
+            color: white;
+        }
+        th {
+            padding: 18px 16px;
+            text-align: left;
+            font-weight: bold;
+        }
+        td {
+            padding: 18px 16px;
+            border-bottom: 1px solid var(--borde);
+            vertical-align: middle;
+        }
+        tbody tr:hover {
+            background: #f1f8f3;
+        }
+        tbody tr:last-child td {
+            border-bottom: none;
+        }
+        .codigo {
+            font-family: Consolas, monospace;
+            font-size: 12px;
+            color: var(--verde-oscuro);
+            font-weight: bold;
+            overflow-wrap: anywhere;
+        }
+        .puntos {
+            color: var(--verde);
+            font-weight: bold;
+        }
+        .estado {
+            display: inline-block;
+            background: var(--verde-claro);
+            color: var(--verde-oscuro);
+            padding: 7px 12px;
+            border-radius: 9px;
+            font-size: 12px;
+            font-weight: bold;
+            overflow-wrap: anywhere;
+        }
+        /* =====================================
+           DESCARGA DEL COMPROBANTE PDF
+        ===================================== */
+        .boton-pdf {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 7px;
+            padding: 9px 14px;
+            border: 1px solid var(--verde);
+            border-radius: 9px;
+            background: var(--verde);
+            color: white;
+            font-size: 12px;
+            font-weight: bold;
+            white-space: nowrap;
+            transition: background 0.2s ease;
+        }
+        .boton-pdf:hover,
+        .boton-pdf:focus-visible {
+            background: var(--verde-oscuro);
+            color: white;
+        }
+        .boton-pdf:focus-visible {
+            outline: 3px solid #90d5af;
+            outline-offset: 2px;
+        }
+        /* =====================================
+           MENSAJE SIN CANJES
+        ===================================== */
+        .sin-registros {
+            background: white;
+            border: 1px solid var(--borde);
+            border-radius: 17px;
+            padding: 60px 30px;
+            text-align: center;
+        }
+        .sin-registros .icono {
+            font-size: 65px;
+            margin-bottom: 15px;
+        }
+        .sin-registros h3 {
+            color: var(--verde-oscuro);
+            font-size: 23px;
+            margin: 10px 0;
+        }
+        .sin-registros p {
+            color: var(--gris);
+            font-size: 15px;
+            max-width: 480px;
+            margin: auto;
+        }
+        /* =====================================
+           ACCIONES
+        ===================================== */
+        .acciones {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 14px;
+            margin-top: 30px;
+        }
+        .boton {
+            display: inline-block;
+            background: var(--verde);
+            color: white;
+            padding: 13px 22px;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: bold;
+        }
+        .boton:hover {
+            background: var(--verde-oscuro);
+        }
+        .boton-secundario {
+            background: white;
+            color: var(--verde-oscuro);
+            border: 1px solid var(--verde);
+        }
+        .boton-secundario:hover {
+            background: var(--verde-claro);
+        }
+        /* =====================================
+           PIE DE PAGINA
+        ===================================== */
+        footer {
+            background: #123827;
+            color: white;
+            text-align: center;
+            padding: 30px 20px;
+        }
+        footer p {
+            color: #c8dfd1;
+            font-size: 13px;
+            margin: 7px;
+        }
+        /* =====================================
+           RESPONSIVE
+        ===================================== */
+        @media (max-width: 750px) {
+            .barra {
+                flex-direction: column;
+            }
+            .menu {
+                justify-content: center;
+            }
+            .resumen {
+                grid-template-columns: 1fr;
+            }
+            .contenedor {
+                padding: 30px 16px 50px;
+            }
+            .presentacion {
+                padding: 30px 22px;
+            }
+            .presentacion h1 {
+                font-size: 27px;
+            }
+            .numero {
+                font-size: 32px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- =====================================
+         ENCABEZADO
+    ===================================== -->
+    <header class="encabezado">
+        <nav class="barra">
+            <a class="logo" th:href="@{/}">
+                ♻ PERÚ RECICLA
+            </a>
+            <div class="menu">
+                <a th:href="@{/}">
+                    Inicio
+                </a>
+                <a th:href="@{/vecino}">
+                    Mi panel
+                </a>
+                <a th:href="@{/vecino/recolectas}">
+                    Mis recolectas
+                </a>
+                <a th:href="@{/vecino/recompensas}">
+                    Recompensas
+                </a>
+                <a th:href="@{/vecino/canjes}">
+                    Mis canjes
+                </a>
+                <!-- CERRAR SESION -->
+                <form th:action="@{/logout}"
+                      method="post">
+                    <button type="submit"
+                            class="cerrar-sesion">
+                        Cerrar sesión
+                    </button>
+                </form>
+            </div>
+        </nav>
+    </header>
+    <!-- =====================================
+         CONTENIDO PRINCIPAL
+    ===================================== -->
+    <main class="contenedor">
+        <!-- =================================
+             PRESENTACION
+        ================================= -->
+        <section class="presentacion">
+            <span class="etiqueta">
+                PANEL DEL VECINO
+            </span>
+            <h1>
+                📋 Mis canjes
+            </h1>
+            <p>
+                Hola,
+                <strong th:text="${nombre}">
+                    Vecino
+                </strong>.
+                Consulta las recompensas
+                canjeadas y sus comprobantes
+                registrados en el sistema.
+            </p>
+        </section>
+        <!-- =================================
+             RESUMEN DEL HISTORIAL
+        ================================= -->
+        <section class="resumen">
+            <!-- TOTAL DE CANJES -->
+            <article class="tarjeta">
+                <h2>
+                    Total de canjes registrados
+                </h2>
+                <div class="numero"
+                     th:text="${totalCanjes}">
+                    0
+                </div>
+                <p class="detalle">
+                    Operaciones de canje
+                    asociadas a tu cuenta.
+                </p>
+            </article>
+            <!-- SALDO DE PUNTOS -->
+            <article class="tarjeta">
+                <h2>
+                    ⭐ Mis puntos disponibles
+                </h2>
+                <div class="numero">
+                    <span th:text="${puntos}">
+                        0.00
+                    </span>
+                    <span>pts</span>
+                </div>
+                <p class="detalle">
+                    Saldo actual registrado
+                    en tu cuenta de MySQL.
+                </p>
+            </article>
+        </section>
+        <!-- =================================
+             HISTORIAL DE CANJES
+        ================================= -->
+        <section class="seccion">
+            <h2>
+                Historial de recompensas canjeadas
+            </h2>
+            <p class="descripcion">
+                Revisa la fecha, recompensa,
+                puntos utilizados, estado y
+                descarga el comprobante PDF de cada operación.
+            </p>
+            <!-- =================================
+                 CUANDO NO EXISTEN CANJES
+            ================================= -->
+            <div class="sin-registros"
+                 th:if="${#lists.isEmpty(canjes)}">
+                <div class="icono">
+                    🎁
+                </div>
+                <h3>
+                    Todavía no tienes canjes
+                </h3>
+                <p>
+                    Cuando realices tu primer
+                    canje de recompensa,
+                    aparecerá aquí con su
+                    fecha, código de ticket
+                    y estado correspondiente.
+                </p>
+            </div>
+            <!-- =================================
+                 TABLA DE CANJES
+            ================================= -->
+            <div class="tabla-contenedor"
+                 th:if="${!#lists.isEmpty(canjes)}">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Código de ticket</th>
+                            <th>Fecha</th>
+                            <th>Recompensa</th>
+                            <th>Puntos usados</th>
+                            <th>Estado</th>
+                            <th>Comprobante</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="c : ${canjes}">
+                            <!-- CODIGO DE TICKET -->
+                            <td>
+                                <span class="codigo"
+                                      th:text="${c.codigo_ticket != null ? c.codigo_ticket : 'Pendiente'}">
+                                    TK-EJEMPLO
+                                </span>
+                            </td>
+                            <!-- FECHA DEL CANJE -->
+                            <td th:text="${c.fecha_canje != null ? #temporals.format(c.fecha_canje, 'dd/MM/yyyy HH:mm') : 'Sin fecha'}">
+                                10/10/2026
+                            </td>
+                            <!-- RECOMPENSA CANJEADA -->
+                            <td th:text="${c.recompensa != null ? c.recompensa.nombre : 'No especificada'}">
+                                Recompensa
+                            </td>
+                            <!-- PUNTOS DESCONTADOS -->
+                            <td class="puntos">
+                                <span th:text="${c.puntos_descontados != null ? c.puntos_descontados : 0}">
+                                    0
+                                </span>
+                                pts
+                            </td>
+                            <!-- ESTADO DEL CANJE -->
+                            <td>
+                                <span class="estado"
+                                      th:text="${c.estado != null ? c.estado : 'Sin estado'}">
+                                    pendiente
+                                </span>
+                            </td>
+                            <!-- DESCARGAR PDF DEL CANJE -->
+                            <td>
+                                <a class="boton-pdf"
+                                   th:href="@{/vecino/canjes/{id}/ticket(id=${c.id_canje})}"
+                                   title="Descargar comprobante PDF">
+                                    📄 Descargar PDF
+                                </a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+        <!-- =================================
+             BOTONES DE NAVEGACION
+        ================================= -->
+        <div class="acciones">
+            <a th:href="@{/vecino}"
+               class="boton">
+                ← Volver a mi panel
+            </a>
+            <a th:href="@{/vecino/recompensas}"
+               class="boton boton-secundario">
+                🎁 Explorar recompensas
+            </a>
+        </div>
+    </main>
+    <!-- =====================================
+         PIE DE PAGINA
+    ===================================== -->
+    <footer>
+        <strong>
+            ♻ PERÚ RECICLA
+        </strong>
+        <p>
+            Ecosistema Digital de Incentivos
+            para el Reciclaje
+        </p>
+        <p>
+            Proyecto académico - Cibertec
+        </p>
+    </footer>
+</body>
+</html>

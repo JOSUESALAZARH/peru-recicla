@@ -1,0 +1,554 @@
+
+<!DOCTYPE html>
+<html lang="es"
+      xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <!-- =====================================
+         CORRECCION DE LOGIN - PASO 63.1
+
+         Inicializar CSRF antes de procesar
+         el resto de la plantilla.
+
+         Evita intentar crear una sesion
+         cuando la respuesta HTTP ya
+         comenzo a enviarse.
+    ===================================== -->
+
+    <meta name="_csrf"
+          th:content="${_csrf.token}">
+
+    <title>Iniciar Sesión | PERÚ RECICLA</title>
+
+    <style>
+
+        /* =====================================
+           VARIABLES DE DISEÑO
+        ===================================== */
+
+        :root {
+            --verde: #16804d;
+            --verde-oscuro: #105a38;
+            --verde-claro: #e6f5eb;
+            --fondo: #f6f9f6;
+            --texto: #1c3027;
+            --gris: #60736a;
+            --blanco: #ffffff;
+            --borde: #dce8df;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, Helvetica, sans-serif;
+            color: var(--texto);
+            background: var(--fondo);
+            line-height: 1.6;
+        }
+
+        a {
+            text-decoration: none;
+        }
+
+        /* =====================================
+           ENCABEZADO
+        ===================================== */
+
+        header {
+            background: white;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.05);
+        }
+
+        .barra {
+            max-width: 1150px;
+            margin: auto;
+            padding: 20px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            color: var(--verde-oscuro);
+            font-size: 23px;
+            font-weight: bold;
+        }
+
+        .volver {
+            color: var(--verde-oscuro);
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        /* =====================================
+           CONTENEDOR PRINCIPAL
+        ===================================== */
+
+        .contenedor {
+            min-height: calc(100vh - 155px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 60px 20px;
+        }
+
+        .panel {
+            max-width: 1050px;
+            width: 100%;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            background: white;
+            border-radius: 22px;
+            overflow: hidden;
+            box-shadow: 0 15px 50px rgba(0,0,0,0.08);
+        }
+
+        /* =====================================
+           PRESENTACION IZQUIERDA
+        ===================================== */
+
+        .presentacion {
+            background: linear-gradient(
+                145deg,
+                #105a38,
+                #16804d
+            );
+            color: white;
+            padding: 60px 45px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .icono {
+            font-size: 65px;
+            margin-bottom: 20px;
+        }
+
+        .presentacion h1 {
+            font-size: 39px;
+            line-height: 1.15;
+            margin: 0 0 20px;
+        }
+
+        .presentacion p {
+            color: #e3f4e9;
+            font-size: 16px;
+            margin-bottom: 24px;
+        }
+
+        .beneficio {
+            padding: 13px 0;
+            border-bottom: 1px solid
+                rgba(255,255,255,0.18);
+            font-size: 14px;
+        }
+
+        /* =====================================
+           FORMULARIO DERECHO
+        ===================================== */
+
+        .formulario-contenedor {
+            padding: 60px 48px;
+        }
+
+        .etiqueta {
+            display: inline-block;
+            background: var(--verde-claro);
+            color: var(--verde-oscuro);
+            padding: 7px 14px;
+            border-radius: 30px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .formulario-contenedor h2 {
+            font-size: 31px;
+            color: var(--verde-oscuro);
+            margin: 20px 0 8px;
+        }
+
+        .descripcion {
+            color: var(--gris);
+            font-size: 14px;
+            margin-bottom: 32px;
+        }
+
+        .campo {
+            margin-bottom: 23px;
+        }
+
+        label {
+            display: block;
+            font-size: 14px;
+            font-weight: bold;
+            margin-bottom: 9px;
+        }
+
+        input {
+            width: 100%;
+            padding: 15px;
+            border: 1px solid var(--borde);
+            background: #fbfdfb;
+            border-radius: 10px;
+            font-size: 15px;
+            font-family: inherit;
+            color: var(--texto);
+        }
+
+        input:focus {
+            outline: none;
+            border-color: var(--verde);
+            box-shadow: 0 0 0 3px
+                rgba(22,128,77,0.12);
+        }
+
+        input::placeholder {
+            color: #97a69d;
+        }
+
+        /* =====================================
+           MENSAJES
+        ===================================== */
+
+        .alerta {
+            padding: 14px;
+            border-radius: 10px;
+            margin-bottom: 22px;
+            font-size: 14px;
+        }
+
+        .alerta-error {
+            background: #fff0ef;
+            border: 1px solid #f6c4bf;
+            color: #a32720;
+        }
+
+        .alerta-exito {
+            background: #e6f5eb;
+            border: 1px solid #b7dfc5;
+            color: #105a38;
+        }
+
+        /* =====================================
+           BOTONES
+        ===================================== */
+
+        .boton {
+            display: block;
+            width: 100%;
+            border: none;
+            background: var(--verde);
+            color: white;
+            padding: 16px;
+            border-radius: 11px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .boton:hover {
+            background: var(--verde-oscuro);
+        }
+
+        .registro {
+            text-align: center;
+            margin-top: 26px;
+            font-size: 14px;
+            color: var(--gris);
+        }
+
+        .registro a {
+            color: var(--verde);
+            font-weight: bold;
+        }
+
+        .registro a:hover {
+            text-decoration: underline;
+        }
+
+        /* =====================================
+           PIE DE PAGINA
+        ===================================== */
+
+        footer {
+            background: #123827;
+            text-align: center;
+            color: white;
+            padding: 25px;
+        }
+
+        footer p {
+            color: #c8dfd1;
+            font-size: 13px;
+            margin: 5px;
+        }
+
+        /* =====================================
+           RESPONSIVE
+        ===================================== */
+
+        @media (max-width: 800px) {
+
+            .panel {
+                grid-template-columns: 1fr;
+                max-width: 550px;
+            }
+
+            .presentacion {
+                padding: 35px;
+            }
+
+            .presentacion h1 {
+                font-size: 28px;
+            }
+
+            .formulario-contenedor {
+                padding: 38px 30px;
+            }
+        }
+
+        @media (max-width: 480px) {
+
+            .barra {
+                padding: 17px;
+            }
+
+            .logo {
+                font-size: 18px;
+            }
+
+            .formulario-contenedor {
+                padding: 30px 22px;
+            }
+
+            .contenedor {
+                padding: 30px 15px;
+            }
+        }
+
+    </style>
+</head>
+
+<body>
+
+    <!-- =====================================
+         ENCABEZADO
+    ===================================== -->
+
+    <header>
+
+        <nav class="barra">
+
+            <a class="logo" th:href="@{/}">
+                ♻ PERÚ RECICLA
+            </a>
+
+            <a class="volver" th:href="@{/}">
+                ← Volver al inicio
+            </a>
+
+        </nav>
+
+    </header>
+
+    <!-- =====================================
+         CONTENIDO PRINCIPAL
+    ===================================== -->
+
+    <main class="contenedor">
+
+        <div class="panel">
+
+            <!-- =============================
+                 PRESENTACION
+            ============================= -->
+
+            <section class="presentacion">
+
+                <div class="icono">
+                    ♻
+                </div>
+
+                <h1>
+                    Bienvenido a
+                    PERÚ RECICLA
+                </h1>
+
+                <p>
+                    Inicia sesión y continúa
+                    transformando tus materiales
+                    reciclables en beneficios.
+                </p>
+
+                <div class="beneficio">
+                    ✓ Consulta tus puntos acumulados
+                </div>
+
+                <div class="beneficio">
+                    ✓ Revisa tu historial de reciclaje
+                </div>
+
+                <div class="beneficio">
+                    ✓ Explora las recompensas disponibles
+                </div>
+
+                <div class="beneficio">
+                    ✓ Gestiona tus canjes
+                </div>
+
+            </section>
+
+            <!-- =============================
+                 FORMULARIO
+            ============================= -->
+
+            <section class="formulario-contenedor">
+
+                <span class="etiqueta">
+                    ACCESO A MI CUENTA
+                </span>
+
+                <h2>
+                    Iniciar sesión
+                </h2>
+
+                <p class="descripcion">
+                    Ingresa el correo electrónico
+                    y la contraseña con los que
+                    registraste tu cuenta.
+                </p>
+
+                <!-- MENSAJE ERROR -->
+
+                <div
+                    class="alerta alerta-error"
+                    th:if="${param.error}"
+                    role="alert">
+
+                    El correo o la contraseña
+                    son incorrectos, o la cuenta
+                    no está habilitada.
+
+                </div>
+
+                <!-- MENSAJE LOGOUT -->
+
+                <div
+                    class="alerta alerta-exito"
+                    th:if="${param.logout}"
+                    role="status">
+
+                    Has cerrado sesión correctamente.
+
+                </div>
+
+                <!-- =================================
+                     FORMULARIO DE LOGIN
+
+                     Thymeleaf sigue agregando
+                     automaticamente el campo CSRF.
+                ================================= -->
+
+                <form th:action="@{/login}"
+                      method="post">
+
+                    <!-- CORREO -->
+
+                    <div class="campo">
+
+                        <label for="username">
+                            Correo electrónico
+                        </label>
+
+                        <input
+                            type="email"
+                            id="username"
+                            name="username"
+                            placeholder="ejemplo@correo.com"
+                            autocomplete="username"
+                            maxlength="150"
+                            required>
+
+                    </div>
+
+                    <!-- CONTRASENA -->
+
+                    <div class="campo">
+
+                        <label for="password">
+                            Contraseña
+                        </label>
+
+                        <input
+                            type="password"
+                            id="password"
+                            name="password"
+                            placeholder="Ingresa tu contraseña"
+                            autocomplete="current-password"
+                            required>
+
+                    </div>
+
+                    <!-- INICIAR SESION -->
+
+                    <button
+                        type="submit"
+                        class="boton">
+
+                        Ingresar a mi cuenta →
+
+                    </button>
+
+                </form>
+
+                <!-- REGISTRO -->
+
+                <div class="registro">
+
+                    ¿Todavía no tienes una cuenta?
+
+                    <a th:href="@{/registro}">
+                        Regístrate aquí
+                    </a>
+
+                </div>
+
+            </section>
+
+        </div>
+
+    </main>
+
+    <!-- =====================================
+         PIE DE PAGINA
+    ===================================== -->
+
+    <footer>
+
+        <strong>
+            ♻ PERÚ RECICLA
+        </strong>
+
+        <p>
+            Ecosistema Digital de Incentivos
+            para el Reciclaje
+        </p>
+
+        <p>
+            Proyecto académico - Cibertec
+        </p>
+
+    </footer>
+
+</body>
+</html>

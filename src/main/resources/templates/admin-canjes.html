@@ -1,0 +1,392 @@
+
+<!DOCTYPE html>
+<html lang="es"
+      xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+    <title>Validar canjes | PERÚ RECICLA</title>
+    <style>
+        :root {
+            --verde: #16804d;
+            --oscuro: #105a38;
+            --claro: #e6f5eb;
+            --fondo: #f6f9f6;
+            --borde: #dde9e0;
+            --texto: #20392b;
+        }
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            margin: 0;
+            background: var(--fondo);
+            color: var(--texto);
+            font-family: Arial, Helvetica, sans-serif;
+            line-height: 1.55;
+        }
+        .barra {
+            background: white;
+            padding: 20px max(24px, calc((100% - 1050px)/2));
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            flex-wrap: wrap;
+            box-shadow: 0 2px 12px #0000000b;
+        }
+        .logo {
+            color: var(--oscuro);
+            font-size: 23px;
+            font-weight: bold;
+            text-decoration: none;
+        }
+        .navegacion {
+            display: flex;
+            align-items: center;
+            gap: 18px;
+        }
+        .navegacion a {
+            color: var(--oscuro);
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: bold;
+        }
+        .salir {
+            padding: 10px 16px;
+            background: white;
+            border: 1px solid var(--verde);
+            border-radius: 9px;
+            color: var(--oscuro);
+            cursor: pointer;
+        }
+        main {
+            max-width: 1050px;
+            margin: 42px auto 75px;
+            padding: 0 20px;
+        }
+        .hero {
+            background: linear-gradient(120deg,
+                        #105a38, #16804d);
+            color: white;
+            padding: 40px;
+            border-radius: 20px;
+        }
+        .etiqueta {
+            display: inline-block;
+            border-radius: 30px;
+            padding: 7px 13px;
+            background: #ffffff30;
+            font-weight: bold;
+            font-size: 12px;
+        }
+        .hero h1 {
+            font-size: 32px;
+            margin: 17px 0 10px;
+        }
+        .hero p {
+            margin: 0;
+        }
+        .card {
+            margin-top: 25px;
+            padding: 30px;
+            background: white;
+            border: 1px solid var(--borde);
+            border-radius: 17px;
+            box-shadow: 0 5px 22px #00000008;
+        }
+        h2 {
+            color: var(--oscuro);
+            font-size: 22px;
+            margin: 0 0 14px;
+        }
+        .ayuda {
+            color: #60736a;
+            font-size: 14px;
+        }
+        label {
+            display: block;
+            font-size: 13px;
+            font-weight: bold;
+            margin-bottom: 9px;
+        }
+        .busqueda {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        input[type="text"] {
+            padding: 13px 15px;
+            border: 1px solid #ccdcd1;
+            border-radius: 10px;
+            font-size: 15px;
+            flex: 1;
+            min-width: 220px;
+        }
+        input:focus {
+            outline: 2px solid #85cda5;
+        }
+        .boton {
+            padding: 13px 20px;
+            background: var(--verde);
+            border: none;
+            border-radius: 10px;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        .boton:hover {
+            background: var(--oscuro);
+        }
+        .mensaje {
+            padding: 16px;
+            margin-top: 20px;
+            border-radius: 10px;
+            font-size: 14px;
+        }
+        .exito {
+            background: #e0f5e6;
+            border: 1px solid #a0ddb0;
+            color: #125d38;
+        }
+        .error {
+            background: #fff0e6;
+            border: 1px solid #efc5ac;
+            color: #8d4010;
+        }
+        .detalle {
+            display: grid;
+            grid-template-columns: 175px 1fr;
+            gap: 16px;
+            margin-top: 24px;
+        }
+        .etiqueta-dato {
+            color: #60736a;
+            font-size: 14px;
+        }
+        .valor {
+            font-weight: bold;
+            overflow-wrap: anywhere;
+        }
+        .estado {
+            display: inline-block;
+            padding: 7px 13px;
+            background: var(--claro);
+            color: var(--oscuro);
+            border-radius: 9px;
+        }
+        .confirmacion {
+            margin-top: 28px;
+            padding: 24px;
+            background: #edf8f0;
+            border: 1px solid #c7e6d1;
+            border-radius: 12px;
+        }
+        .confirmacion p {
+            margin-top: 0;
+        }
+        .advertencia {
+            background: #fff5e9;
+            border: 1px solid #ead3b5;
+            border-radius: 12px;
+            padding: 18px;
+            margin-top: 25px;
+        }
+        footer {
+            background: #123827;
+            color: white;
+            padding: 25px;
+            text-align: center;
+            font-size: 13px;
+        }
+        @media (max-width: 650px) {
+            .hero {
+                padding: 28px;
+            }
+            .hero h1 {
+                font-size: 26px;
+            }
+            .card {
+                padding: 22px;
+            }
+            .detalle {
+                grid-template-columns: 1fr;
+                gap: 5px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- ENCABEZADO ADMINISTRATIVO -->
+    <header class="barra">
+        <a class="logo" th:href="@{/admin}">
+            ♻ PERÚ RECICLA
+        </a>
+        <nav class="navegacion" aria-label="Navegación administrativa">
+            <!-- Regresar al inicio del administrador -->
+            <a th:href="@{/admin}">
+                Mi dashboard
+            </a>
+            <a th:href="@{/admin/canjes}">
+                Validar canjes
+            </a>
+            <form th:action="@{/logout}" method="post">
+                <button class="salir" type="submit">
+                    Cerrar sesión
+                </button>
+            </form>
+        </nav>
+    </header>
+    <main>
+        <!-- PRESENTACION -->
+        <section class="hero">
+            <span class="etiqueta">
+                PANEL ADMINISTRATIVO
+            </span>
+            <h1>Validación de recompensas</h1>
+            <p>
+                Bienvenido,
+                <strong th:text="${administrador}">
+                    Administrador
+                </strong>.
+                Consulta tickets y registra
+                entregas de recompensas.
+            </p>
+        </section>
+        <!-- BUSCADOR -->
+        <section class="card">
+            <h2>Buscar comprobante</h2>
+            <p class="ayuda">
+                Ingresa el código del ticket
+                presentado por el vecino.
+            </p>
+            <form th:action="@{/admin/canjes}"
+                  method="get">
+                <label for="codigo">
+                    Código de ticket
+                </label>
+                <div class="busqueda">
+                    <input
+                        id="codigo"
+                        type="text"
+                        name="codigo"
+                        maxlength="20"
+                        required
+                        placeholder="Ejemplo: TK-9EB2F72EC2274932"
+                        th:value="${codigo}">
+                    <button class="boton"
+                            type="submit">
+                        Buscar ticket
+                    </button>
+                </div>
+            </form>
+            <!-- MENSAJES -->
+            <div class="mensaje exito"
+                 role="status"
+                 th:if="${exito != null}"
+                 th:text="${exito}">
+            </div>
+            <div class="mensaje error"
+                 role="alert"
+                 th:if="${error != null}"
+                 th:text="${error}">
+            </div>
+        </section>
+        <!-- INFORMACION DEL CANJE -->
+        <section class="card"
+                 th:if="${canje != null}">
+            <h2>Detalle del ticket</h2>
+            <div class="detalle">
+                <span class="etiqueta-dato">
+                    Código de ticket
+                </span>
+                <span class="valor"
+                      th:text="${canje.codigo_ticket}">
+                </span>
+                <span class="etiqueta-dato">
+                    Vecino
+                </span>
+                <span class="valor"
+                      th:text="${canje.usuario.nombre + ' ' + canje.usuario.apellido}">
+                </span>
+                <span class="etiqueta-dato">
+                    Recompensa
+                </span>
+                <span class="valor"
+                      th:text="${canje.recompensa.nombre}">
+                </span>
+                <span class="etiqueta-dato">
+                    Puntos descontados
+                </span>
+                <span class="valor"
+                      th:text="${canje.puntos_descontados + ' pts'}">
+                </span>
+                <span class="etiqueta-dato">
+                    Fecha del canje
+                </span>
+                <span class="valor"
+                      th:text="${canje.fecha_canje != null ? #temporals.format(canje.fecha_canje, 'dd/MM/yyyy HH:mm') : 'Sin fecha'}">
+                </span>
+                <span class="etiqueta-dato">
+                    Estado
+                </span>
+                <span class="valor">
+                    <span class="estado"
+                          th:text="${canje.estado}">
+                    </span>
+                </span>
+            </div>
+            <!-- CONFIRMACION SOLO SI ESTA PENDIENTE -->
+            <div class="confirmacion"
+                 th:if="${canje.estado != null and canje.estado.name() == 'pendiente'}">
+                <h2>Confirmar entrega</h2>
+                <p>
+                    Verifica que la recompensa
+                    haya sido entregada físicamente
+                    antes de confirmar.
+                </p>
+                <form th:action="@{/admin/canjes/entregar}"
+                      method="post">
+                    <input type="hidden"
+                           name="codigo"
+                           th:value="${canje.codigo_ticket}">
+                    <input type="hidden"
+                           th:name="${_csrf.parameterName}"
+                           th:value="${_csrf.token}">
+                    <button class="boton"
+                            type="submit">
+                        ✓ Confirmar entrega física
+                    </button>
+                </form>
+            </div>
+            <!-- ESTADO FINAL -->
+            <div class="mensaje exito"
+                 th:if="${canje.estado != null and canje.estado.name() == 'entregado'}">
+                Esta recompensa ya fue registrada
+                como entregada.
+            </div>
+            <div class="advertencia"
+                 th:if="${canje.estado != null and canje.estado.name() == 'cancelado'}">
+                Este canje está cancelado y
+                no puede entregarse.
+            </div>
+        </section>
+        <div class="advertencia">
+            <strong>Importante:</strong>
+            este módulo registra la entrega
+            de un canje previamente realizado.
+            No debe utilizarse para descontar
+            puntos ni reducir el stock nuevamente.
+        </div>
+    </main>
+    <footer>
+        ♻ PERÚ RECICLA
+        <div>
+            Ecosistema Digital de Incentivos
+            para el Reciclaje
+        </div>
+    </footer>
+</body>
+</html>

@@ -1,0 +1,826 @@
+
+<!DOCTYPE html>
+<html lang="es"
+      xmlns:th="http://www.thymeleaf.org">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>
+        Registrar pesaje | PERÚ RECICLA
+    </title>
+
+    <style>
+
+        /* =====================================
+           PERU RECICLA - PASO 60
+           FORMULARIO DE PESAJE
+        ===================================== */
+
+        :root {
+            --verde: #16804d;
+            --oscuro: #105a38;
+            --claro: #e6f5eb;
+            --fondo: #f6f9f6;
+            --texto: #20392b;
+            --gris: #60736a;
+            --borde: #dde9e0;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            background: var(--fondo);
+            color: var(--texto);
+            font-family: Arial, Helvetica, sans-serif;
+            line-height: 1.6;
+        }
+
+        a {
+            text-decoration: none;
+        }
+
+        /* =====================================
+           ENCABEZADO
+        ===================================== */
+
+        .barra {
+            background: white;
+            padding: 20px max(
+                24px,
+                calc((100% - 1100px) / 2)
+            );
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 18px;
+            box-shadow: 0 2px 12px #0000000b;
+        }
+
+        .logo {
+            color: var(--oscuro);
+            font-size: 23px;
+            font-weight: bold;
+        }
+
+        .navegacion {
+            display: flex;
+            gap: 19px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .navegacion a {
+            color: var(--oscuro);
+            font-size: 13px;
+            font-weight: bold;
+        }
+
+        .navegacion a:hover {
+            color: var(--verde);
+        }
+
+        .salir {
+            padding: 10px 16px;
+            color: var(--oscuro);
+            background: white;
+            border: 1px solid var(--verde);
+            border-radius: 9px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        /* =====================================
+           CONTENEDOR
+        ===================================== */
+
+        main {
+            max-width: 1100px;
+            padding: 0 20px;
+            margin: 40px auto 75px;
+        }
+
+        /* =====================================
+           PRESENTACION
+        ===================================== */
+
+        .hero {
+            background: linear-gradient(
+                120deg,
+                #105a38,
+                #16804d
+            );
+            padding: 40px;
+            border-radius: 20px;
+            color: white;
+        }
+
+        .etiqueta {
+            display: inline-block;
+            background: #ffffff30;
+            padding: 7px 13px;
+            border-radius: 30px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .hero h1 {
+            margin: 16px 0 10px;
+            font-size: 34px;
+        }
+
+        .hero p {
+            margin: 0;
+            color: #e3f4e9;
+        }
+
+        /* =====================================
+           TARJETAS
+        ===================================== */
+
+        .card {
+            background: white;
+            border: 1px solid var(--borde);
+            border-radius: 17px;
+            padding: 32px;
+            margin-top: 27px;
+            box-shadow: 0 5px 20px #00000008;
+        }
+
+        .card h2 {
+            color: var(--oscuro);
+            font-size: 23px;
+            margin: 0 0 10px;
+        }
+
+        .ayuda {
+            color: var(--gris);
+            font-size: 14px;
+            margin: 0 0 23px;
+        }
+
+        /* =====================================
+           FORMULARIO
+        ===================================== */
+
+        .formulario {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
+
+        .campo-completo {
+            grid-column: 1 / -1;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 9px;
+            font-size: 13px;
+            font-weight: bold;
+        }
+
+        select,
+        input {
+            display: block;
+            width: 100%;
+            padding: 14px;
+            background: white;
+            color: var(--texto);
+            border: 1px solid #ccdcd1;
+            border-radius: 10px;
+            font-size: 15px;
+        }
+
+        select:focus,
+        input:focus {
+            outline: 2px solid #85cda5;
+        }
+
+        .ayuda-campo {
+            color: var(--gris);
+            font-size: 12px;
+            display: block;
+            margin-top: 7px;
+        }
+
+        /* =====================================
+           ESTIMACION DE PUNTOS
+        ===================================== */
+
+        .estimacion {
+            margin-top: 23px;
+            background: #edf8f0;
+            border: 1px solid #c7e6d1;
+            border-radius: 13px;
+            padding: 22px;
+        }
+
+        .estimacion h3 {
+            margin: 0 0 8px;
+            color: var(--oscuro);
+            font-size: 17px;
+        }
+
+        .estimacion-valor {
+            color: var(--verde);
+            font-size: 29px;
+            font-weight: bold;
+            margin: 0;
+        }
+
+        .estimacion-nota {
+            margin: 9px 0 0;
+            color: var(--gris);
+            font-size: 12px;
+        }
+
+        /* =====================================
+           BOTONES
+        ===================================== */
+
+        .acciones {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-top: 26px;
+        }
+
+        .boton {
+            display: inline-block;
+            background: var(--verde);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            padding: 13px 21px;
+            font-weight: bold;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        .boton:hover {
+            background: var(--oscuro);
+        }
+
+        .boton:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .boton-secundario {
+            background: var(--claro);
+            color: var(--oscuro);
+        }
+
+        .boton-secundario:hover {
+            background: #cdebd7;
+        }
+
+        /* =====================================
+           MENSAJES
+        ===================================== */
+
+        .mensaje {
+            margin-top: 25px;
+            padding: 17px 20px;
+            border-radius: 11px;
+            font-size: 14px;
+        }
+
+        .exito {
+            background: #e0f5e6;
+            border: 1px solid #a0ddb0;
+            color: #125d38;
+        }
+
+        .error {
+            background: #fff0e6;
+            border: 1px solid #efc5ac;
+            color: #8d4010;
+        }
+
+        .advertencia {
+            background: #fff5e9;
+            border: 1px solid #ead3b5;
+            color: #795221;
+            border-radius: 12px;
+            padding: 19px;
+            font-size: 14px;
+        }
+
+        /* =====================================
+           EXPLICACION DEL PROCESO
+        ===================================== */
+
+        .pasos {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 18px;
+            margin-top: 20px;
+        }
+
+        .paso {
+            background: var(--fondo);
+            border: 1px solid var(--borde);
+            border-radius: 13px;
+            padding: 20px;
+        }
+
+        .paso-numero {
+            color: var(--verde);
+            font-size: 23px;
+            font-weight: bold;
+        }
+
+        .paso h3 {
+            color: var(--oscuro);
+            margin: 8px 0;
+            font-size: 15px;
+        }
+
+        .paso p {
+            color: var(--gris);
+            font-size: 13px;
+            margin: 0;
+        }
+
+        /* =====================================
+           PIE DE PAGINA
+        ===================================== */
+
+        footer {
+            text-align: center;
+            background: #123827;
+            color: white;
+            padding: 28px 20px;
+        }
+
+        footer p {
+            color: #c8dfd1;
+            font-size: 13px;
+        }
+
+        /* =====================================
+           RESPONSIVE
+        ===================================== */
+
+        @media (max-width: 700px) {
+
+            .barra,
+            .navegacion {
+                justify-content: center;
+            }
+
+            .hero {
+                padding: 28px;
+            }
+
+            .hero h1 {
+                font-size: 27px;
+            }
+
+            .card {
+                padding: 22px;
+            }
+
+            .formulario,
+            .pasos {
+                grid-template-columns: 1fr;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+    <!-- =====================================
+         MENU DEL RECOLECTOR
+    ===================================== -->
+
+    <header class="barra">
+
+        <a class="logo"
+           th:href="@{/recolector/panel}">
+            ♻ PERÚ RECICLA
+        </a>
+
+        <nav class="navegacion"
+             aria-label="Navegación del recolector">
+
+            <a th:href="@{/recolector/panel}">
+                Mi panel
+            </a>
+
+            <a th:href="@{/recolector/pesajes/nuevo}">
+                Registrar pesaje
+            </a>
+
+            <form th:action="@{/logout}"
+                  method="post">
+
+                <button class="salir"
+                        type="submit">
+                    Cerrar sesión
+                </button>
+
+            </form>
+
+        </nav>
+
+    </header>
+
+    <main>
+
+        <!-- =====================================
+             PRESENTACION
+        ===================================== -->
+
+        <section class="hero">
+
+            <span class="etiqueta">
+                PANEL DEL RECOLECTOR
+            </span>
+
+            <h1>⚖ Registrar nuevo pesaje</h1>
+
+            <p>
+                Bienvenido,
+                <strong th:text="${recolector}">
+                    Recolector
+                </strong>.
+                Registra la entrega de material
+                reciclable de un vecino.
+            </p>
+
+        </section>
+
+        <!-- =====================================
+             MENSAJES DEL SERVIDOR
+        ===================================== -->
+
+        <div class="mensaje exito"
+             role="status"
+             th:if="${exito != null}"
+             th:text="${exito}">
+        </div>
+
+        <div class="mensaje error"
+             role="alert"
+             th:if="${error != null}"
+             th:text="${error}">
+        </div>
+
+        <!-- =====================================
+             FORMULARIO
+        ===================================== -->
+
+        <section class="card">
+
+            <h2>Datos de la recolecta</h2>
+
+            <p class="ayuda">
+                Selecciona un vecino y el material
+                recibido. Luego ingresa el peso
+                registrado en la balanza.
+            </p>
+
+            <!-- SIN VECINOS -->
+
+            <div class="advertencia"
+                 th:if="${#lists.isEmpty(vecinos)}">
+
+                No existen vecinos activos disponibles.
+                Registra primero una cuenta de vecino.
+
+            </div>
+
+            <!-- SIN MATERIALES -->
+
+            <div class="advertencia"
+                 th:if="${#lists.isEmpty(materiales)}">
+
+                No existen materiales con un factor
+                de puntos válido en la base de datos.
+
+            </div>
+
+            <form id="formPesaje"
+                  th:action="@{/recolector/pesajes/registrar}"
+                  method="post">
+
+                <!-- PROTECCION CSRF -->
+
+                <input type="hidden"
+                       th:name="${_csrf.parameterName}"
+                       th:value="${_csrf.token}">
+
+                <div class="formulario">
+
+                    <!-- =================================
+                         SELECCIONAR VECINO
+                    ================================= -->
+
+                    <div>
+
+                        <label for="idVecino">
+                            Vecino que entrega el material
+                        </label>
+
+                        <select id="idVecino"
+                                name="idVecino"
+                                required>
+
+                            <option value="">
+                                Selecciona un vecino
+                            </option>
+
+                            <option
+                                th:each="v : ${vecinos}"
+                                th:value="${v.id_usuario}"
+                                th:text="${v.nombre + ' ' + v.apellido + ' (ID ' + v.id_usuario + ')'}">
+                                Vecino
+                            </option>
+
+                        </select>
+
+                    </div>
+
+                    <!-- =================================
+                         SELECCIONAR MATERIAL
+                    ================================= -->
+
+                    <div>
+
+                        <label for="idMaterial">
+                            Material reciclable
+                        </label>
+
+                        <select id="idMaterial"
+                                name="idMaterial"
+                                required>
+
+                            <option value=""
+                                    data-factor="">
+                                Selecciona un material
+                            </option>
+
+                            <option
+                                th:each="m : ${materiales}"
+                                th:value="${m.id_material}"
+                                th:attr="data-factor=${m.puntos_por_gramo}"
+                                th:text="${m.tipo_material + ' — ' + m.puntos_por_gramo + ' pts/g'}">
+                                Material
+                            </option>
+
+                        </select>
+
+                    </div>
+
+                    <!-- =================================
+                         PESO
+                    ================================= -->
+
+                    <div class="campo-completo">
+
+                        <label for="pesoGramos">
+                            Peso del material (gramos)
+                        </label>
+
+                        <input
+                            id="pesoGramos"
+                            name="pesoGramos"
+                            type="number"
+                            min="0.01"
+                            max="1000000"
+                            step="0.01"
+                            placeholder="Ejemplo: 500"
+                            required>
+
+                        <span class="ayuda-campo">
+                            Utiliza gramos, no kilogramos.
+                            Por ejemplo, 1 kg = 1000 g.
+                        </span>
+
+                    </div>
+
+                </div>
+
+                <!-- =================================
+                     ESTIMACION
+                ================================= -->
+
+                <div class="estimacion">
+
+                    <h3>
+                        Puntos estimados
+                    </h3>
+
+                    <p id="puntosEstimados"
+                       class="estimacion-valor"
+                       aria-live="polite">
+                        0.00 pts
+                    </p>
+
+                    <p class="estimacion-nota">
+                        Cálculo referencial en pantalla.
+                        El sistema calculará el valor
+                        definitivo al guardar.
+                        Los puntos requieren validación
+                        antes de acreditarse.
+                    </p>
+
+                </div>
+
+                <!-- =================================
+                     ACCIONES
+                ================================= -->
+
+                <div class="acciones">
+
+                    <button
+                        id="botonRegistrar"
+                        class="boton"
+                        type="submit"
+                        th:disabled="${#lists.isEmpty(vecinos) or #lists.isEmpty(materiales)}">
+
+                        Guardar recolecta
+
+                    </button>
+
+                    <a class="boton boton-secundario"
+                       th:href="@{/recolector/panel}">
+                        Volver a mi panel
+                    </a>
+
+                </div>
+
+            </form>
+
+        </section>
+
+        <!-- =====================================
+             INFORMACION DEL PROCESO
+        ===================================== -->
+
+        <section class="card">
+
+            <h2>¿Qué sucede después del pesaje?</h2>
+
+            <p class="ayuda">
+                PERÚ RECICLA controla el estado
+                de cada operación registrada.
+            </p>
+
+            <div class="pasos">
+
+                <article class="paso">
+
+                    <div class="paso-numero">
+                        01
+                    </div>
+
+                    <h3>Registrar</h3>
+
+                    <p>
+                        Se guarda el vecino,
+                        material, peso y
+                        puntaje calculado.
+                    </p>
+
+                </article>
+
+                <article class="paso">
+
+                    <div class="paso-numero">
+                        02
+                    </div>
+
+                    <h3>Validar</h3>
+
+                    <p>
+                        La recolecta queda
+                        pendiente hasta que
+                        sea aprobada.
+                    </p>
+
+                </article>
+
+                <article class="paso">
+
+                    <div class="paso-numero">
+                        03
+                    </div>
+
+                    <h3>Acreditar puntos</h3>
+
+                    <p>
+                        Una vez validada,
+                        el puntaje se suma
+                        al saldo del vecino.
+                    </p>
+
+                </article>
+
+            </div>
+
+        </section>
+
+    </main>
+
+    <!-- =====================================
+         PIE DE PAGINA
+    ===================================== -->
+
+    <footer>
+
+        <strong>
+            ♻ PERÚ RECICLA
+        </strong>
+
+        <p>
+            Ecosistema Digital de Incentivos
+            para el Reciclaje
+        </p>
+
+        <p>
+            Registro de materiales reciclables
+        </p>
+
+    </footer>
+
+    <!-- =====================================
+         ESTIMACION EN EL NAVEGADOR
+         EL SERVIDOR SIEMPRE RECALCULA
+    ===================================== -->
+
+    <script>
+
+        const selectorMaterial =
+            document.getElementById("idMaterial");
+
+        const entradaPeso =
+            document.getElementById("pesoGramos");
+
+        const salidaPuntos =
+            document.getElementById("puntosEstimados");
+
+        function actualizarEstimacion() {
+
+            const opcion =
+                selectorMaterial.options[
+                    selectorMaterial.selectedIndex
+                ];
+
+            const factor =
+                Number(opcion.dataset.factor);
+
+            const peso =
+                Number(
+                    entradaPeso.value.replace(",", ".")
+                );
+
+            if (
+                !Number.isFinite(factor)
+                || !Number.isFinite(peso)
+                || factor <= 0
+                || peso <= 0
+            ) {
+
+                salidaPuntos.textContent =
+                    "0.00 pts";
+
+                return;
+            }
+
+            const puntos =
+                peso * factor;
+
+            salidaPuntos.textContent =
+                puntos.toFixed(2) + " pts";
+        }
+
+        selectorMaterial.addEventListener(
+            "change",
+            actualizarEstimacion
+        );
+
+        entradaPeso.addEventListener(
+            "input",
+            actualizarEstimacion
+        );
+
+    </script>
+
+</body>
+</html>
